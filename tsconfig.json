@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es5",                                
+    "jsx": "react",
+    "module": "commonjs",                           
+    "strict": true,                                
+    "esModuleInterop": true,                      
+    "skipLibCheck": true,                        
+    "forceConsistentCasingInFileNames": true,   
+    "plugins": [{
+      "name": "typescript-plugin-css-modules"
+    }]
+  }
+}

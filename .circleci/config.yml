@@ -1,0 +1,114 @@
+version: 2.1
+executors:
+  app-executor:
+    docker:
+      - image: cimg/node:15.2.0
+    working_directory: ~/my_repo
+  # terraform-executor:
+  #   docker:
+  #     - image: hashicorp/terraform:0.15.4
+
+aliases:
+  - &show_branch
+    run:
+      name: Show current branch after checkout
+      command: echo ${CIRCLE_BRANCH} 
+  - &restore_cache
+    restore_cache:
+      keys:
+        - app-{{ checksum "package.json" }}
+        - app-
+  - &install_dependencies
+    run:
+      name: Install dependencies and create artifacts directory for persisting workspaces
+      command: npm install
+  - &save_cache
+    save_cache:
+      paths:
+        - node_modules
+      key: app-{{ checksum "package.json" }}
+  - &install_aws_cli
+    run:
+      name: Installing AWS CLI
+      working_directory: /
+      command: |
+        sudo apt-get -y -qq update
+        sudo apt-get install -y awscli
+  - &build_project
+    run:
+      name: Build project
+      command: |
+        npm install
+        npm run build
+        cd public
+        zip ../build.zip -r * .[^.]*
+        echo "Build successful"
+
+jobs:
+  build:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show_branch
+      - *restore_cache
+      - *install_dependencies
+      - *save_cache
+  lint:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show_branch
+      - *restore_cache
+      - run:
+          name: Run linting with ESLint + Prettier
+          command: |
+            npm run lint
+  deploy_to_aws_s3:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show_branch
+      - *install_aws_cli
+      - *build_project
+      - run:
+          name: Deploy to S3
+          command: aws --region ${AWS_REGION} s3 sync ~/my_repo/public s3://${AWS_BUCKET_NAME} --delete
+  deploy_to_aws_cloudfront:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show_branch
+      - *install_aws_cli
+      - *build_project
+      - run:
+          name: Deploy to CloudFront (before invalidating old distributions)
+          command: |
+            aws configure set preview.cloudfront true
+            aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths /\*
+
+workflows:
+  build_and_deploy:
+    jobs:
+      - build # Build and lint, and terraform validate will check every branch!
+      - lint:
+          requires:
+            - build
+      - deploy_to_aws_s3:
+          filters: &only_production
+            branches:
+              only:
+                - main
+          context:
+            - blog_context
+            - aws_context
+          requires:
+            - lint
+      - deploy_to_aws_cloudfront:
+          context:
+            - blog_context
+            - aws_context
+          requires:
+            - deploy_to_aws_s3
+          filters:
+            <<: *only_production
+

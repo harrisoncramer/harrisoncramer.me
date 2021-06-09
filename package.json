@@ -1,0 +1,54 @@
+{
+  "name": "harrison-personal-portfolio",
+  "private": true,
+  "description": "My personal blog where I'm keeping track of what I've learned on a daily basis (rather than in a journaling app)",
+  "version": "0.1.0",
+  "author": "Harrison Cramer <kingofcramers.dev@gmail.com>",
+  "dependencies": {
+    "@fontsource/raleway": "^4.4.5",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "eslint": "^7.28.0",
+    "eslint-plugin-react": "^7.24.0",
+    "gatsby": "^3.6.2",
+    "gatsby-plugin-image": "^1.6.0",
+    "gatsby-plugin-manifest": "^3.6.0",
+    "gatsby-plugin-offline": "^4.6.0",
+    "gatsby-plugin-react-helmet": "^4.6.0",
+    "gatsby-plugin-sharp": "^3.6.0",
+    "gatsby-source-filesystem": "^3.6.0",
+    "gatsby-transformer-sharp": "^3.6.0",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-helmet": "^6.1.0",
+    "typescript": "^4.3.2"
+  },
+  "devDependencies": {
+    "@types/react-helmet": "^6.1.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "2.2.1"
+  },
+  "keywords": [
+    "gatsby"
+  ],
+  "license": "0BSD",
+  "scripts": {
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "start": "npm run develop",
+    "lint": "eslint src/**/*.ts*",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean",
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harrisoncramer/my-portfolio"
+  },
+  "bugs": {
+    "url": "https://github.com/gatsbyjs/gatsby/issues"
+  }
+}
