@@ -1,9 +1,21 @@
 import * as React from "react"
-// import { Link } from "gatsby"
+// import { graphql } from "gatsby"
 
-import Layout from "../components/layout"
-import Seo from "../components/seo"
+import Layout from "../components/layout/layout"
+import Seo from "../components/seo/seo"
 import * as styles from "./blog.module.css"
+
+// Later we will query our data, all of our blog posts,
+// and then display them here...
+// export const query = graphql`
+//   query BlogPageQuery {
+//     site {
+//       siteMetadata {
+//         title
+//       }
+//     }
+//   }
+// `
 
 const BlogPage = (): JSX.Element => (
   <Layout>
