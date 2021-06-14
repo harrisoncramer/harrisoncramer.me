@@ -4,21 +4,10 @@ module.exports = {
       version: "detect",
     },
   },
-  env: {
-    browser: true,
-    es2021: true,
-  },
   globals: {
     __PATH_PREFIX__: false,
     ___emitter: false,
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
-  ],
-  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -26,8 +15,32 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint"],
-  rules: {
-    "react/no-unescaped-entities": "off",
-  },
+  extends: ["eslint:recommended", "plugin:prettier/recommended"],
+  overrides: [
+    // Typescript
+    {
+      files: ["*.ts", "*.tsx"],
+      env: {
+        browser: true,
+        es2021: true,
+      },
+      excludedFiles: ["*.test.js", "gatsby-node.js", "gatsby-config.js"],
+      extends: [
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react/recommended",
+      ],
+      parser: "@typescript-eslint/parser",
+      plugins: ["react", "@typescript-eslint"],
+      rules: {
+        "react/no-unescaped-entities": "off",
+      },
+    },
+    // Gatsby + ESLint
+    {
+      files: [".eslintrc.js", "gatsby-node.js", "gatsby-config.js"],
+      env: {
+        node: true,
+      },
+    },
+  ],
 }
