@@ -13,4 +13,3 @@ variable "domain_name" {
 variable "project" {
   default = "gatsby-blog-app"
 }
-

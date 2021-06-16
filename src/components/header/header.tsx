@@ -1,24 +1,48 @@
 import * as React from "react"
 import { Link } from "gatsby"
 
+import styled from "styled-components"
+
 type HeaderProps = {
   siteTitle: string
 }
 
-import * as headerStyles from "./style.module.css"
-
 const Header = ({ siteTitle }: HeaderProps): JSX.Element => (
-  <header className={headerStyles.header}>
-    <nav className={headerStyles.nav}>
-      <ul className={headerStyles.list}>
-        <Link to="/">{siteTitle}</Link>
-        <Link to="/blog">Blog</Link>
-        <Link to="/projects">Projects</Link>
-        <Link to="/about">About</Link>
-        <Link to="/contact">Contact</Link>
-      </ul>
-    </nav>
-  </header>
+  <StyledHeader>
+    <StyledNav>
+      <StyledUl>
+        <Link className="link" to="/">
+          {siteTitle}
+        </Link>
+        <Link className="link" to="/blog">
+          Blog
+        </Link>
+        <Link className="link" to="/projects">
+          Projects
+        </Link>
+        <Link className="link" to="/about">
+          About
+        </Link>
+        <Link className="link" to="/contact">
+          Contact
+        </Link>
+      </StyledUl>
+    </StyledNav>
+  </StyledHeader>
 )
+
+const StyledHeader = styled.header`
+  padding: 1em;
+`
+
+const StyledUl = styled.ul`
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 600px;
+`
+
+const StyledNav = styled.nav``
 
 export default Header
