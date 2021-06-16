@@ -12,7 +12,7 @@ aliases:
   - &show_branch
     run:
       name: Show current branch after checkout
-      command: echo ${CIRCLE_BRANCH} 
+      command: echo ${CIRCLE_BRANCH}
   - &restore_cache
     restore_cache:
       keys:
@@ -111,4 +111,3 @@ workflows:
             - deploy_to_aws_s3
           filters:
             <<: *only_production
-

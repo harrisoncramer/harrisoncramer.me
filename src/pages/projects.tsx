@@ -2,7 +2,7 @@ import * as React from "react"
 
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
-import * as styles from "./projects.module.css"
+import { StyledP } from "../components/styled-components/text"
 
 const ProjectsPage = (): JSX.Element => (
   <Layout>
@@ -11,7 +11,7 @@ const ProjectsPage = (): JSX.Element => (
       lang="en-us"
       description="This page contains all of my personal projects"
     />
-    <p className={styles.projects}>Projects page</p>
+    <StyledP>Projects page</StyledP>
   </Layout>
 )
 

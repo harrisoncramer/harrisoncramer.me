@@ -2,7 +2,7 @@ import * as React from "react"
 
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
-import * as styles from "./about.module.css"
+import { StyledP } from "../components/styled-components/text"
 
 const AboutPage = (): JSX.Element => (
   <Layout>
@@ -11,7 +11,7 @@ const AboutPage = (): JSX.Element => (
       lang="en-us"
       description="This is the page that tells you a little bit about me, Harrison Cramer."
     />
-    <p className={styles.profile}>About page</p>
+    <StyledP>About page</StyledP>
   </Layout>
 )
 

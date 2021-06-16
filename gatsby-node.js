@@ -4,18 +4,14 @@
  * See: https://www.gatsbyjs.com/docs/node-apis/
  */
 
-const path = require("path")
+const path = require(`path`)
 
-exports.createPages = async ({ actions, graphql, reporter }) => {
+exports.createPages = async ({ actions, graphql }) => {
   const { createPage } = actions
-  const blogPostTemplate = path.resolve(`src/templates/blog-post.tsx`)
 
   const result = await graphql(`
     {
-      allMarkdownRemark(
-        sort: { order: DESC, fields: [frontmatter___date] }
-        limit: 1000
-      ) {
+      allMarkdownRemark {
         edges {
           node {
             frontmatter {
@@ -26,8 +22,15 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       }
     }
   `)
+
   if (result.errors) {
-    reporter.panicOnBuild(`Error while running GraphQL query.`)
-    return
+    console.error(result.errors)
   }
+
+  result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+    createPage({
+      path: node.frontmatter.path,
+      component: path.resolve(`src/templates/post.tsx`),
+    })
+  })
 }

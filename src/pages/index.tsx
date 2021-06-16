@@ -2,16 +2,15 @@ import * as React from "react"
 
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
-import * as styles from "./index.module.css"
+import { StyledH1 } from "../components/styled-components/text"
 
 const IndexPage = (): JSX.Element => (
   <Layout>
     <Seo
       title="harrison.me"
-      lang="en-us"
       description="Harrison Cramer personal blog site."
     />
-    <h1 className={styles.hello}>Hello 👋</h1>
+    <StyledH1>Hello 👋</StyledH1>
     <p>
       My name is Harrison and I'm a software engineer and former journalist. I'm
       currently in the June cohort of{" "}
