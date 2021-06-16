@@ -8,6 +8,7 @@ yarn-error.log*
 # Ignore terraform plugins and state information
 .terraform
 terraform.tfstate
+terraform.tfstate.backup
 terraform.tfstate.d
 .terraform.lock.hcl
 
