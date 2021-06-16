@@ -3,17 +3,13 @@ import { graphql } from "gatsby"
 import styled from "styled-components"
 import Seo from "../components/seo/seo"
 import Layout from "../components/layout/layout"
+import { Post } from "../types/markdown"
 
 type TemplateProps = {
   data: {
     markdownRemark: {
       html: string
-      frontmatter: {
-        date: string
-        path: string
-        title: string
-        description: string
-      }
+      frontmatter: Post
     }
   }
 }
@@ -27,10 +23,9 @@ export default function Template({ data }: TemplateProps): JSX.Element {
       <StyledPostWrapper>
         <PostTitle>{frontmatter.title}</PostTitle>
         <PostSubtitle>{frontmatter.date}</PostSubtitle>
-        <div
-          className="blog-post-content"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <PostContent>
+          <div dangerouslySetInnerHTML={{ __html: html }}></div>
+        </PostContent>
       </StyledPostWrapper>
     </Layout>
   )
@@ -59,5 +54,9 @@ const PostTitle = styled.h1`
 `
 
 const PostSubtitle = styled.h2`
+  color: red;
+`
+
+const PostContent = styled.div`
   color: red;
 `
