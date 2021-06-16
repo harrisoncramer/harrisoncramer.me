@@ -8,7 +8,6 @@ const IndexPage = (): JSX.Element => (
   <Layout>
     <Seo
       title="harrison.me"
-      lang="en-us"
       description="Harrison Cramer personal blog site."
     />
     <StyledH1>Hello 👋</StyledH1>

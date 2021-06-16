@@ -1,30 +1,38 @@
 import React from "react"
 import { graphql } from "gatsby"
+import styled from "styled-components"
+import Seo from "../components/seo/seo"
+import Layout from "../components/layout/layout"
 
 type TemplateProps = {
   data: {
     markdownRemark: {
       html: string
       frontmatter: {
-        title: string
         date: string
+        path: string
+        title: string
+        description: string
       }
     }
   }
 }
 
 export default function Template({ data }: TemplateProps): JSX.Element {
-  const { markdownRemark } = data // data.markdownRemark holds your post data
+  const { markdownRemark } = data
   const { frontmatter, html } = markdownRemark
   return (
-    <div className="blog-post">
-      <h1>{frontmatter.title}</h1>
-      <h2>{frontmatter.date}</h2>
-      <div
-        className="blog-post-content"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-    </div>
+    <Layout>
+      <Seo title={frontmatter.title} description={frontmatter.description} />
+      <StyledPostWrapper>
+        <PostTitle>{frontmatter.title}</PostTitle>
+        <PostSubtitle>{frontmatter.date}</PostSubtitle>
+        <div
+          className="blog-post-content"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </StyledPostWrapper>
+    </Layout>
   )
 }
 
@@ -36,52 +44,20 @@ export const pageQuery = graphql`
         date(formatString: "MMMM DD, YYYY")
         path
         title
+        description
       }
     }
   }
 `
 
-// import React from "react"
-// import { graphql } from "gatsby"
+const StyledPostWrapper = styled.div`
+  color: red;
+`
 
-// type TemplateProps = {
-//   data: {
-//     markdownRemark: {
-//       html: string
-//       frontmatter: {
-//         title: string
-//         date: string
-//       }
-//     }
-//   }
-// }
+const PostTitle = styled.h1`
+  color: red;
+`
 
-// export default function Template({ data }: TemplateProps): JSX.Element {
-//   const { markdownRemark } = data // data.markdownRemark holds your post data
-//   const { frontmatter, html } = markdownRemark
-//   return (
-//     <div className="blog-post-container">
-//       <div className="blog-post">
-//         <h1>{frontmatter.title}</h1>
-//         <h2>{frontmatter.date}</h2>
-//         <div
-//           className="blog-post-content"
-//           dangerouslySetInnerHTML={{ __html: html }}
-//         />
-//       </div>
-//     </div>
-//   )
-// }
-
-// export const data = graphql`
-//   query($id: String!) {
-//     markdownRemark(id: { eq: $id }) {
-//       html
-//       frontmatter {
-//         date
-//         slug
-//         title
-//       }
-//     }
-//   }
-// `
+const PostSubtitle = styled.h2`
+  color: red;
+`
