@@ -32,10 +32,8 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   return (
     <WrapperLayoutDiv>
       <Header siteTitle={data.site.siteMetadata?.title || `Title`} />
-      <div className="content-wrapper">
-        <main>{children}</main>
-        <Footer />
-      </div>
+      <main className="content-wrapper">{children}</main>
+      {/* {<Footer />} */}
     </WrapperLayoutDiv>
   )
 }
@@ -46,10 +44,20 @@ const WrapperLayoutDiv = styled.div`
     font-family: "Helvetica", "sans-serif";
   }
 
+  body {
+    align-items: center;
+    justify-content: center;
+  }
+
+  a {
+    color: #3399ff;
+  }
+
   .content-wrapper {
-    margin: 0 auto;
-    max-width: 960;
-    padding: 0 1.0875rem 1.45rem;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 `
 

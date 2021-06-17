@@ -15,7 +15,7 @@ type SeoProps = {
   title: string
 }
 
-function Seo({ description, meta, title }: SeoProps): JSX.Element {
+function Seo({ description, title }: SeoProps): JSX.Element {
   const { site } = useStaticQuery(
     graphql`
       query {
