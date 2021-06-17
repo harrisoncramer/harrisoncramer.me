@@ -10,6 +10,7 @@ yarn-error.log*
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfstate.d
+.terraform.lock.tfstate.info
 .terraform.lock.hcl
 
 # Runtime data
