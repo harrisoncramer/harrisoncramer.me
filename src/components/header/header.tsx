@@ -63,8 +63,6 @@ const StyledNav = styled.nav`
   .visible {
     display: flex;
     padding: 1em;
-    flex-direction: row;
-
     a {
       font-family: "Raleway";
     }
