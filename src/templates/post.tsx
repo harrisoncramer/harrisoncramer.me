@@ -4,6 +4,7 @@ import styled from "styled-components"
 import Seo from "../components/seo/seo"
 import Layout from "../components/layout/layout"
 import { Post } from "../types/markdown"
+import { GatsbyImage, getImage } from "gatsby-plugin-image"
 
 type TemplateProps = {
   data: {
@@ -40,6 +41,13 @@ export const pageQuery = graphql`
         path
         title
         description
+        featuredImage {
+          childImageSharp {
+            fluid(maxWidth: 800) {
+              ...GatsbyImageSharpFluid
+            }
+          }
+        }
       }
     }
   }
