@@ -4,9 +4,6 @@ executors:
     docker:
       - image: cimg/node:15.2.0
     working_directory: ~/my_repo
-  # terraform-executor:
-  #   docker:
-  #     - image: hashicorp/terraform:0.15.4
 
 aliases:
   - &show_branch
@@ -63,12 +60,20 @@ jobs:
           name: Run linting with ESLint + Prettier
           command: |
             npm run lint
+  gatsby_build:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show_branch
+      - *restore_cache
+      - *build_project
   deploy_to_aws_s3:
     executor: app-executor
     steps:
       - checkout
       - *show_branch
       - *install_aws_cli
+      - *restore_cache
       - *build_project
       - run:
           name: Deploy to S3
@@ -79,6 +84,7 @@ jobs:
       - checkout
       - *show_branch
       - *install_aws_cli
+      - *restore_cache
       - *build_project
       - run:
           name: Deploy to CloudFront (before invalidating old distributions)
