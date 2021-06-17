@@ -61,6 +61,9 @@ const StyledNav = styled.nav`
 
   .container,
   .visible {
+    position: absolute;
+    top: -1em;
+    margin-right: 1em;
     display: flex;
     padding: 1em;
     a {
