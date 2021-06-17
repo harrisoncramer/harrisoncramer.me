@@ -11,8 +11,8 @@ provider "aws" {
 locals {
   common_tags = {
     Environment = terraform.workspace # Will be production/dev/staging, depending on workspace set
-    Project     = var.project
+    Application = var.application
+    Owner       = var.owner
     ManagedBy   = "Terraform"
-    Owner       = "Harrison Cramer"
   }
 }
