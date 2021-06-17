@@ -1,4 +1,4 @@
-import * as React from "react"
+import React, { useState } from "react"
 import { Link } from "gatsby"
 
 import styled from "styled-components"
@@ -7,42 +7,82 @@ type HeaderProps = {
   siteTitle: string
 }
 
-const Header = ({ siteTitle }: HeaderProps): JSX.Element => (
-  <StyledHeader>
-    <StyledNav>
-      <StyledUl>
-        <Link className="link" to="/">
-          {siteTitle}
-        </Link>
-        <Link className="link" to="/blog">
-          Blog
-        </Link>
-        <Link className="link" to="/projects">
-          Projects
-        </Link>
-        <Link className="link" to="/about">
-          About
-        </Link>
-        <Link className="link" to="/contact">
-          Contact
-        </Link>
-      </StyledUl>
-    </StyledNav>
-  </StyledHeader>
-)
+const Header = ({ siteTitle }: HeaderProps): JSX.Element => {
+  const [visible, setVisible] = useState(false)
+  const handleToggleNavbar = () => {
+    setVisible(!visible)
+  }
+
+  return (
+    <StyledHeader>
+      <StyledNav>
+        <StyledSvgContainer onClick={handleToggleNavbar}>
+          <svg viewBox="0 0 75 50" width="20" height="25">
+            <rect width="75" height="10"></rect>
+            <rect y="30" width="75" height="10"></rect>
+            <rect y="60" width="75" height="10"></rect>
+          </svg>
+        </StyledSvgContainer>
+        <div className={visible ? "container visible" : "container invisible"}>
+          <LinkContainer link="/" text={siteTitle} />
+          <LinkContainer link="/blog" text="blog" />
+          <LinkContainer link="/projects" text="projects" />
+          <LinkContainer link="/contact" text="contact" />
+        </div>
+      </StyledNav>
+    </StyledHeader>
+  )
+}
+
+const LinkContainer = ({
+  link,
+  text,
+}: {
+  link: string
+  text: string
+}): JSX.Element => {
+  return (
+    <StyledDiv>
+      <Link to={link}>{text}</Link>
+    </StyledDiv>
+  )
+}
 
 const StyledHeader = styled.header`
   padding: 1em;
 `
 
-const StyledUl = styled.ul`
-  padding: 0;
+const StyledNav = styled.nav`
+  overflow: hidden;
+  position: relative;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 600px;
+  flex-direction: column;
+  align-items: flex-end;
+
+  .container,
+  .visible {
+    display: flex;
+    padding: 1em;
+    flex-direction: row;
+
+    a {
+      font-family: "Raleway";
+    }
+  }
+
+  .invisible {
+    display: none;
+  }
 `
 
-const StyledNav = styled.nav``
+const StyledDiv = styled.div`
+  padding: 0.5rem;
+`
+
+const StyledSvgContainer = styled.div`
+  :hover {
+    cursor: pointer;
+  }
+`
 
 export default Header

@@ -1,17 +1,23 @@
 import * as React from "react"
-import { Link } from "gatsby"
-
-import * as footerStyles from "./style.module.css"
+import styled from "styled-components"
 
 const Footer = (): JSX.Element => (
-  <footer>
-    <nav className={footerStyles.nav}>
-      <ul className={footerStyles.list}>
-        <Link to="/about">About</Link>
-        <Link to="/contact">Contact</Link>
-      </ul>
-    </nav>
-  </footer>
+  <StyledFooter>
+    <p>
+      See something wrong? Make a{" "}
+      <a href="https://github.com/harrisoncramer/harrisoncramer.me">pull</a>{" "}
+      request!
+    </p>
+  </StyledFooter>
 )
+
+const StyledFooter = styled.footer`
+  background: white;
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`
 
 export default Footer

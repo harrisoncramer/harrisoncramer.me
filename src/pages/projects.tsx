@@ -2,16 +2,15 @@ import * as React from "react"
 
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
-import { StyledP } from "../components/styled-components/text"
+import { StyledH1 } from "../components/styled-components/text"
 
 const ProjectsPage = (): JSX.Element => (
   <Layout>
     <Seo
       title="harrison.me"
-      lang="en-us"
       description="This page contains all of my personal projects"
     />
-    <StyledP>Projects page</StyledP>
+    <StyledH1>Projects page</StyledH1>
   </Layout>
 )
 
