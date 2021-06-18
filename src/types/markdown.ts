@@ -4,10 +4,10 @@ export type Post = {
   date: string
   path: string
   description: string
-  imageDescription: string
+  imageDescription: string | null
   featuredImage: {
     childImageSharp: {
       gatsbyImageData: IGatsbyImageData
-    }
+    } | null
   }
 }

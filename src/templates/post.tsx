@@ -26,7 +26,7 @@ export default function Template({ data }: TemplateProps): JSX.Element {
       <StyledPostWrapper>
         <PostTitle>{frontmatter.title}</PostTitle>
         <PostSubtitle>{frontmatter.date}</PostSubtitle>
-        {image && (
+        {image && frontmatter.imageDescription && (
           <GatsbyImage image={image} alt={frontmatter.imageDescription} />
         )}
         <PostContent>
@@ -50,7 +50,8 @@ export const pageQuery = graphql`
         featuredImage {
           childImageSharp {
             gatsbyImageData(
-              width: 200
+              width: 700
+              height: 500
               placeholder: TRACED_SVG
               formats: [AUTO, WEBP, AVIF]
             )

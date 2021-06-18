@@ -5,6 +5,7 @@ import Seo from "../components/seo/seo"
 import { StyledH1 } from "../components/styled-components/text"
 import { Post } from "../types/markdown"
 import styled from "styled-components"
+import { GatsbyImage, getImage } from "gatsby-plugin-image"
 
 type BlogPageProps = {
   data: {
@@ -20,11 +21,23 @@ type BlogPageProps = {
   }
 }
 
-const PostPreview = ({ title, description, date, path }: Post): JSX.Element => {
+const PostPreview = ({
+  title,
+  description,
+  date,
+  path,
+  featuredImage,
+  imageDescription,
+}: Post): JSX.Element => {
+  //@ts-ignore
+  const image = getImage(featuredImage)
   return (
     <StyledPostPreview>
       <Link to={path}>{title}</Link>
       <p>{description}</p>
+      {image && imageDescription && (
+        <GatsbyImage image={image} alt={imageDescription} />
+      )}
     </StyledPostPreview>
   )
 }
@@ -51,6 +64,33 @@ const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
   )
 }
 
+export const query = graphql`
+  query BlogPostsQuery {
+    allMarkdownRemark {
+      edges {
+        node {
+          frontmatter {
+            title
+            date
+            path
+            description
+            imageDescription
+            featuredImage {
+              childImageSharp {
+                gatsbyImageData(
+                  width: 200
+                  placeholder: TRACED_SVG
+                  formats: [AUTO, WEBP, AVIF]
+                )
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 const StyledPostWrapper = styled.div`
   display: grid;
   width: 100%;
@@ -58,20 +98,4 @@ const StyledPostWrapper = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 `
 
-export const query = graphql`
-  query BlogPostsQuery {
-    allMarkdownRemark {
-      edges {
-        node {
-          frontmatter {
-            path
-            date
-            title
-            description
-          }
-        }
-      }
-    }
-  }
-`
 export default BlogPage
