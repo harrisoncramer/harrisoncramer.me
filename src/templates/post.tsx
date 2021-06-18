@@ -26,7 +26,10 @@ export default function Template({ data }: TemplateProps): JSX.Element {
       <Seo title={frontmatter.title} description={frontmatter.description} />
       <StyledPostWrapper>
         <PostTitle>{frontmatter.title}</PostTitle>
-        <PostSubtitle>{frontmatter.date}</PostSubtitle>
+        <StyledSubtitleAndIcons>
+          <h3>{frontmatter.date}</h3>
+          <div className="sharethis-inline-share-buttons"></div>
+        </StyledSubtitleAndIcons>
         {image && frontmatter.imageDescription && (
           <GatsbyImage image={image} alt={frontmatter.imageDescription} />
         )}
@@ -51,12 +54,7 @@ export const pageQuery = graphql`
         tags
         featuredImage {
           childImageSharp {
-            gatsbyImageData(
-              width: 700
-              height: 500
-              placeholder: TRACED_SVG
-              formats: [AUTO, WEBP, AVIF]
-            )
+            gatsbyImageData(placeholder: BLURRED, formats: [AUTO, WEBP, AVIF])
           }
         }
       }
@@ -65,17 +63,26 @@ export const pageQuery = graphql`
 `
 
 const StyledPostWrapper = styled.div`
-  color: red;
+  h2,
+  h3,
+  h4 {
+    font-family: "Raleway";
+  }
 `
 
 const PostTitle = styled.h1`
-  color: red;
+  font-family: "Raleway";
+  margin-bottom: 0;
 `
 
-const PostSubtitle = styled.h2`
-  color: red;
+const StyledSubtitleAndIcons = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  h3 {
+    font-family: "Raleway";
+  }
 `
 
-const PostContent = styled.div`
-  color: red;
-`
+const PostContent = styled.div``

@@ -9,6 +9,9 @@ import * as React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import styled from "styled-components"
 
+import { defineCustomElements as deckDeckGoHighlightElement } from "@deckdeckgo/highlight-code/dist/loader"
+deckDeckGoHighlightElement()
+
 import Header from "../header/header"
 import Footer from "../footer/footer"
 
