@@ -18,6 +18,7 @@ type TemplateProps = {
 export default function Template({ data }: TemplateProps): JSX.Element {
   const { markdownRemark } = data
   const { frontmatter, html } = markdownRemark
+  console.log(data)
   //@ts-ignore
   const image = getImage(frontmatter.featuredImage)
   return (
@@ -47,6 +48,7 @@ export const pageQuery = graphql`
         title
         description
         imageDescription
+        tags
         featuredImage {
           childImageSharp {
             gatsbyImageData(
