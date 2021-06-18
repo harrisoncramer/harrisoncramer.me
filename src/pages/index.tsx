@@ -6,6 +6,7 @@ import { StyledH1 } from "../components/styled-components/text"
 import { Link } from "gatsby"
 import styled from "styled-components"
 
+// For code highlighting
 const IndexPage = (): JSX.Element => (
   <Layout>
     <Seo
