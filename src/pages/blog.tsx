@@ -7,6 +7,7 @@ import { Post } from "../types/markdown"
 import styled from "styled-components"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import dayjs from "dayjs"
+import svgPicker from "../util/svgPicker"
 
 type BlogPageProps = {
   data: {
@@ -22,6 +23,19 @@ type BlogPageProps = {
   }
 }
 
+const StyledSvgContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding: 0.5em;
+  gap: 0.25em;
+  svg {
+    max-width: 1.25em;
+  }
+`
+const Tag = ({ tag }: { tag: string }): JSX.Element => svgPicker(tag)
+
 const PostPreview = ({
   title,
   description,
@@ -29,17 +43,21 @@ const PostPreview = ({
   path,
   featuredImage,
   imageDescription,
+  tags,
 }: Post): JSX.Element => {
   //@ts-ignore
   const image = getImage(featuredImage)
   return (
     <StyledPostPreview onClick={() => navigate(path)}>
       <h3>{title}</h3>
+      <span>{dayjs(date).format("DD/MM/YYYY")}</span>
       <p>{description}</p>
       {image && imageDescription && (
         <GatsbyImage image={image} alt={imageDescription} />
       )}
-      <p>{dayjs(date).format("DD/MM/YYYY")}</p>
+      <StyledSvgContainer>
+        {tags && tags.map(tag => <Tag key={tag} tag={tag} />)}
+      </StyledSvgContainer>
     </StyledPostPreview>
   )
 }
@@ -84,6 +102,7 @@ export const query = graphql`
             date
             path
             description
+            tags
             imageDescription
             featuredImage {
               childImageSharp {
