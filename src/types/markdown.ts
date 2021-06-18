@@ -5,6 +5,7 @@ export type Post = {
   path: string
   description: string
   imageDescription: string | null
+  tags: string[] | null
   featuredImage: {
     childImageSharp: {
       gatsbyImageData: IGatsbyImageData
