@@ -33,6 +33,7 @@ module.exports = {
       plugins: ["react", "@typescript-eslint"],
       rules: {
         "react/no-unescaped-entities": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
       },
     },
     // Gatsby + ESLint

@@ -4,6 +4,7 @@ import styled from "styled-components"
 import Seo from "../components/seo/seo"
 import Layout from "../components/layout/layout"
 import { Post } from "../types/markdown"
+import { GatsbyImage, getImage } from "gatsby-plugin-image"
 
 type TemplateProps = {
   data: {
@@ -17,12 +18,17 @@ type TemplateProps = {
 export default function Template({ data }: TemplateProps): JSX.Element {
   const { markdownRemark } = data
   const { frontmatter, html } = markdownRemark
+  //@ts-ignore
+  const image = getImage(frontmatter.featuredImage)
   return (
     <Layout>
       <Seo title={frontmatter.title} description={frontmatter.description} />
       <StyledPostWrapper>
         <PostTitle>{frontmatter.title}</PostTitle>
         <PostSubtitle>{frontmatter.date}</PostSubtitle>
+        {image && frontmatter.imageDescription && (
+          <GatsbyImage image={image} alt={frontmatter.imageDescription} />
+        )}
         <PostContent>
           <div dangerouslySetInnerHTML={{ __html: html }}></div>
         </PostContent>
@@ -40,6 +46,17 @@ export const pageQuery = graphql`
         path
         title
         description
+        imageDescription
+        featuredImage {
+          childImageSharp {
+            gatsbyImageData(
+              width: 700
+              height: 500
+              placeholder: TRACED_SVG
+              formats: [AUTO, WEBP, AVIF]
+            )
+          }
+        }
       }
     }
   }
