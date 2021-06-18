@@ -1,11 +1,12 @@
 import * as React from "react"
-import { graphql, Link } from "gatsby"
+import { graphql, navigate } from "gatsby"
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
 import { StyledH1 } from "../components/styled-components/text"
 import { Post } from "../types/markdown"
 import styled from "styled-components"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
+import dayjs from "dayjs"
 
 type BlogPageProps = {
   data: {
@@ -32,17 +33,26 @@ const PostPreview = ({
   //@ts-ignore
   const image = getImage(featuredImage)
   return (
-    <StyledPostPreview>
-      <Link to={path}>{title}</Link>
+    <StyledPostPreview onClick={() => navigate(path)}>
+      <h3>{title}</h3>
       <p>{description}</p>
       {image && imageDescription && (
         <GatsbyImage image={image} alt={imageDescription} />
       )}
+      <p>{dayjs(date).format("DD/MM/YYYY")}</p>
     </StyledPostPreview>
   )
 }
 
 const StyledPostPreview = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    font-family: "Raleway";
+  }
+
+  cursor: pointer;
   padding: 1em;
   box-shadow: 0px 5px 4px lightgrey;
 `
@@ -78,7 +88,8 @@ export const query = graphql`
             featuredImage {
               childImageSharp {
                 gatsbyImageData(
-                  width: 200
+                  width: 250
+                  height: 150
                   placeholder: TRACED_SVG
                   formats: [AUTO, WEBP, AVIF]
                 )
