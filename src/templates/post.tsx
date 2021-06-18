@@ -18,12 +18,17 @@ type TemplateProps = {
 export default function Template({ data }: TemplateProps): JSX.Element {
   const { markdownRemark } = data
   const { frontmatter, html } = markdownRemark
+  //@ts-ignore
+  const image = getImage(frontmatter.featuredImage)
   return (
     <Layout>
       <Seo title={frontmatter.title} description={frontmatter.description} />
       <StyledPostWrapper>
         <PostTitle>{frontmatter.title}</PostTitle>
         <PostSubtitle>{frontmatter.date}</PostSubtitle>
+        {image && (
+          <GatsbyImage image={image} alt={frontmatter.imageDescription} />
+        )}
         <PostContent>
           <div dangerouslySetInnerHTML={{ __html: html }}></div>
         </PostContent>
@@ -41,11 +46,14 @@ export const pageQuery = graphql`
         path
         title
         description
+        imageDescription
         featuredImage {
           childImageSharp {
-            fluid(maxWidth: 800) {
-              ...GatsbyImageSharpFluid
-            }
+            gatsbyImageData(
+              width: 200
+              placeholder: TRACED_SVG
+              formats: [AUTO, WEBP, AVIF]
+            )
           }
         }
       }
