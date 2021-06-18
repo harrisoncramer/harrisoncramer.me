@@ -2,7 +2,6 @@ import * as React from "react"
 import { graphql, navigate } from "gatsby"
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
-import { StyledH1 } from "../components/styled-components/text"
 import { Post } from "../types/markdown"
 import styled from "styled-components"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
@@ -11,7 +10,16 @@ import svgPicker from "../util/svgPicker"
 
 type BlogPageProps = {
   data: {
-    allMarkdownRemark: {
+    featured: {
+      edges: [
+        {
+          node: {
+            frontmatter: Post
+          }
+        }
+      ]
+    }
+    posts: {
       edges: [
         {
           node: {
@@ -23,17 +31,6 @@ type BlogPageProps = {
   }
 }
 
-const StyledSvgContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  padding: 0.5em;
-  gap: 0.25em;
-  svg {
-    max-width: 1.25em;
-  }
-`
 const Tag = ({ tag }: { tag: string }): JSX.Element => svgPicker(tag)
 
 const PostPreview = ({
@@ -48,43 +45,32 @@ const PostPreview = ({
   //@ts-ignore
   const image = getImage(featuredImage)
   return (
-    <StyledPostPreview onClick={() => navigate(path)}>
-      <h3>{title}</h3>
-      <span>{dayjs(date).format("DD/MM/YYYY")}</span>
-      <p>{description}</p>
+    <StyledPost onClick={() => navigate(path)}>
       {image && imageDescription && (
         <GatsbyImage image={image} alt={imageDescription} />
       )}
+      <h3>{title}</h3>
+      <StyledDate>{dayjs(date).format("DD/MM/YYYY")}</StyledDate>
+      <p>{description}</p>
       <StyledSvgContainer>
         {tags && tags.map(tag => <Tag key={tag} tag={tag} />)}
       </StyledSvgContainer>
-    </StyledPostPreview>
+    </StyledPost>
   )
 }
 
-const StyledPostPreview = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  h3 {
-    font-family: "Raleway";
-  }
-
-  cursor: pointer;
-  padding: 1em;
-  box-shadow: 0px 5px 4px lightgrey;
-`
-
 const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
+  const featuredPost = data.featured.edges[0]
+  if (!featuredPost) return <div>No posts.</div>
   return (
     <Layout>
       <Seo
         title="harrison.me"
         description="This blog contains posts about what I'm learning as a software engineer. Topics include Javascript, DevOps, Cloud, Go/Golang, Typescript, Docker, Kubernetes, and much more!"
       />
-      <StyledH1>Blog ✍️</StyledH1>
+      <PostPreview {...featuredPost.node.frontmatter} />
       <StyledPostWrapper>
-        {data.allMarkdownRemark.edges.map(({ node }, i) => {
+        {data.posts.edges.map(({ node }, i) => {
           return <PostPreview {...node.frontmatter} key={i} />
         })}
       </StyledPostWrapper>
@@ -92,9 +78,50 @@ const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
   )
 }
 
+const StyledPostWrapper = styled.div`
+  display: grid;
+  width: 100%;
+  gap: 1em;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+`
+
+const StyledSvgContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding: 0.5em;
+  gap: 0.25em;
+  svg {
+    max-width: 1.25em;
+  }
+`
+
+const StyledPost = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 1em;
+
+  h3 {
+    font-family: "Raleway";
+    margin: 0.5em 0 0.25em 0;
+  }
+`
+
+const StyledDate = styled.span`
+  font-family: "Raleway";
+  color: #303030;
+  font-size: 0.75em;
+`
+
 export const query = graphql`
-  query BlogPostsQuery {
-    allMarkdownRemark {
+  {
+    posts: allMarkdownRemark(
+      sort: { fields: frontmatter___date, order: DESC }
+      skip: 1
+    ) {
       edges {
         node {
           frontmatter {
@@ -107,9 +134,36 @@ export const query = graphql`
             featuredImage {
               childImageSharp {
                 gatsbyImageData(
-                  width: 250
-                  height: 150
-                  placeholder: TRACED_SVG
+                  width: 350
+                  height: 250
+                  placeholder: BLURRED
+                  formats: [AUTO, WEBP, AVIF]
+                )
+              }
+            }
+          }
+        }
+      }
+    }
+    featured: allMarkdownRemark(
+      sort: { fields: frontmatter___date, order: DESC }
+      limit: 1
+    ) {
+      edges {
+        node {
+          frontmatter {
+            title
+            date
+            path
+            description
+            tags
+            imageDescription
+            featuredImage {
+              childImageSharp {
+                gatsbyImageData(
+                  width: 850
+                  height: 350
+                  placeholder: BLURRED
                   formats: [AUTO, WEBP, AVIF]
                 )
               }
@@ -119,13 +173,6 @@ export const query = graphql`
       }
     }
   }
-`
-
-const StyledPostWrapper = styled.div`
-  display: grid;
-  width: 100%;
-  gap: 1em;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 `
 
 export default BlogPage
