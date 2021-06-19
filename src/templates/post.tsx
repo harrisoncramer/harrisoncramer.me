@@ -7,6 +7,9 @@ import { Post } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import { Social } from "../components/social/social"
 
+import { defineCustomElements as deckDeckGoHighlightElement } from "@deckdeckgo/highlight-code/dist/loader"
+deckDeckGoHighlightElement() // Style code
+
 type TemplateProps = {
   uri: string
   data: {
@@ -101,4 +104,20 @@ const StyledSubtitle = styled.div`
   }
 `
 
-const PostContent = styled.div``
+const PostContent = styled.div`
+  .code-block {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    align-items: center;
+    color: darkgrey;
+  }
+
+  .code-caption {
+    font-size: 0.8em;
+    flex-grow: 1;
+    text-align: left;
+    padding: 0;
+    margin: 0.5em;
+    font-style: italic;
+  }
+`
