@@ -16,7 +16,6 @@ const Header = ({ siteTitle }: HeaderProps): JSX.Element => {
   return (
     <StyledHeader>
       <StyledNav>
-        <link rel="stylesheet" href="devicon.min.css" />
         <StyledSvgContainer onClick={handleToggleNavbar}>
           <svg viewBox="0 0 75 50" width="20" height="25">
             <rect width="75" height="10"></rect>

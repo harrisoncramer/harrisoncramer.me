@@ -5,9 +5,16 @@ import Seo from "../components/seo/seo"
 import Layout from "../components/layout/layout"
 import { Post } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
+import { Social } from "../components/social/social"
 
 type TemplateProps = {
+  uri: string
   data: {
+    site: {
+      siteMetadata: {
+        siteUrl: string
+      }
+    }
     markdownRemark: {
       html: string
       frontmatter: Post
@@ -15,8 +22,8 @@ type TemplateProps = {
   }
 }
 
-export default function Template({ data }: TemplateProps): JSX.Element {
-  const { markdownRemark } = data
+export default function Template(props: TemplateProps): JSX.Element {
+  const { markdownRemark } = props.data
   const { frontmatter, html } = markdownRemark
   //@ts-ignore
   const image = getImage(frontmatter.featuredImage)
@@ -25,13 +32,18 @@ export default function Template({ data }: TemplateProps): JSX.Element {
       <Seo title={frontmatter.title} description={frontmatter.description} />
       <StyledPostWrapper>
         <PostTitle>{frontmatter.title}</PostTitle>
-        <StyledSubtitleAndIcons>
+        <StyledSubtitle>
           <h3>{frontmatter.date}</h3>
-          <div className="sharethis-inline-share-buttons"></div>
-        </StyledSubtitleAndIcons>
+        </StyledSubtitle>
         {image && frontmatter.imageDescription && (
           <GatsbyImage image={image} alt={frontmatter.imageDescription} />
         )}
+        <Social
+          title={frontmatter.title}
+          uri={props.uri}
+          siteUrl={props.data.site.siteMetadata.siteUrl}
+          quote={markdownRemark.frontmatter.description}
+        />
         <PostContent>
           <div dangerouslySetInnerHTML={{ __html: html }}></div>
         </PostContent>
@@ -41,7 +53,7 @@ export default function Template({ data }: TemplateProps): JSX.Element {
 }
 
 export const pageQuery = graphql`
-  query($path: String!) {
+  query TemplatePageQuery($path: String!) {
     markdownRemark(frontmatter: { path: { eq: $path } }) {
       html
       frontmatter {
@@ -56,6 +68,11 @@ export const pageQuery = graphql`
             gatsbyImageData(placeholder: BLURRED, formats: [AUTO, WEBP, AVIF])
           }
         }
+      }
+    }
+    site {
+      siteMetadata {
+        siteUrl
       }
     }
   }
@@ -74,7 +91,7 @@ const PostTitle = styled.h1`
   margin-bottom: 0;
 `
 
-const StyledSubtitleAndIcons = styled.div`
+const StyledSubtitle = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
