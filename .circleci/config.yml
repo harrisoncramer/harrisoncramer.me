@@ -36,7 +36,7 @@ aliases:
       name: Build project
       command: |
         npm install
-        npm run build
+        GATSBY_CPU_COUNT=2 NODE_OPTIONS=--max-old-space-size=8192 npm run build
         cd public
         zip ../build.zip -r * .[^.]*
         echo "Build successful"

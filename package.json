@@ -16,6 +16,7 @@
     "esm": "^3.2.25",
     "gatsby": "^3.6.2",
     "gatsby-plugin-image": "^1.6.0",
+    "gatsby-plugin-no-sourcemaps": "^3.7.0",
     "gatsby-plugin-offline": "^4.6.0",
     "gatsby-plugin-react-helmet": "^4.6.0",
     "gatsby-plugin-sharp": "^3.6.0",
@@ -41,7 +42,7 @@
   ],
   "license": "0BSD",
   "scripts": {
-    "build": "NODE_OPTIONS=--max-old-space-size=8192 gatsby build",
+    "build": "gatsby build",
     "develop": "gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "start": "npm run develop",
