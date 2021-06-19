@@ -3,6 +3,7 @@ module.exports = {
     title: `harrison.me`,
     description: `My name is Harrison and I'm a software engineer and former journalist. This is my personal blog where I'm taking down notes on everything that I've learned. Welcome!`,
     author: `@harrisoncramer`,
+    siteUrl: "https://www.harrisoncramer.me",
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
@@ -24,7 +25,12 @@ module.exports = {
     {
       resolve: `gatsby-transformer-remark`,
       options: {
-        plugins: [],
+        plugins: [
+          {
+            resolve: `gatsby-remark-highlight-code`, // Styles code
+            options: {},
+          },
+        ],
       },
     },
     // Images

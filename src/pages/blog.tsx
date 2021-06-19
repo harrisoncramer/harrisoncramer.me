@@ -82,7 +82,7 @@ const StyledPostWrapper = styled.div`
   display: grid;
   width: 100%;
   gap: 1em;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
 `
 
 const StyledSvgContainer = styled.div`
