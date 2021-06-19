@@ -3,6 +3,7 @@ executors:
   app-executor:
     docker:
       - image: cimg/node:15.2.0
+    resource_class: large
     working_directory: ~/my_repo
 
 aliases:
