@@ -73,13 +73,7 @@ function Seo({ description, title }: SeoProps): JSX.Element {
         },
       ]}
       //.concat(meta)}
-    >
-      <script
-        // Share buttons
-        type="text/javascript"
-        src="https://platform-api.sharethis.com/js/sharethis.js#property=60ccfb150a21890019baf1b7&product=inline-share-buttons"
-      ></script>
-    </Helmet>
+    ></Helmet>
   )
 }
 
