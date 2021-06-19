@@ -99,6 +99,9 @@ workflows:
       - lint:
           requires:
             - build
+      - gatsby_build:
+          requires:
+            - lint
       - deploy_to_aws_s3:
           filters: &only_production
             branches:
