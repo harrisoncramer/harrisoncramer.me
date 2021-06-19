@@ -3,7 +3,6 @@ executors:
   app-executor:
     docker:
       - image: cimg/node:15.2.0
-    resource_class: large
     working_directory: ~/my_repo
 
 aliases:
@@ -37,7 +36,7 @@ aliases:
       name: Build project
       command: |
         npm install
-        GATSBY_CPU_COUNT=2 NODE_OPTIONS=--max-old-space-size=8192 npm run build
+        GATSBY_CPU_COUNT=2 NODE_OPTIONS=--max-old-space-size=4096 npm run build
         cd public
         zip ../build.zip -r * .[^.]*
         echo "Build successful"
