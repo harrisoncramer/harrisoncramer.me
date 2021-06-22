@@ -31,7 +31,7 @@ export default function Template(props: TemplateProps): JSX.Element {
   //@ts-ignore
   const image = getImage(frontmatter.featuredImage)
   return (
-    <Layout>
+    <Layout title={frontmatter.title}>
       <Seo title={frontmatter.title} description={frontmatter.description} />
       <StyledPostWrapper>
         <PostTitle>{frontmatter.title}</PostTitle>
