@@ -46,6 +46,8 @@ const StyledHeader = styled.header`
   display: flex;
   padding: 1em;
   gap: 1em;
+  box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.1);
+
   justify-content: space-between;
   ${({ isDark }: { isDark: boolean }) =>
     isDark &&
