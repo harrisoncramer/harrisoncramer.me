@@ -19,7 +19,7 @@ type LayoutProps = {
 }
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
-  const [isDark, setIsDark] = useState(true)
+  const [isDark, setIsDark] = useState(false)
 
   return (
     <main className={`${main} ${isDark ? mainDark : mainLight}`}>
