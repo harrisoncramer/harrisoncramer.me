@@ -9,6 +9,18 @@ module.exports = {
     `gatsby-plugin-react-helmet`,
     `gatsby-plugin-no-sourcemaps`,
     {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        name: `harrisoncramer.me`,
+        short_name: `harrisoncramer.me`,
+        start_url: `/`,
+        background_color: `#663399`,
+        theme_color: `#663399`,
+        display: `minimal-ui`,
+        icon: `src/images/favicon.png`,
+      },
+    },
+    {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `pages`,

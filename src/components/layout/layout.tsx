@@ -6,7 +6,6 @@
  */
 
 import * as React from "react"
-import { useStaticQuery, graphql } from "gatsby"
 import styled from "styled-components"
 
 import { defineCustomElements as deckDeckGoHighlightElement } from "@deckdeckgo/highlight-code/dist/loader"
@@ -18,23 +17,14 @@ import Footer from "../footer/footer"
 import "normalize.css"
 
 type LayoutProps = {
+  title: string
   children: React.ReactChild | React.ReactChild[]
 }
 
-const Layout = ({ children }: LayoutProps): JSX.Element => {
-  const data = useStaticQuery(graphql`
-    query SiteTitleQuery {
-      site {
-        siteMetadata {
-          title
-        }
-      }
-    }
-  `)
-
+const Layout = ({ children, title }: LayoutProps): JSX.Element => {
   return (
     <WrapperLayoutDiv>
-      <Header siteTitle={data.site.siteMetadata?.title || `Title`} />
+      <Header siteTitle={title} />
       <main className="content-wrapper">{children}</main>
       {/* {<Footer />} */}
     </WrapperLayoutDiv>

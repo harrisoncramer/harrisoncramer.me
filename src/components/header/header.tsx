@@ -24,7 +24,7 @@ const Header = ({ siteTitle }: HeaderProps): JSX.Element => {
           </svg>
         </StyledSvgContainer>
         <div className={visible ? "container visible" : "container invisible"}>
-          <LinkContainer link="/" text={siteTitle} />
+          <LinkContainer link="/" text="home" />
           <LinkContainer link="/blog" text="blog" />
           <LinkContainer link="/projects" text="projects" />
           <LinkContainer link="/contact" text="contact" />

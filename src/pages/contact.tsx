@@ -5,9 +5,9 @@ import Seo from "../components/seo/seo"
 import { StyledH1 } from "../components/styled-components/text"
 
 const ContactPage = (): JSX.Element => (
-  <Layout>
+  <Layout title="contact">
     <Seo
-      title="harrison.me"
+      title="contact"
       description="This page includes my contact information like my Twitter handle and my Github account and my developer email. It also includes my resume."
     />
     <StyledH1>Contact page</StyledH1>
