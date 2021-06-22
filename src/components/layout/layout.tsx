@@ -21,12 +21,15 @@ type LayoutProps = {
 const Layout = ({ children }: LayoutProps): JSX.Element => {
   // Get theme from browser, if it exists, and set it.
   const [isDark, setIsDark] = useState(
-    localStorage.getItem("isDark") === "true" ? true : false
+    typeof window !== "undefined" && localStorage.getItem("isDark") === "true"
+      ? true
+      : false
   )
 
   // And set the theme on every render
   useEffect(() => {
-    localStorage.setItem("isDark", isDark.toString())
+    typeof window !== "undefined" &&
+      localStorage.setItem("isDark", isDark.toString())
   }, [isDark])
 
   return (
