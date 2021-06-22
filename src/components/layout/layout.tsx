@@ -5,16 +5,13 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import * as React from "react"
-import styled from "styled-components"
-
-import { defineCustomElements as deckDeckGoHighlightElement } from "@deckdeckgo/highlight-code/dist/loader"
-deckDeckGoHighlightElement()
+import React, { useState } from "react"
 
 import Header from "../header/header"
-import Footer from "../footer/footer"
 
+// Global styling
 import "normalize.css"
+import { main, mainDark, mainLight, contentWrapper } from "./global.module.css"
 
 type LayoutProps = {
   title: string
@@ -22,38 +19,14 @@ type LayoutProps = {
 }
 
 const Layout = ({ children, title }: LayoutProps): JSX.Element => {
+  const [isDark, setIsDark] = useState(true)
+
   return (
-    <WrapperLayoutDiv>
-      <Header siteTitle={title} />
-      <main className="content-wrapper">{children}</main>
-      {/* {<Footer />} */}
-    </WrapperLayoutDiv>
+    <main className={`${main} ${isDark ? mainDark : mainLight}`}>
+      <Header setIsDark={setIsDark} isDark={isDark} />
+      <main className={contentWrapper}>{children}</main>
+    </main>
   )
 }
-
-// Site-wide styles
-const WrapperLayoutDiv = styled.div`
-  * {
-    font-family: "Helvetica", "sans-serif";
-  }
-
-  body {
-    align-items: center;
-    justify-content: center;
-  }
-
-  a {
-    color: #3399ff;
-  }
-
-  .content-wrapper {
-    padding: 1em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 1050px;
-    margin: 0 auto;
-  }
-`
 
 export default Layout

@@ -8,6 +8,9 @@ import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import dayjs from "dayjs"
 import svgPicker from "../util/svgPicker"
 
+import "prismjs/themes/prism-okaidia.css"
+import "prismjs/plugins/line-numbers/prism-line-numbers.css"
+
 type BlogPageProps = {
   data: {
     featured: {
