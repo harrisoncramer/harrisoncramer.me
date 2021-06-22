@@ -82,5 +82,7 @@ module.exports = {
     `gatsby-plugin-image`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
+    // Allow SSR for styled-components
+    `gatsby-plugin-styled-components`,
   ],
 }
