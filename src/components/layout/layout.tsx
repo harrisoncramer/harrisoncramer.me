@@ -18,7 +18,7 @@ type LayoutProps = {
   children: React.ReactChild | React.ReactChild[]
 }
 
-const Layout = ({ children, title }: LayoutProps): JSX.Element => {
+const Layout = ({ children }: LayoutProps): JSX.Element => {
   const [isDark, setIsDark] = useState(true)
 
   return (
