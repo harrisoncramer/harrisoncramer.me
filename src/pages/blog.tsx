@@ -8,6 +8,9 @@ import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import dayjs from "dayjs"
 import svgPicker from "../util/svgPicker"
 
+import "prismjs/themes/prism-okaidia.css"
+import "prismjs/plugins/line-numbers/prism-line-numbers.css"
+
 type BlogPageProps = {
   data: {
     featured: {
@@ -63,9 +66,9 @@ const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
   const featuredPost = data.featured.edges[0]
   if (!featuredPost) return <div>No posts.</div>
   return (
-    <Layout>
+    <Layout title="blog">
       <Seo
-        title="harrison.me"
+        title="blog"
         description="This blog contains posts about what I'm learning as a software engineer. Topics include Javascript, DevOps, Cloud, Go/Golang, Typescript, Docker, Kubernetes, and much more!"
       />
       <PostPreview {...featuredPost.node.frontmatter} />

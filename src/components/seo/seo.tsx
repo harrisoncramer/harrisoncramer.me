@@ -11,8 +11,8 @@ import { useStaticQuery, graphql } from "gatsby"
 
 type SeoProps = {
   description: string
-  meta?: string
   title: string
+  meta?: string
 }
 
 function Seo({ description, title }: SeoProps): JSX.Element {
@@ -31,13 +31,12 @@ function Seo({ description, title }: SeoProps): JSX.Element {
   )
 
   const metaDescription = description || site.siteMetadata.description
-  const defaultTitle = site.siteMetadata?.title
 
   return (
     <Helmet
       htmlAttributes={{ lang: "en-us" }}
       title={title}
-      titleTemplate={defaultTitle ? `%s | ${defaultTitle}` : undefined}
+      titleTemplate={`${title}`}
       meta={[
         {
           name: `description`,

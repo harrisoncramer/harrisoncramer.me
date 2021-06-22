@@ -1,0 +1,33 @@
+.main {
+  font-family: "Helvetica", "sans-serif";
+  min-height: 100%;
+}
+
+/* Light mode! */
+.main-light {
+  color: #222;
+  background: #f9f9f9;
+}
+
+.main-light a {
+  color: #0366fc;
+}
+
+/* Dark mode! */
+.main-dark {
+  color: #eee;
+  background: #121212;
+}
+
+.main-dark a {
+  color: #9ec4ff;
+}
+
+.content-wrapper {
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  lign-items: center;
+  max-width: 1050px;
+  margin: 0 auto;
+}

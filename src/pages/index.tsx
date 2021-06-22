@@ -8,9 +8,9 @@ import styled from "styled-components"
 
 // For code highlighting
 const IndexPage = (): JSX.Element => (
-  <Layout>
+  <Layout title="harrisoncramer.me">
     <Seo
-      title="harrison.me"
+      title="harrisoncramer.me"
       description="Harrison Cramer personal blog site."
     />
     <div>

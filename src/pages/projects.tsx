@@ -5,9 +5,9 @@ import Seo from "../components/seo/seo"
 import { StyledH1 } from "../components/styled-components/text"
 
 const ProjectsPage = (): JSX.Element => (
-  <Layout>
+  <Layout title="projects">
     <Seo
-      title="harrison.me"
+      title="projects"
       description="This page contains all of my personal projects"
     />
     <StyledH1>Projects page</StyledH1>

@@ -1,89 +1,59 @@
-import React, { useState } from "react"
-import { Link } from "gatsby"
-
+import React, { Dispatch, SetStateAction } from "react"
+import { Dropdown } from "../dropdown/dropdown"
 import styled from "styled-components"
 
 type HeaderProps = {
-  siteTitle: string
+  isDark: boolean
+  setIsDark: Dispatch<SetStateAction<boolean>>
 }
 
-const Header = ({ siteTitle }: HeaderProps): JSX.Element => {
-  const [visible, setVisible] = useState(false)
-  const handleToggleNavbar = () => {
-    setVisible(!visible)
+const Header = ({ setIsDark, isDark }: HeaderProps): JSX.Element => {
+  const changeTheme = () => {
+    setIsDark(!isDark)
   }
 
   return (
-    <StyledHeader>
-      <StyledNav>
-        <StyledSvgContainer onClick={handleToggleNavbar}>
-          <svg viewBox="0 0 75 50" width="20" height="25">
-            <rect width="75" height="10"></rect>
-            <rect y="30" width="75" height="10"></rect>
-            <rect y="60" width="75" height="10"></rect>
-          </svg>
-        </StyledSvgContainer>
-        <div className={visible ? "container visible" : "container invisible"}>
-          <LinkContainer link="/" text={siteTitle} />
-          <LinkContainer link="/blog" text="blog" />
-          <LinkContainer link="/projects" text="projects" />
-          <LinkContainer link="/contact" text="contact" />
-        </div>
-      </StyledNav>
+    <StyledHeader isDark={isDark}>
+      <Dropdown isDark={isDark} />
+      <StyledSvg
+        isDark={isDark}
+        onClick={changeTheme}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+      >
+        <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10v-20zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12z" />
+      </StyledSvg>
     </StyledHeader>
   )
 }
 
-const LinkContainer = ({
-  link,
-  text,
-}: {
-  link: string
-  text: string
-}): JSX.Element => {
-  return (
-    <StyledDiv>
-      <Link to={link}>{text}</Link>
-    </StyledDiv>
-  )
-}
+const StyledSvg = styled.svg`
+  cursor: pointer;
+  ${({ isDark }: { isDark: boolean }) =>
+    isDark &&
+    `
+  fill: white;
+`}
+`
 
 const StyledHeader = styled.header`
-  padding: 1em;
-`
-
-const StyledNav = styled.nav`
-  overflow: hidden;
-  position: relative;
+  top: 0;
+  z-index: 1000;
+  background: white;
+  position: sticky;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  padding: 1em;
+  gap: 1em;
+  box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.1);
 
-  .container,
-  .visible {
-    position: absolute;
-    top: -1em;
-    margin-right: 1em;
-    display: flex;
-    padding: 1em;
-    a {
-      font-family: "Raleway";
-    }
-  }
-
-  .invisible {
-    display: none;
-  }
-`
-
-const StyledDiv = styled.div`
-  padding: 0.5rem;
-`
-
-const StyledSvgContainer = styled.div`
-  :hover {
-    cursor: pointer;
-  }
+  justify-content: space-between;
+  ${({ isDark }: { isDark: boolean }) =>
+    isDark &&
+    `
+  background: black;
+`}
 `
 
 export default Header
