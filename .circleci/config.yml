@@ -35,14 +35,13 @@ aliases:
     run:
       name: Build project
       command: |
-        npm install
         npm run build
         cd public
         zip ../build.zip -r * .[^.]*
         echo "Build successful"
 
 jobs:
-  build:
+  install_packages:
     executor: app-executor
     steps:
       - checkout
@@ -95,7 +94,7 @@ jobs:
 workflows:
   build_and_deploy:
     jobs:
-      - build # Build and lint, and terraform validate will check every branch!
+      - install_packages # Build and lint, and terraform validate will check every branch!
       - lint:
           requires:
             - build
