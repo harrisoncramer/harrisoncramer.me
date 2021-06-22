@@ -5,7 +5,7 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 import Header from "../header/header"
 
@@ -19,7 +19,15 @@ type LayoutProps = {
 }
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
-  const [isDark, setIsDark] = useState(false)
+  // Get theme from browser, if it exists, and set it.
+  const [isDark, setIsDark] = useState(
+    localStorage.getItem("isDark") === "true" ? true : false
+  )
+
+  // And set the theme on every render
+  useEffect(() => {
+    localStorage.setItem("isDark", isDark.toString())
+  }, [isDark])
 
   return (
     <main className={`${main} ${isDark ? mainDark : mainLight}`}>
