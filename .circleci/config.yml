@@ -98,9 +98,15 @@ workflows:
       - lint:
           requires:
             - install_packages
+          filters: &only_develop
+            branches:
+              only:
+                - develop
       - gatsby_build:
           requires:
             - lint
+          filters:
+            <<: *only_develop
       - deploy_to_aws_s3:
           filters: &only_production
             branches:
