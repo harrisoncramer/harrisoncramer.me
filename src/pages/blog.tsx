@@ -7,6 +7,7 @@ import styled from "styled-components"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import dayjs from "dayjs"
 import svgPicker from "../util/svgPicker"
+import { ThemeContext } from "../components/theme/Theme"
 
 import "prismjs/themes/prism-okaidia.css"
 import "prismjs/plugins/line-numbers/prism-line-numbers.css"
@@ -34,8 +35,6 @@ type BlogPageProps = {
   }
 }
 
-const Tag = ({ tag }: { tag: string }): JSX.Element => svgPicker(tag)
-
 const PostPreview = ({
   title,
   description,
@@ -47,17 +46,22 @@ const PostPreview = ({
 }: Post): JSX.Element => {
   //@ts-ignore
   const image = getImage(featuredImage)
+  const isDark = React.useContext(ThemeContext)
   return (
     <StyledPost onClick={() => navigate(path)}>
       {image && imageDescription && (
         <GatsbyImage image={image} alt={imageDescription} />
       )}
-      <h3>{title}</h3>
-      <StyledDate>{dayjs(date).format("DD/MM/YYYY")}</StyledDate>
+      <StyledMetaContainer>
+        <StyledTitleAndDate>
+          <h2>{title}</h2>
+          <StyledDate>{dayjs(date).format("DD/MM/YYYY")}</StyledDate>
+        </StyledTitleAndDate>
+        <StyledSvgContainer>
+          {tags && tags.map(tag => svgPicker({ tag, isDark }))}
+        </StyledSvgContainer>
+      </StyledMetaContainer>
       <p>{description}</p>
-      <StyledSvgContainer>
-        {tags && tags.map(tag => <Tag key={tag} tag={tag} />)}
-      </StyledSvgContainer>
     </StyledPost>
   )
 }
@@ -81,23 +85,35 @@ const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
   )
 }
 
-const StyledPostWrapper = styled.div`
-  display: grid;
-  width: 100%;
-  gap: 1em;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+const StyledMetaContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const StyledTitleAndDate = styled.div`
+  flex-grow: 9;
 `
 
 const StyledSvgContainer = styled.div`
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  padding: 0.5em;
+  flex-grow: 1;
   gap: 0.25em;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-top: 0.25em;
+
   svg {
-    max-width: 1.25em;
+    min-width: 12px;
+    max-width: 25px;
   }
+`
+
+const StyledPostWrapper = styled.div`
+  display: grid;
+  width: 100%;
+  gap: 1em;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
 `
 
 const StyledPost = styled.div`
@@ -107,16 +123,15 @@ const StyledPost = styled.div`
   cursor: pointer;
   padding: 1em;
 
-  h3 {
+  h2 {
     font-family: "Raleway";
-    margin: 0.5em 0 0.25em 0;
+    margin: 0.25em 0 0.25em 0;
   }
 `
 
 const StyledDate = styled.span`
   font-family: "Raleway";
-  color: #303030;
-  font-size: 0.75em;
+  font-size: 0.9em;
 `
 
 export const query = graphql`
@@ -137,8 +152,6 @@ export const query = graphql`
             featuredImage {
               childImageSharp {
                 gatsbyImageData(
-                  width: 350
-                  height: 250
                   placeholder: BLURRED
                   formats: [AUTO, WEBP, AVIF]
                 )

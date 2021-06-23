@@ -5,13 +5,13 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import React, { useState, useEffect } from "react"
-
+import React from "react"
 import Header from "../header/header"
 
 // Global styling
 import "normalize.css"
 import { main, mainDark, mainLight, contentWrapper } from "./global.module.css"
+import { ThemeContext } from "../theme/Theme"
 
 type LayoutProps = {
   title: string
@@ -19,24 +19,24 @@ type LayoutProps = {
 }
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
-  // Get theme from browser, if it exists, and set it.
-  const [isDark, setIsDark] = useState(
-    typeof window !== "undefined" && localStorage.getItem("isDark") === "true"
-      ? true
-      : false
-  )
+  const [isDark, setIsDark] = React.useState(0)
 
-  // And set the theme on every render
-  useEffect(() => {
-    typeof window !== "undefined" &&
-      localStorage.setItem("isDark", isDark.toString())
+  React.useEffect(() => {
+    const parsedCount = Number(localStorage.getItem("isDark") || 0)
+    setIsDark(parsedCount)
+  }, [])
+
+  React.useEffect(() => {
+    localStorage.setItem("isDark", String(isDark))
   }, [isDark])
 
   return (
-    <main className={`${main} ${isDark ? mainDark : mainLight}`}>
-      <Header setIsDark={setIsDark} isDark={isDark} />
-      <main className={contentWrapper}>{children}</main>
-    </main>
+    <ThemeContext.Provider value={isDark}>
+      <main className={`${main} ${isDark ? mainDark : mainLight}`}>
+        <Header setIsDark={setIsDark} isDark={!!isDark} />
+        <main className={contentWrapper}>{children}</main>
+      </main>
+    </ThemeContext.Provider>
   )
 }
 

@@ -68,6 +68,7 @@ const StyledMenuContainer = styled.div`
 `
 
 const StyledSvg = styled.svg`
+  cursor: pointer;
   ${({ isDark }: { isDark: boolean }) =>
     isDark &&
     `

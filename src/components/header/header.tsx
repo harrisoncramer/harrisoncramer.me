@@ -1,22 +1,24 @@
-import React, { Dispatch, SetStateAction } from "react"
+import React, { Dispatch, SetStateAction, useContext } from "react"
 import { Dropdown } from "../dropdown/dropdown"
 import styled from "styled-components"
+import { ThemeContext } from "../theme/Theme"
 
 type HeaderProps = {
   isDark: boolean
-  setIsDark: Dispatch<SetStateAction<boolean>>
+  setIsDark: Dispatch<SetStateAction<number>>
 }
 
-const Header = ({ setIsDark, isDark }: HeaderProps): JSX.Element => {
+const Header = ({ setIsDark }: HeaderProps): JSX.Element => {
+  const isDark = useContext(ThemeContext)
   const changeTheme = () => {
-    setIsDark(!isDark)
+    setIsDark(isDark > 0 ? 0 : 1)
   }
 
   return (
-    <StyledHeader isDark={isDark}>
-      <Dropdown isDark={isDark} />
+    <StyledHeader isDark={!!isDark}>
+      <Dropdown isDark={!!isDark} />
       <StyledSvg
-        isDark={isDark}
+        isDark={!!isDark}
         onClick={changeTheme}
         xmlns="http://www.w3.org/2000/svg"
         width="24"

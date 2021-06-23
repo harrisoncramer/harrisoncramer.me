@@ -1,6 +1,6 @@
 ---
 title: Welcome to my blog!
-date: 2019-07-10
+date: 2020-06-22
 path: /my-first-post
 description: This is a template post that shows what's possible with my blog.
 imageDescription: View of some code on a monitor.
