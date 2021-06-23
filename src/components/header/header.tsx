@@ -4,7 +4,6 @@ import styled from "styled-components"
 import { ThemeContext } from "../theme/Theme"
 
 type HeaderProps = {
-  isDark: boolean
   setIsDark: Dispatch<SetStateAction<number>>
 }
 
