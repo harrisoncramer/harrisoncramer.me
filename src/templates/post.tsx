@@ -111,4 +111,14 @@ const PostContent = styled.div`
     padding-left: 0.75em;
     border-left: 0.25em solid #f99;
   }
+
+  .gatsby-resp-image-figcaption {
+    font-size: 0.8em;
+    text-align: center;
+  }
+
+  .gatsby-resp-image-figcaption p {
+    padding: 0;
+    margin: 0.5em;
+  }
 `

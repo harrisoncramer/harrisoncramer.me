@@ -38,6 +38,16 @@ module.exports = {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [
+          // Allow images inside markdown
+          {
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 1050,
+              showCaptions: ["title"],
+              markdownCaptions: true,
+            },
+          },
+          // Style code inside markdown
           {
             resolve: `gatsby-remark-prismjs`,
             options: {
