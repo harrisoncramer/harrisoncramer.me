@@ -19,10 +19,10 @@ type LayoutProps = {
 }
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
-  const [isDark, setIsDark] = React.useState(0)
+  const [isDark, setIsDark] = React.useState(1)
 
   React.useEffect(() => {
-    const parsedCount = Number(localStorage.getItem("isDark") || 0)
+    const parsedCount = Number(localStorage.getItem("isDark") || 1)
     setIsDark(parsedCount)
   }, [])
 
@@ -33,7 +33,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   return (
     <ThemeContext.Provider value={isDark}>
       <main className={`${main} ${isDark ? mainDark : mainLight}`}>
-        <Header setIsDark={setIsDark} isDark={!!isDark} />
+        <Header setIsDark={setIsDark} />
         <main className={contentWrapper}>{children}</main>
       </main>
     </ThemeContext.Provider>
