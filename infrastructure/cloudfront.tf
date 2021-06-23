@@ -18,7 +18,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
 
-    domain_name = aws_s3_bucket.site.bucket_regional_domain_name
+    // Error in Terraform. Hard-coded for now, see: https://github.com/hashicorp/terraform-provider-aws/issues/15102
+    domain_name = "harrisoncramer.me.s3-website-us-east-1.amazonaws.com" //aws_s3_bucket.site.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
   }
 
@@ -47,9 +48,9 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   # We'll display 404 pages inside of our application
   custom_error_response {
-    error_caching_min_ttl = 300
+    error_caching_min_ttl = 0
     error_code            = 404
-    response_code         = 404
+    response_code         = 200
     response_page_path    = "/404.html"
   }
 
