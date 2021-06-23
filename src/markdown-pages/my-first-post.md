@@ -18,11 +18,20 @@ I'm a former national security reporter, who recently left my job on Capitol Hil
 
 Previously, I'd done all of my personal journaling in an offline application, but wasn't the best for sharing my own learnings with others. This site is an an attempt to share what I'm learning with other aspiring software developers who may be figuring out some of the same technologies.
 
-## What's the technology stack?
+## What are you going to write about?
+
+I'll be focused mostly on Javascript and Typescript for the next few months, but will likely occasionally upload posts relating to Docker, Kubernetes, and other CI/CD technologies. I'm also learning Golang and will probably post about that occasionally. I'm also a vim user, and will ocassionally post about some of the things I'm learning about the editor—whether it's new plugins that speed up productivity, or built-in features that I'm learning to master, like the quickfix list.
+
+Most of the posts will be for my own reference and will therefore be explanatory or otherwise instructional.
+
+## What's the technology stack of this site?
 
 Unlike pre-baked blogging platforms like Medium, this site is built entirely from the ground up. That lets me easily share my content with others and migrate to another system more easily, should I choose to move away from a static site generator. The application is built on <a href="https://www.gatsby.io">Gatsby</a> with a CI/CD pipeline using <a href="http://circleci.com/">CircleCI</a>, and is hosted on AWS using <a href="https://www.terraform.io/">Terraform</a>. The source code is <a href="https://github.com/harrisoncramer/harrisoncramer.me">here</a>.
 
 The posts in this section are originally written in markdown and converted to HTML. I'll style code snippets like this:
+
+Thanks to a number of plugins available through Gatsby, namely `gatsby-transformer-remark` + `gatsby-remark-prismjs`, we can include styled code:
+
 ```javascript{1,2-3}
 var a, b, c;
 a = 5;
@@ -30,15 +39,7 @@ b = 6;
 c = a + b;
 document.getElementById('demo1').innerHTML = c;
 ```
-## What are you going to write about?
 
-I'll be focused mostly on Javascript and Typescript for the next few months, but will likely occasionally upload posts relating to Docker, Kubernetes, and other CI/CD technologies. I'm also learning Golang and will probably post about that occasionally.
+We can also include images thanks to the `gatsby-remark-images` plugin:
 
-Most of the posts will be for my own reference and will therefore be explanatory or otherwise instructional: 
-- How do you configure Nginx inside of Docker? 
-- How can you use the stream editor inside of Bash? 
-
-There may be posts that are more theoretical, however. 
-- How is memory managment in Javascript handled? 
-- What is a System Call?
-- What is agile software development? What is SCRUM?
+![I'm some alternate text for this image](../images/posts/example-image.png "These are some of the styles used in this site.")

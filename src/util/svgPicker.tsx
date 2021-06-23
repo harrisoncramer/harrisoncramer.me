@@ -10,6 +10,8 @@ import {
   Github,
   Golang,
   Kubernetes,
+  ReactSvg,
+  CircleCI,
 } from "../components/svgs"
 
 export default function svgPicker({
@@ -17,13 +19,17 @@ export default function svgPicker({
   isDark,
 }: {
   tag: string
-  isDark: boolean
+  isDark: number
 }): JSX.Element {
   const t = tag.toLowerCase()
-  const color = isDark ? "white" : "black"
+  const color = !!isDark ? "white" : "black"
   switch (t) {
     case "javascript":
       return <Javascript color={color} />
+    case "circleci":
+      return <CircleCI color={color} />
+    case "react":
+      return <ReactSvg color={color} />
     case "css":
       return <CSS color={color} />
     case "aws":
