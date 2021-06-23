@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useRef, useState, useEffect } from "react"
 import { Link } from "gatsby"
 import styled from "styled-components"
 
@@ -6,6 +6,25 @@ export const Dropdown = ({ isDark }: { isDark: boolean }): JSX.Element => {
   const dropdownRef = useRef(null)
   const [isActive, setIsActive] = useState(false)
   const onClick = () => setIsActive(!isActive)
+
+  const pageClickEvent = (e: React.MouseEvent) => {
+    if (dropdownRef && dropdownRef.current === null) return
+    if (!dropdownRef.current.contains(e.target)) {
+      setIsActive(!isActive)
+    }
+  }
+
+  useEffect(() => {
+    // If the item is active (ie open) then listen for clicks
+    if (isActive) {
+      window.addEventListener("click", pageClickEvent)
+    }
+
+    // Clean up
+    return () => {
+      window.removeEventListener("click", pageClickEvent)
+    }
+  }, [isActive])
 
   return (
     <StyledMenuContainer>
@@ -49,7 +68,6 @@ const StyledMenuContainer = styled.div`
 `
 
 const StyledSvg = styled.svg`
-  cursor: pointer;
   ${({ isDark }: { isDark: boolean }) =>
     isDark &&
     `
@@ -69,7 +87,7 @@ const StyledNav = styled.nav`
   opacity: 0;
   visibility: hidden;
   transform: translateY(-20px);
-  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
 
   ul {
     list-style: none;
