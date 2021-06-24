@@ -45,6 +45,62 @@ aliases:
         cd public
         zip ../build.zip -r * .[^.]*
         echo "Build successful"
+  - &slack_success_post_step
+    post-steps:
+      - slack/notify:
+          custom: |
+            {
+              "text": "",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "✅ ${CIRCLE_BRANCH} succeeded!",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch*:\n$CIRCLE_BRANCH"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*When*:\n$(date +'%m/%d/%Y %T')"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Build*:\n$CIRCLE_BUILD_NUM"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author*:\n$CIRCLE_PROJECT_USERNAME"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Job"
+                      },
+                      "url": "${CIRCLE_BUILD_URL}"
+                    }
+                  ]
+                }
+              ]
+            }
+          event: pass
   - &slack_fail_post_step
     post-steps:
       - slack/notify:
@@ -152,65 +208,7 @@ jobs:
           command: |
             aws configure set preview.cloudfront true
             aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths /\*
-  notify_develop:
-    executor: slack-executor
-    steps:
-      - run: echo "Slack notification"
-      - slack/notify:
-          event: "always"
-          channel: "general"
-          template: ""
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "${CIRCLE_BRANCH} branch build is complete",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch*:\n$CIRCLE_BRANCH"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*When*:\n$(date +'%m/%d/%Y %T')"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Build*:\n$CIRCLE_BUILD_NUM"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Author*:\n$CIRCLE_PROJECT_USERNAME"
-                    }
-                  ]
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "View Job"
-                      },
-                      "url": "${CIRCLE_BUILD_URL}"
-                    }
-                  ]
-                }
-              ]
-            }
+
 workflows:
   build_and_deploy:
     jobs:
@@ -230,19 +228,13 @@ workflows:
                 - develop
       - gatsby_build:
           <<: *slack_fail_post_step
+          <<: *slack_success_post_step
           context:
             - slack_context
           requires:
             - lint
           filters:
             <<: *only_develop
-      - notify_develop:
-          requires:
-            - gatsby_build
-          filters:
-            <<: *only_develop
-          context:
-            - slack_context
       ## Our production workflow only relies on package installation, not lint/gatsby_build
       - deploy_to_aws_s3:
           <<: *slack_fail_post_step
@@ -258,6 +250,7 @@ workflows:
             - install_packages
       - deploy_to_aws_cloudfront:
           <<: *slack_fail_post_step
+          <<: *slack_success_post_step
           context:
             - slack_context
             - blog_context
