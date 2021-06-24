@@ -22,7 +22,7 @@ aliases:
         - app-
   - &install_dependencies
     run:
-      name: Install dependencies and create artifacts directory for persisting workspaces
+      name: Install dependencies
       command: npm install
   - &save_cache
     save_cache:
@@ -83,7 +83,7 @@ jobs:
                   "fields": [
                     {
                       "type": "plain_text",
-                      "text": "The gatsby_build was successful. Ready to push to production."
+                      "text": "The gatsby_build was successful. Ready to push to production.",
                       "emoji": true
                     }
                   ]
