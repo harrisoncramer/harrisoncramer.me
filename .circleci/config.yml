@@ -56,10 +56,10 @@ aliases:
                   "type": "header",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "$❌ Failure on build #${CIRCLE_BUILD_NUM} for {CIRCLE_BRANCH} branch.",
+                    "text": "❌ *Failure* on build #${CIRCLE_BUILD_NUM} for branch `${CIRCLE_BRANCH}`",
                     "emoji": true
                   }
-                },            
+                },
                 {
                   "type": "section",
                   "fields": [
