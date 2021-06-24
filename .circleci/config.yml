@@ -45,6 +45,36 @@ aliases:
         cd public
         zip ../build.zip -r * .[^.]*
         echo "Build successful"
+  - &slack_fail_post_step
+    post-steps:
+      - slack/notify:
+          custom: |
+            {
+              "text": "",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "❌ *Failure* #${CIRCLE_BUILD_NUM} `${CIRCLE_PROJECT_REPONAME}` on `${CIRCLE_BRANCH}`"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Job"
+                      },
+                      "url": "${CIRCLE_BUILD_URL}"
+                    }
+                  ]
+                }
+              ]
+            }
+          event: fail
 
 jobs:
   install_packages:
@@ -72,6 +102,30 @@ jobs:
       - *show_branch
       - *restore_cache
       - *build_project
+  deploy_to_aws_s3:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show_branch
+      - *install_aws_cli
+      - *restore_cache
+      - *build_project
+      - run:
+          name: Deploy to S3
+          command: aws --region ${AWS_REGION} s3 sync ~/my_repo/public s3://${AWS_BUCKET_NAME} --delete
+  deploy_to_aws_cloudfront:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show_branch
+      - *install_aws_cli
+      - *restore_cache
+      - *build_project
+      - run:
+          name: Deploy to CloudFront (before invalidating old distributions)
+          command: |
+            aws configure set preview.cloudfront true
+            aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths /\*
   notify_develop:
     executor: slack-executor
     steps:
@@ -131,36 +185,17 @@ jobs:
                 }
               ]
             }
-  deploy_to_aws_s3:
-    executor: app-executor
-    steps:
-      - checkout
-      - *show_branch
-      - *install_aws_cli
-      - *restore_cache
-      - *build_project
-      - run:
-          name: Deploy to S3
-          command: aws --region ${AWS_REGION} s3 sync ~/my_repo/public s3://${AWS_BUCKET_NAME} --delete
-  deploy_to_aws_cloudfront:
-    executor: app-executor
-    steps:
-      - checkout
-      - *show_branch
-      - *install_aws_cli
-      - *restore_cache
-      - *build_project
-      - run:
-          name: Deploy to CloudFront (before invalidating old distributions)
-          command: |
-            aws configure set preview.cloudfront true
-            aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths /\*
-
 workflows:
   build_and_deploy:
     jobs:
-      - install_packages
+      - install_packages:
+          <<: *slack_fail_post_step
+          context:
+            - slack_context
       - lint:
+          <<: *slack_fail_post_step
+          context:
+            - slack_context
           requires:
             - install_packages
           filters: &only_develop
@@ -168,6 +203,7 @@ workflows:
               only:
                 - develop
       - gatsby_build:
+          <<: *slack_fail_post_step
           requires:
             - lint
           filters:
@@ -181,6 +217,7 @@ workflows:
             - slack_context
       ## Our production workflow only relies on package installation, not lint/gatsby_build
       - deploy_to_aws_s3:
+          <<: *slack_fail_post_step
           filters: &only_production
             branches:
               only:
@@ -188,10 +225,13 @@ workflows:
           context:
             - blog_context
             - aws_context
+            - slack_context
           requires:
             - install_packages
       - deploy_to_aws_cloudfront:
+          <<: *slack_fail_post_step
           context:
+            - slack_context
             - blog_context
             - aws_context
           requires:
