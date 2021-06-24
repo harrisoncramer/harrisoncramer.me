@@ -73,62 +73,64 @@ jobs:
       - *restore_cache
       - *build_project
   notify_develop:
-    - run: echo "Slack notification"
-    - slack/notify
-        event: 'always'
-        channel: "general"
-        template: ''
-        custom: |
-          {
-            "blocks": [
-              {
-                "type": "header",
-                "text": {
-                  "type": "plain_text",
-                  "text": "${CIRCLE_BRANCH} branch build is complete",
-                  "emoji": true
-                }
-              },
-              {
-                "type": "section",
-                "fields": [
-                  {
-                    "type": "mrkdwn",
-                    "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
-                  },
-                  {
-                    "type": "mrkdwn",
-                    "text": "*Branch*:\n$CIRCLE_BRANCH"
-                  },
-                  {
-                    "type": "mrkdwn",
-                    "text": "*When*:\n$(date +'%m/%d/%Y %T')"
-                  },
-                  {
-                    "type": "mrkdwn",
-                    "text": "*Build*:\n$CIRCLE_BUILD_NUM"
-                  },
-                  {
-                    "type": "mrkdwn",
-                    "text": "*Author*:\n$CIRCLE_PROJECT_USERNAME"
+    executor: slack-executor
+    steps:
+      - run: echo "Slack notification"
+      - slack/notify:
+          event: "always"
+          channel: "general"
+          template: ""
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${CIRCLE_BRANCH} branch build is complete",
+                    "emoji": true
                   }
-                ]
-              },
-              {
-                "type": "actions",
-                "elements": [
-                  {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "View Job"
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
                     },
-                    "url": "${CIRCLE_BUILD_URL}"
-                  }
-                ]
-              }
-            ]
-          }
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch*:\n$CIRCLE_BRANCH"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*When*:\n$(date +'%m/%d/%Y %T')"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Build*:\n$CIRCLE_BUILD_NUM"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author*:\n$CIRCLE_PROJECT_USERNAME"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Job"
+                      },
+                      "url": "${CIRCLE_BUILD_URL}"
+                    }
+                  ]
+                }
+              ]
+            }
   deploy_to_aws_s3:
     executor: app-executor
     steps:
