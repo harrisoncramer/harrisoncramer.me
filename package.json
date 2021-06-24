@@ -5,6 +5,8 @@
   "version": "0.1.0",
   "author": "Harrison Cramer <kingofcramers.dev@gmail.com>",
   "dependencies": {
+    "@fontsource/lora": "^4.4.5",
+    "@fontsource/playfair-display": "^4.4.5",
     "@fontsource/raleway": "^4.4.5",
     "@types/styled-components": "^5.1.10",
     "@typescript-eslint/eslint-plugin": "^4.26.0",
@@ -22,6 +24,7 @@
     "gatsby-plugin-react-helmet": "^4.6.0",
     "gatsby-plugin-sharp": "^3.6.0",
     "gatsby-plugin-styled-components": "^4.8.0",
+    "gatsby-remark-images": "^5.5.0",
     "gatsby-remark-prismjs": "^5.4.1",
     "gatsby-source-filesystem": "^3.7.0",
     "gatsby-transformer-remark": "^4.4.1",

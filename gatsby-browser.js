@@ -5,4 +5,6 @@
  */
 
 import "@fontsource/raleway"
+import "@fontsource/playfair-display"
+import "@fontsource/lora"
 import "./src/styles/global.css"

@@ -124,13 +124,11 @@ const StyledPost = styled.div`
   padding: 1em;
 
   h2 {
-    font-family: "Raleway";
     margin: 0.25em 0 0.25em 0;
   }
 `
 
 const StyledDate = styled.span`
-  font-family: "Raleway";
   font-size: 0.9em;
 `
 

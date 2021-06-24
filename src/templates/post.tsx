@@ -30,7 +30,7 @@ export default function Template(props: TemplateProps): JSX.Element {
   return (
     <Layout title={frontmatter.title}>
       <Seo title={frontmatter.title} description={frontmatter.description} />
-      <StyledPostWrapper>
+      <div>
         <PostTitle>{frontmatter.title}</PostTitle>
         <StyledSubtitle>
           <h3>{frontmatter.date}</h3>
@@ -45,9 +45,12 @@ export default function Template(props: TemplateProps): JSX.Element {
           quote={markdownRemark.frontmatter.description}
         />
         <PostContent>
-          <div dangerouslySetInnerHTML={{ __html: html }}></div>
+          <div
+            className="content"
+            dangerouslySetInnerHTML={{ __html: html }}
+          ></div>
         </PostContent>
-      </StyledPostWrapper>
+      </div>
     </Layout>
   )
 }
@@ -78,16 +81,7 @@ export const pageQuery = graphql`
   }
 `
 
-const StyledPostWrapper = styled.div`
-  h2,
-  h3,
-  h4 {
-    font-family: "Raleway";
-  }
-`
-
 const PostTitle = styled.h1`
-  font-family: "Raleway";
   margin-bottom: 0;
 `
 
@@ -96,19 +90,46 @@ const StyledSubtitle = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  h3 {
-    font-family: "Raleway";
-  }
 `
 
 const PostContent = styled.div`
-  .gatsby-highlight-code-line {
+  .gatsby-highlight {
     background-color: #444444;
+    border-radius: 10px;
+    overflow: auto;
+  }
+
+  .gatsby-highlight pre[class*="language-"] {
+    margin: 0;
+    overflow: initial;
+    float: left; /* 1 */
+    min-width: 100%; /* 2 */
+  }
+
+  .gatsby-highlight-code-line {
+    background-color: #5f5f5f;
     display: block;
     margin-right: -1em;
     margin-left: -1em;
     padding-right: 1em;
     padding-left: 0.75em;
     border-left: 0.25em solid #f99;
+  }
+
+  /* Inline text */
+  .language-text {
+    font-size: 0.9em;
+    padding: 0em 0.3em;
+    text-shadow: none;
+  }
+
+  .gatsby-resp-image-figcaption {
+    font-size: 0.8em;
+    text-align: center;
+  }
+
+  .gatsby-resp-image-figcaption p {
+    padding: 0;
+    margin: 0.5em;
   }
 `
