@@ -3,7 +3,6 @@ import * as React from "react"
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
 import { Link } from "gatsby"
-import styled from "styled-components"
 
 // For code highlighting
 const IndexPage = (): JSX.Element => (
@@ -13,7 +12,7 @@ const IndexPage = (): JSX.Element => (
       description="Harrison Cramer personal blog site."
     />
     <div>
-      <StyledH1>Hello 👋</StyledH1>
+      <h1>Hello 👋</h1>
       <p>
         My name is Harrison and I'm a software engineer and former national
         security reporter. I'm currently in the June cohort of{" "}
@@ -44,7 +43,4 @@ const IndexPage = (): JSX.Element => (
   </Layout>
 )
 
-const StyledH1 = styled.h1`
-  font-family: "Raleway";
-`
 export default IndexPage

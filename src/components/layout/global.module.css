@@ -1,8 +1,29 @@
 .main {
-  font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto",
-    "Helvetica Neue", "Arial", "Noto Sans", sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   min-height: 100%;
+}
+
+.main h1,
+h2,
+h3 {
+  font-family: "Playfair Display";
+  font-weight: 500;
+}
+
+/* Increase title size on computers */
+@media only screen and (min-width: 875px) {
+  .main h1 {
+    font-size: 2.75em;
+  }
+}
+
+.main h2 {
+  font-size: 1.75em;
+}
+
+.main p,
+li {
+  font-size: 1.2em;
+  font-family: "Lora";
 }
 
 /* Light mode! */
@@ -30,6 +51,6 @@
   display: flex;
   flex-direction: column;
   lign-items: center;
-  max-width: 1050px;
+  max-width: 900px;
   margin: 0 auto;
 }
