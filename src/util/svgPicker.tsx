@@ -22,7 +22,7 @@ export default function svgPicker({
   isDark: number
 }): JSX.Element {
   const t = tag.toLowerCase()
-  const color = !!isDark ? "white" : "black"
+  const color = isDark > 0 ? "white" : "black"
   switch (t) {
     case "javascript":
       return <Javascript color={color} />
