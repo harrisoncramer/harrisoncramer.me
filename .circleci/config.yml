@@ -55,8 +55,8 @@ aliases:
                 {
                   "type": "header",
                   "text": {
-                    "type": "plain_text",
-                    "text": "$❌ {CIRCLE_BRANCH} branch failed!",
+                    "type": "mrkdwn",
+                    "text": "$❌ Failure on build #${CIRCLE_BUILD_NUM} for {CIRCLE_BRANCH} branch.",
                     "emoji": true
                   }
                 },            
