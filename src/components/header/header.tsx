@@ -15,7 +15,7 @@ const Header = ({ setIsDark }: HeaderProps): JSX.Element => {
 
   return (
     <StyledHeader isDark={!!isDark}>
-      <Dropdown isDark={!!isDark} />
+      <Dropdown />
       <StyledSvg
         isDark={!!isDark}
         onClick={changeTheme}
