@@ -1,9 +1,14 @@
 version: 2.1
+orbs:
+  slack: circleci/slack@4.1
 executors:
   app-executor:
     docker:
       - image: cimg/node:15.2.0
     working_directory: ~/my_repo
+  general-executor:
+    docker:
+      - image: cimg/base:stable
 
 aliases:
   - &show_branch
@@ -66,6 +71,26 @@ jobs:
       - *show_branch
       - *restore_cache
       - *build_project
+  notify_develop:
+    executor: general-executor
+    steps:
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "The gatsby_build was successful. Ready to push to production."
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
+            event: always
   deploy_to_aws_s3:
     executor: app-executor
     steps:
@@ -94,7 +119,7 @@ jobs:
 workflows:
   build_and_deploy:
     jobs:
-      - install_packages # Build and lint, and terraform validate will check every branch!
+      - install_packages
       - lint:
           requires:
             - install_packages
@@ -107,6 +132,14 @@ workflows:
             - lint
           filters:
             <<: *only_develop
+      - notify_develop:
+          requires:
+            - gatsby_build
+          filters:
+            <<: *only_develop
+          context:
+            - slack_context
+      ## Our production workflow only relies on package installation, not lint/gatsby_build
       - deploy_to_aws_s3:
           filters: &only_production
             branches:
