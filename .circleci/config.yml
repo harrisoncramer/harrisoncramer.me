@@ -8,7 +8,7 @@ executors:
     working_directory: ~/my_repo
   slack-executor:
     docker:
-      - image: cimg/base:latest
+      - image: cimg/base:stable
     resource_class: small
 
 aliases:
