@@ -6,9 +6,10 @@ executors:
     docker:
       - image: cimg/node:15.2.0
     working_directory: ~/my_repo
-  general-executor:
+  slack-executor:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:latest
+    resource_class: small
 
 aliases:
   - &show_branch
@@ -72,25 +73,62 @@ jobs:
       - *restore_cache
       - *build_project
   notify_develop:
-    executor: general-executor
-    steps:
-      - slack/notify:
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "The gatsby_build was successful. Ready to push to production.",
-                      "emoji": true
-                    }
-                  ]
+    - run: echo "Slack notification"
+    - slack/notify
+        event: 'always'
+        channel: "general"
+        template: ''
+        custom: |
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "${CIRCLE_BRANCH} branch build is complete",
+                  "emoji": true
                 }
-              ]
-            }
-            event: always
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Branch*:\n$CIRCLE_BRANCH"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*When*:\n$(date +'%m/%d/%Y %T')"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Build*:\n$CIRCLE_BUILD_NUM"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Author*:\n$CIRCLE_PROJECT_USERNAME"
+                  }
+                ]
+              },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "View Job"
+                    },
+                    "url": "${CIRCLE_BUILD_URL}"
+                  }
+                ]
+              }
+            ]
+          }
   deploy_to_aws_s3:
     executor: app-executor
     steps:
