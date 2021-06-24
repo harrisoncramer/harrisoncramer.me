@@ -230,6 +230,8 @@ workflows:
                 - develop
       - gatsby_build:
           <<: *slack_fail_post_step
+          context:
+            - slack_context
           requires:
             - lint
           filters:
