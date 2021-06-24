@@ -116,7 +116,7 @@ workflows:
             - blog_context
             - aws_context
           requires:
-            - lint
+            - install_packages
       - deploy_to_aws_cloudfront:
           context:
             - blog_context
