@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React from "react"
 import { graphql } from "gatsby"
 import styled from "styled-components"
 import Seo from "../components/seo/seo"
@@ -6,7 +6,6 @@ import Layout from "../components/layout/layout"
 import { Post } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import { Social } from "../components/social/social"
-import { ThemeContext } from "../components/theme/Theme"
 
 type TemplateProps = {
   uri: string
@@ -24,7 +23,6 @@ type TemplateProps = {
 }
 
 export default function Template(props: TemplateProps): JSX.Element {
-  const isDark = useContext(ThemeContext)
   const { markdownRemark } = props.data
   const { frontmatter, html } = markdownRemark
   //@ts-ignore
@@ -95,8 +93,21 @@ const StyledSubtitle = styled.div`
 `
 
 const PostContent = styled.div`
-  .gatsby-highlight-code-line {
+  .gatsby-highlight {
     background-color: #444444;
+    border-radius: 10px;
+    overflow: auto;
+  }
+
+  .gatsby-highlight pre[class*="language-"] {
+    margin: 0;
+    overflow: initial;
+    float: left; /* 1 */
+    min-width: 100%; /* 2 */
+  }
+
+  .gatsby-highlight-code-line {
+    background-color: #5f5f5f;
     display: block;
     margin-right: -1em;
     margin-left: -1em;
@@ -105,9 +116,10 @@ const PostContent = styled.div`
     border-left: 0.25em solid #f99;
   }
 
+  /* Inline text */
   .language-text {
     font-size: 0.9em;
-    padding: 0.1em 0.3em;
+    padding: 0em 0.3em;
     text-shadow: none;
   }
 

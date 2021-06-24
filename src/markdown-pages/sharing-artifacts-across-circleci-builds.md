@@ -46,7 +46,7 @@ Let's say we're trying to build a basic continuous integration setup for this pr
 1. Lint the code. 
 2. Run some tests.
 
-Let's build a basic pipeline that does each of those jobs by running scripts inside our package.json file:
+Let's build a pipeline that does each of those jobs by running scripts inside our package.json file:
 
 ```yaml{14,23}
 version: 2.1
@@ -88,10 +88,18 @@ Both jobs run `npm install` in order to download our dependencies. This isn't id
 
 The simplest way to boost the speed of our pipeline is to implement CircleCI's caching mechanism.
 
-We do this by specifying the creation of a cache as a separate `save_cache` step within the job that installs our dependencies.
+Look at the first highlighted portion of the configuration file. We specify the creation of a cache as a separate `save_cache` step within the job that installs our dependencies. The step requires two fields: the `paths` and `key` fields. 
+
+The `paths` key tells the cache what folders and files to save. In our case, we're only caching our dependencies.
+
+The `key` field is a user-defined string that points to the cache. We create a unique hash of our `package.json` file with the checksum command, and prepend it with the characters "-app" string. This hash will be unique to our current package.json file.
+
+We can use the `restore_cache` step in our later jobs to fetch those dependencies, since our `package.json` doesn't change and the checksum will be the same.
+
+We pass an array of `keys` to the step, and it looks sequentially for hashes that match. When it finds one, it'll load those depedencies. The second value in the array is known as a "fallback" and will allow CircleCI to load _part_ of our cache. For instance, if our package.json has changed slightly, we won't have to redownload everything.
 
 
-```yaml{16-19}
+```yaml{16-19,24-27,31}
 version: 2.1
 executors:
   app-executor:
@@ -115,10 +123,13 @@ jobs:
     executor: app-executor
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - app-{{ checksum "package.json" }}
+            - app-
       - run:
           name: Run tests
           command: |
-            npm install
             npm run test
 workflows:
   lint_and_test_before_merge:
