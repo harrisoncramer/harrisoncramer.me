@@ -1,5 +1,5 @@
 ---
-title: Speeding up CircleCI Builds
+title: Speeding up CircleCI Builds with Caching and Artifacts
 date: 2021-07-23
 path: /sharing-circleci-build-artifacts
 description: Sharing files and folders across different steps in your CI/CD pipeline can dramatically speed up the build time of your application, making your team more responsive to breaking changes and ultimately more productive. Here's how to do it.
@@ -9,43 +9,123 @@ tags: ["circleci"]
 ---
 
 ## Why do we need faster deployments?
-When building out a deployment pipeline for an application, it's important to get feedback about the build quickly, so that your team can address any issues quickly. Ultimately, a quicker pipeline means you'll be able to push code to production more frequently, giving you greater confidence in each commit and ensuring a quicker development cycle overall.
+When building out a deployment pipeline for an application, it's important to get feedback about the build quickly. Ultimately, a quicker pipeline leads to code reaching a production environment more frequently and in smaller chunks. This ensures rapid iteration for developers, who won't be waiting around for a massive build before continuing on to the next feature.
 
-The faster deployment cycle also keeps developers sharp. It's much easier to debug code you've written three minutes ago, versus a half hour ago.
+The faster deployment cycle also facilitates better debugging and rollback. It's much easier to debug code you've written three minutes ago, versus a half hour ago. And rolling back each small feature is effortless, compared to rolling back a massive, jumbled commit.
 
-## Caching
-One of the simplest ways to boost the speed of your CI/CD pipeline is to use <a href="https://circleci.io">CircleCI's</a> caching mechanisms. 
+## Our basic application and pipeline
 
-Let's take a look at a basic pipeline for a NodeJS project that installs our following dependencies:
+Let's say our simple NodeJS application relies on a few packages to function. It's a simple Express application that reaches out to another API and provides JSON data back at a specific endpoint. This is the entire application:
 
-```yaml{1,2,10-14} 
+```javascript
+const express = require("express");
+const axios = require("axios");
+
+const app = express();
+const port = 3000;
+
+app.get("/", async (req, res) => {
+  try {
+    const response = await axios.get(
+      "https://jsonplaceholder.typicode.com/todos/1"
+    );
+    res.send(response.data);
+  } catch (err) {
+    res.status(500);
+    res.send(err);
+  }
+});
+
+app.listen(port, () => {
+  console.log("Application running on port " + port);
+});
+
+```
+
+Let's say we're trying to build a basic continuous integration setup for this project (we'll leave deployment aside for the moment) in order to ensure that our code passes checks before merging it into master. We might want to do a two things:
+1. Lint the code. 
+2. Run some tests.
+
+Let's build a basic pipeline that does each of those jobs by running scripts inside our package.json file:
+
+```yaml{14,23}
 version: 2.1
 executors:
   app-executor:
     docker:
       - image: cimg/node:15.2.0
 jobs:
-  install_packages:
+  lint:
     executor: app-executor
     steps:
       - checkout
       - run:
-          name: Install and build project
+          name: Install and lint project
           command: |
             npm install
-  run_project:
+            npm run lint
+  test:
     executor: app-executor
     steps:
       - checkout
       - run:
-          name: Run project
+          name: Run tests
           command: |
             npm install
-            npm run build
+            npm run test
 workflows:
-  build:
+  lint_and_test_before_merge:
     jobs:
-      - install_packages
-      - run_project
+      - lint
+      - test:
+          requires:
+            - lint
+```
+
+Both jobs run `npm install` in order to download our dependencies. This isn't ideal, because the dependencies aren't actually changing and our pipeline is doing extra work. These installs will also take more time as the project grows in size, both because our dependency list will grow, and because we will have more jobs re-fetching the dependencies.
+
+## Introducing the Cache feature
+
+The simplest way to boost the speed of our pipeline is to implement CircleCI's caching mechanism.
+
+We do this by specifying the creation of a cache as a separate `save_cache` step within the job that installs our dependencies.
+
+
+```yaml{16-19}
+version: 2.1
+executors:
+  app-executor:
+    docker:
+      - image: cimg/node:15.2.0
+jobs:
+  lint:
+    executor: app-executor
+    steps:
+      - checkout
+      - run:
+          name: Install and lint project
+          command: |
+            npm install
+            npm run lint
+      - save_cache:
+          paths:
+            - node_modules
+          key: app-{{ checksum "package.json" }}
+  test:
+    executor: app-executor
+    steps:
+      - checkout
+      - run:
+          name: Run tests
+          command: |
+            npm install
+            npm run test
+workflows:
+  lint_and_test_before_merge:
+    jobs:
+      - lint
+      - test:
+          requires:
+            - lint
 ```
 

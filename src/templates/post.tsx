@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext } from "react"
 import { graphql } from "gatsby"
 import styled from "styled-components"
 import Seo from "../components/seo/seo"
@@ -6,6 +6,7 @@ import Layout from "../components/layout/layout"
 import { Post } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import { Social } from "../components/social/social"
+import { ThemeContext } from "../components/theme/Theme"
 
 type TemplateProps = {
   uri: string
@@ -23,6 +24,7 @@ type TemplateProps = {
 }
 
 export default function Template(props: TemplateProps): JSX.Element {
+  const isDark = useContext(ThemeContext)
   const { markdownRemark } = props.data
   const { frontmatter, html } = markdownRemark
   //@ts-ignore
@@ -30,7 +32,7 @@ export default function Template(props: TemplateProps): JSX.Element {
   return (
     <Layout title={frontmatter.title}>
       <Seo title={frontmatter.title} description={frontmatter.description} />
-      <StyledPostWrapper>
+      <div>
         <PostTitle>{frontmatter.title}</PostTitle>
         <StyledSubtitle>
           <h3>{frontmatter.date}</h3>
@@ -45,9 +47,12 @@ export default function Template(props: TemplateProps): JSX.Element {
           quote={markdownRemark.frontmatter.description}
         />
         <PostContent>
-          <div dangerouslySetInnerHTML={{ __html: html }}></div>
+          <div
+            className="content"
+            dangerouslySetInnerHTML={{ __html: html }}
+          ></div>
         </PostContent>
-      </StyledPostWrapper>
+      </div>
     </Layout>
   )
 }
@@ -78,16 +83,7 @@ export const pageQuery = graphql`
   }
 `
 
-const StyledPostWrapper = styled.div`
-  h2,
-  h3,
-  h4 {
-    font-family: "Raleway";
-  }
-`
-
 const PostTitle = styled.h1`
-  font-family: "Raleway";
   margin-bottom: 0;
 `
 
@@ -96,9 +92,6 @@ const StyledSubtitle = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  h3 {
-    font-family: "Raleway";
-  }
 `
 
 const PostContent = styled.div`
@@ -110,6 +103,12 @@ const PostContent = styled.div`
     padding-right: 1em;
     padding-left: 0.75em;
     border-left: 0.25em solid #f99;
+  }
+
+  .language-text {
+    font-size: 0.9em;
+    padding: 0.1em 0.3em;
+    text-shadow: none;
   }
 
   .gatsby-resp-image-figcaption {

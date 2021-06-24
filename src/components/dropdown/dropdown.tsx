@@ -1,9 +1,11 @@
-import React, { useRef, useState, useEffect } from "react"
+import React, { useRef, useState, useEffect, useContext } from "react"
 import { Link } from "gatsby"
 import styled from "styled-components"
+import { ThemeContext } from "../theme/Theme"
 
-export const Dropdown = ({ isDark }: { isDark: boolean }): JSX.Element => {
+export const Dropdown = (): JSX.Element => {
   const dropdownRef = useRef(null)
+  const isDark = useContext(ThemeContext)
   const [isActive, setIsActive] = useState(false)
   const onClick = () => setIsActive(!isActive)
 
@@ -29,7 +31,7 @@ export const Dropdown = ({ isDark }: { isDark: boolean }): JSX.Element => {
   return (
     <StyledMenuContainer>
       <StyledSvg
-        isDark={isDark}
+        isDark={!!isDark}
         onClick={onClick}
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -42,7 +44,7 @@ export const Dropdown = ({ isDark }: { isDark: boolean }): JSX.Element => {
         ref={dropdownRef}
         className={"menu"}
         isActive={isActive}
-        isDark={isDark}
+        isDark={!!isDark}
       >
         <ul>
           <li>
@@ -101,9 +103,11 @@ const StyledNav = styled.nav`
   }
 
   li a {
+    color: black;
+    font-family: "Playfair Display";
+    font-size: 1em;
     padding: 15px 20px;
     display: block;
-    font-family: "Raleway";
   }
 
   ${({ isActive }: { isActive: boolean }) =>
@@ -121,9 +125,14 @@ const StyledNav = styled.nav`
       color: white;
       background: black;
       box-shadow: 0 1px 8px rgba(255, 255, 255, 0.3);
+
+    li a {
+      color: white;
+    }
   
     li {
-      border-bottom: 1px solid grey;
+      color: white;
+      border-bottom: 1px solid #282828;
     }
   `}
 `
