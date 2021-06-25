@@ -38,6 +38,13 @@ module.exports = {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [
+          // Allow titles for code blocks
+          {
+            resolve: "gatsby-remark-code-titles",
+            options: {
+              className: "code-block-file-name",
+            },
+          },
           // Allow images inside markdown
           {
             resolve: `gatsby-remark-images`,
