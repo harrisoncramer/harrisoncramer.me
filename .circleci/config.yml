@@ -152,7 +152,7 @@ jobs:
           command: |
             aws configure set preview.cloudfront true
             aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths /\*
-  notify_develop:
+  notify_developers:
     executor: slack-executor
     steps:
       - run: echo "Slack notification"
@@ -236,7 +236,7 @@ workflows:
             - lint
           filters:
             <<: *only_develop
-      - notify_develop:
+      - notify_developers:
           requires:
             - gatsby_build
           filters:
@@ -266,3 +266,10 @@ workflows:
             - deploy_to_aws_s3
           filters:
             <<: *only_production
+      - notify_developers:
+          requires:
+            - deploy_to_aws_cloudfront
+          filters:
+            <<: *only_production
+          context:
+            - slack_context
