@@ -24,6 +24,7 @@
     "gatsby-plugin-react-helmet": "^4.6.0",
     "gatsby-plugin-sharp": "^3.6.0",
     "gatsby-plugin-styled-components": "^4.8.0",
+    "gatsby-remark-code-titles": "^1.1.0",
     "gatsby-remark-images": "^5.5.0",
     "gatsby-remark-prismjs": "^5.4.1",
     "gatsby-source-filesystem": "^3.7.0",
