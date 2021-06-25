@@ -1,6 +1,6 @@
 ---
 title: Speeding up CircleCI Builds with Caching
-date: 2021-07-23
+date: 2021-06-23
 path: /speeding-up-circleci-builds-with-caching
 description: Redownloading dependencies for every step in your CI/CD pipeline can be time consuming. You can dramatically speed up the build time of your application with caching, making your team more responsive to breaking changes and ultimately more productive. Here's how to do it.
 imageDescription: An image of a child staring at steps.
@@ -17,7 +17,7 @@ The faster deployment cycle also facilitates better debugging and rollback. It's
 
 Let's say our simple NodeJS application relies on a few packages to function. It's a simple Express application that reaches out to another API and provides JSON data back at a specific endpoint. This is the entire application:
 
-```javascript
+```javascript:title=index.js
 const express = require("express");
 const axios = require("axios");
 
@@ -48,7 +48,7 @@ Let's say we're trying to build a basic continuous integration setup for this pr
 
 Let's build a pipeline that does each of those jobs by running scripts inside our package.json file:
 
-```yaml{14,23}
+```yaml{14,23}:title=.circleci/config.yml
 version: 2.1
 executors:
   app-executor:
@@ -90,7 +90,7 @@ The simplest way to boost the speed of our pipeline is to implement CircleCI's c
 
 Let's set up the cache. We specify the creation of a cache as a separate `save_cache` step within the job that installs our dependencies. The step requires two fields: the `paths` and `key` fields. 
 
-```yaml{16-19,24-27,31}
+```yaml{16-19,24-27,31}:title=.circleci/config.yml
 version: 2.1
 executors:
   app-executor:
@@ -126,7 +126,7 @@ Now, let's use that cache in another step.
 
 We can use the `restore_cache` step in our later jobs to fetch those dependencies, since our `package.json` doesn't change and the checksum will be the same.
 
-```yaml{24-27}
+```yaml{24-27}:title=.circleci/config.yml
 version: 2.1
 executors:
   app-executor:

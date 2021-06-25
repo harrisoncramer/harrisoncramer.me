@@ -95,15 +95,34 @@ const StyledSubtitle = styled.div`
 const PostContent = styled.div`
   .gatsby-highlight {
     background-color: #444444;
-    border-radius: 10px;
     overflow: auto;
+  }
+
+  .code-block-file-name {
+    padding: 0.5em 1em;
+    font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console",
+      "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
+      "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier,
+      monospace;
+
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+
+    font-size: 0.8em;
+    font-style: italic;
+    background-color: #272822;
+    color: white;
+    text-align: end;
   }
 
   .gatsby-highlight pre[class*="language-"] {
     margin: 0;
     overflow: initial;
+    box-sizing: border-box;
     float: left; /* 1 */
     min-width: 100%; /* 2 */
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
   }
 
   .gatsby-highlight-code-line {
