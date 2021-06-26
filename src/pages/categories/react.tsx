@@ -1,4 +1,4 @@
-import { graphql } from "gatsby"
+import { graphql, PageProps } from "gatsby"
 import React from "react"
 import { useStaticQuery } from "gatsby"
 import { Post } from "../../components/post/post"
@@ -18,7 +18,7 @@ type ReactData = {
   }
 }
 
-const ReactCategory = (): React.ReactElement => {
+const ReactCategory = (props: PageProps): React.ReactElement => {
   const data: ReactData = useStaticQuery(
     graphql`
       query ReactQuery {
@@ -56,7 +56,7 @@ const ReactCategory = (): React.ReactElement => {
   return (
     <Layout title="React">
       <Seo description="All posts pertaining to React" title="React" />
-      <h2>Category: {location.pathname.split("/").pop()}</h2>
+      <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {
           return <Post key={i} {...node.frontmatter} />

@@ -11,7 +11,10 @@ import { categories } from "../../util/constants"
 const handleGoToCategory = (e: MouseEvent) => {
   const input = e.target as HTMLElement
   const category = input.innerText
-  navigate(`/categories/${category}`)
+  // Don't navigate if we're on the same page and clutter up the history
+  if (!window.location.href.endsWith(category)) {
+    navigate(`/categories/${category}`)
+  }
   e.stopPropagation()
 }
 

@@ -1,5 +1,5 @@
 import React from "react"
-import { graphql } from "gatsby"
+import { graphql, PageProps } from "gatsby"
 import { useStaticQuery } from "gatsby"
 import { Post } from "../../components/post/post"
 import { Post as PostType } from "../../types/markdown"
@@ -18,7 +18,7 @@ type JavascriptData = {
   }
 }
 
-const JavascriptCategory = (): React.ReactElement => {
+const JavascriptCategory = (props: PageProps): React.ReactElement => {
   const data: JavascriptData = useStaticQuery(
     graphql`
       query JavascriptQuery {
@@ -59,7 +59,7 @@ const JavascriptCategory = (): React.ReactElement => {
         description="All posts pertaining to Javascript"
         title="Javascript"
       />
-      <h2>Category: {location.pathname.split("/").pop()}</h2>
+      <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {
           return <Post key={i} {...node.frontmatter} />

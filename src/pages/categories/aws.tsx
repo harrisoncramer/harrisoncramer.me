@@ -1,4 +1,4 @@
-import { graphql } from "gatsby"
+import { graphql, PageProps } from "gatsby"
 import React from "react"
 import { useStaticQuery } from "gatsby"
 import { Post } from "../../components/post/post"
@@ -18,7 +18,7 @@ type AwsData = {
   }
 }
 
-const Aws = (): React.ReactElement => {
+const Aws = (props: PageProps): React.ReactElement => {
   const data: AwsData = useStaticQuery(
     graphql`
       query AwsQuery {
@@ -53,7 +53,7 @@ const Aws = (): React.ReactElement => {
   return (
     <Layout title="aws">
       <Seo description="All posts pertaining to aws" title="aws" />
-      <h2>Category: {location.pathname.split("/").pop()}</h2>
+      <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {
           return <Post key={i} {...node.frontmatter} />

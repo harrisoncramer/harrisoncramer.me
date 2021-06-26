@@ -1,5 +1,5 @@
 import React from "react"
-import { graphql } from "gatsby"
+import { graphql, PageProps } from "gatsby"
 import { useStaticQuery } from "gatsby"
 import { Post } from "../../components/post/post"
 import { Post as PostType } from "../../types/markdown"
@@ -18,7 +18,7 @@ type TerraformData = {
   }
 }
 
-const TerraformCategory = (): React.ReactElement => {
+const TerraformCategory = (props: PageProps): React.ReactElement => {
   const data: TerraformData = useStaticQuery(
     graphql`
       query TerraformQuery {
@@ -56,7 +56,7 @@ const TerraformCategory = (): React.ReactElement => {
   return (
     <Layout title="Terraform">
       <Seo description="All posts pertaining to Terraform" title="Terraform" />
-      <h2>Category: {location.pathname.split("/").pop()}</h2>
+      <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {
           return <Post key={i} {...node.frontmatter} />
