@@ -40,6 +40,7 @@ exports.createPages = async ({ actions, graphql }) => {
     createPage({
       path: node.frontmatter.path,
       component: path.resolve(`src/templates/post.tsx`),
+      categories: ["aws", "react"],
     })
   })
 }

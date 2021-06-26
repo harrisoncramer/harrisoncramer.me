@@ -8,6 +8,4 @@ featuredImage: ../images/posts/react-reference.jpeg
 tags: ["javascript", "react"]
 ---
 
-Within the React ecosystem, the `<Ref>`
-I am some content.
-
+Hello from my React post
