@@ -5,7 +5,6 @@ path: /my-first-post
 description: This is a template post that shows what's possible with my blog.
 imageDescription: View of some code on a monitor.
 featuredImage: ../images/posts/my-first-post.png
-tags: ["General"]
 ---
 
 Welcome to the blog section of my personal website!

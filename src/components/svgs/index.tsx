@@ -107,6 +107,7 @@ export const Docker = ({ color }: { color: string }): JSX.Element => (
     ></path>
   </svg>
 )
+
 export const Golang = ({ color }: { color: string }): JSX.Element => (
   <svg viewBox="0 0 128 128">
     <defs>

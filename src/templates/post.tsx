@@ -136,7 +136,7 @@ const PostContent = styled.div`
   }
 
   /* Inline text */
-  .language-text {
+  p > .language-text {
     font-size: 0.9em;
     padding: 0em 0.3em;
     text-shadow: none;
