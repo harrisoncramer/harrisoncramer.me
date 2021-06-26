@@ -6,6 +6,7 @@ import { navigate } from "gatsby"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import svgPicker from "../../util/svgPicker"
 import dayjs from "dayjs"
+import { categories } from "../../util/constants"
 
 const handleGoToCategory = (e: MouseEvent) => {
   const input = e.target as HTMLElement
@@ -33,14 +34,16 @@ export const Post = ({
     <StyledPost onClick={() => handleClickPost(path)}>
       <StyledTagHolder>
         {tags &&
-          tags.map((tag, i) => (
-            <StyledTag key={i} onClick={handleGoToCategory}>
-              <StyledSvgContainer>
-                {tag.toLowerCase()}
-                {svgPicker({ tag, isDark: 0 })}
-              </StyledSvgContainer>
-            </StyledTag>
-          ))}
+          tags
+            .filter(tag => categories.includes(tag))
+            .map((tag, i) => (
+              <StyledTag key={i} onClick={handleGoToCategory}>
+                <StyledSvgContainer>
+                  {tag.toLowerCase()}
+                  {svgPicker({ tag, isDark: 0 })}
+                </StyledSvgContainer>
+              </StyledTag>
+            ))}
       </StyledTagHolder>
       {image && imageDescription && (
         <GatsbyImage image={image} alt={imageDescription} />
