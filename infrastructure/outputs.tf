@@ -17,3 +17,7 @@ output "s3_website_endpoint" {
 output "cdn_domain" {
   value = aws_cloudfront_distribution.s3_distribution.domain_name
 }
+
+output "static_assets" {
+  value = aws_s3_bucket.assets.id
+}
