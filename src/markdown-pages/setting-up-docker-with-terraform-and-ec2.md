@@ -83,8 +83,7 @@ The `instance_ami` for the specific EC2 server you'd like to use by logging onto
 
 ![AWS Dashboard view](../images/inline_images/aws_ami.png "This is where you can find the AMI of the server that you'd like to deploy.")
 
-## Creating the EC2 Instance
-
+When we setup ssh for our EC2 server later, the `ssh_public_key` will match with the private key from our computer.
 
 ## Creating the Network
 
@@ -101,6 +100,245 @@ resource "aws_vpc" "main" {
 }
 ```
 
-The full list of options for the VPC is <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc">here.</a> Basically, we're telling our VPC that we want to enable domain name support (perhaps we want to have this in the future). We're also telling our VPC that our network will have a CIDR block with suppport for 65,534 hosts, ranging between the IP addresses of 10.0.0.1 to 10.0.255.254. To learn more about subnetting and CIDR blocks, check out <a href="https://cloudacademy.com/course/aws-virtual-private-cloud-subnets-and-routing/vpc-cidr-blocks/">this</a> introduction video on the topic.
+The full list of options for the VPC is <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc">here.</a> We'll enable enable domain name support (perhaps we want to have a domain in the future). We're also telling our VPC to have a CIDR block with suppport for 65,534 hosts, ranging between the IP addresses of 10.0.0.1 to 10.0.255.254. To learn more about subnetting and CIDR blocks, check out <a href="https://cloudacademy.com/course/aws-virtual-private-cloud-subnets-and-routing/vpc-cidr-blocks/">this</a> introduction video on the topic.
 
-We'll also need to create our Elastic IP resource. The IP address is a static address that _will not change_. This lets us 
+Next, create our Elastic IP resource. The IP address is a static address that _will not change_, and we can map to our EC2 instance. In the future, if the EC2 instance goes down or is re-created, the public-facing URL will remain accessible at the same place.
+
+```hcl{10-14}:title=infrastructure/network.tf
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  tags = {
+    Name = "my_app's VPC"
+  }
+}
+
+resource "aws_eip" "my_app" {
+  instance = aws_instance.my_app.id
+  vpc      = true
+}
+```
+
+You'll notice that we're referencing the `aws_instance` which is our EC2 server. We'll create the actual EC2 instance resource in the next section.
+
+Next, we'll create a subnet within the range that we defined for our VPC. The `cidrsubnet` function <a href="https://www.terraform.io/docs/language/functions/cidrsubnet.html">calculates</a> a subnet address within the given VPC's CIDR block:
+
+```hcl:title=infrastructure/subnet.tf
+resource "aws_subnet" "my_app" {
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 3, 1)
+  vpc_id            = aws_vpc.main.id
+  availability_zone = var.availability_zone
+}
+```
+
+Let's also create the route table. This will allow traffic from our internet gateway (which we haven't created yet) to reach our VPC.
+
+```hcl{7-18}:title=infrastructure/subnet.tf
+resource "aws_subnet" "my_app" {
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 3, 1)
+  vpc_id            = aws_vpc.main.id
+  availability_zone = var.availability_zone
+}
+
+resource "aws_route_table" "my_app" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.my_app.id # This will be created when we apply our configuration.
+  }
+
+  tags = {
+    Name = "my_app"
+  }
+}
+```
+
+We also need to associate this route table with our subnet.
+
+```hcl{20-23}:title=infrastructure/subnet.tf
+resource "aws_subnet" "my_app" {
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 3, 1)
+  vpc_id            = aws_vpc.main.id
+  availability_zone = var.availability_zone
+}
+
+resource "aws_route_table" "my_app" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.my_app.id
+  }
+
+  tags = {
+    Name = "my_app"
+  }
+}
+
+resource "aws_route_table_association" "subnet-association" {
+  subnet_id      = aws_subnet.my_app.id
+  route_table_id = aws_route_table.my_app.id
+}
+```
+
+The last resource that we'll need to create is our internet gateway. This is the resource that actually opens up our VPC to the rest of the internet:
+
+```hcl:title=infrastructure/gateway.tf
+resource "aws_internet_gateway" "my_app" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "my_app"
+  }
+}
+```
+
+Whew! We're done with the network. Let's move on to the server itself.
+
+## Creating the EC2 Instance
+
+
+Start by creating a new `aws_key_pair` that we'll include in our EC2 instance to give us shell access. If we need to manually connect to the server at some point in the future, we'll use the private key that corresponds with this credential.
+
+```hcl:title=infrastructure/ec2.tf
+resource "aws_key_pair" "ssh-key" {
+  key_name   = "ssh-key"
+  public_key = var.ssh_public_key
+}
+```
+
+Next create the EC2 instance. We're referencing many of the variables that we already set up, for the type, the size, and the availablity zone. We're also creating it within the subnet we created earlier.
+
+```hcl{6-27}:title=infrastructure/ec2.tf
+resource "aws_key_pair" "ssh-key" {
+  key_name   = "ssh-key"
+  public_key = var.ssh_public_key
+}
+
+resource "aws_instance" "my_app" {
+  ami                         = var.instance_ami
+  instance_type               = var.instance_type
+  availability_zone           = var.availability_zone
+  security_groups             = [aws_security_group.my_app.id]
+  associate_public_ip_address = true
+  subnet_id                   = aws_subnet.my_app.id
+
+  key_name = "ssh-key"
+
+  ### Install Docker
+  user_data = <<-EOF
+  #!/bin/bash
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sudo sh get-docker.sh
+  sudo groupadd docker
+  sudo usermod -aG docker ubuntu
+  newgrp docker
+  sudo timedatectl set-timezone America/New_York
+  EOF
+
+  tags = {
+    Name = "my_app_API"
+  }
+}
+
+```
+
+The `user_data` keyword is an awesome feature that lets us pipe custom commands into the container at startup. In this case, we're installing Docker using a bash script. The exact script could change slightly if you use a different AMI (EC2 type).
+
+When creating an Ubuntu EC2 instance (the AMI chosen for this walkthrough) an ubuntu user will be the default user. We're giving this user access to docker too.
+
+Finally, I'm setting the time zone of the server to match my timezone in New York.
+
+## Creating the Security Group
+
+The last resource we need to configure is the security group, which defines ingress access rules for our VPC.
+
+Let's create the security group that will open up the ports required for our application to function. First, we'll allow SSH access on Port 22 from any IP. We could narrow this down if we only want a smaller group of computers to be able to access our resource for security reasons.
+
+```hcl:title=infrastructure/security_group.tf
+resource "aws_security_group" "my_app" {
+  name   = "SSH + Port 3005 for API"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+  }
+}
+```
+
+Next, we'll allow all outgoing traffic as well with an egress rule.
+
+```hcl{14-19}:title=infrastructure/security_group.tf
+resource "aws_security_group" "my_app" {
+  name   = "SSH + Port 3005 for API"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+## Creating the output file
+
+For convenience (and so we don't have to use the AWS GUI at all) we can create an output file, that'll log out information about our network after a deploy. For simplicity's sake, we're only interested in the IP address of our EC2 server.
+
+```hcl:title=infrastructure/outputs.tf
+output "ec2_ip_address" {
+  value = aws_instance.my_app.public_ip
+}
+
+```
+
+## Applying our files
+
+At this point, we should have a list of terraform files that can setup an EC2 instance with Docker. Let's get a view of our folder.
+
+```shell
+$ ls infrastructure
+ec2.tf
+gateway.tf
+main.tf
+network.tf              
+security_group.tf
+subnet.tf
+terraform.tfvars
+variables.tf
+```
+
+We should be able to now plan and apply our infrastucture with Terraform, using the `terraform plan` and `terraform apply` commands inside of the infrastructure folder.
+
+```shell
+$ cd infrastucture
+$ terraform init 
+$ terraform plan 
+$ terraform apply --auto-approve
+```
+
+That's it! We now have an EC2 container with Docker, running inside of a VPC. 
+
+```shell
+$ ssh ubuntu@your_ip_here # From the output of the apply command
+$ docker ps
+Docker version 20.10.7, build f0df350
+
+```
+
+The complete source files for this tutorial are online <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/infrastructure.tar.gz">here.</a>
