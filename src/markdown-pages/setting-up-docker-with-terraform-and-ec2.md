@@ -5,7 +5,7 @@ path: /setting-up-docker-with-terraform
 description: How to get an EC2 container up and running with Docker using Terraform.
 imageDescription: View of a container shipyard.
 featuredImage: ../images/posts/container.png
-tags: ["aws", "docker"]
+tags: ["aws", "docker", "terraform"]
 ---
 
 There are lots of pre-baked applications that let you set up Docker quickly, but many of them involve click-ops and don't allow you to save your infrastructure as repeatable code.
