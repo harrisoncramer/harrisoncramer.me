@@ -1,28 +1,30 @@
-import React from "react"
-import { graphql } from "gatsby"
+import React, { useContext } from "react"
+import { graphql, PageProps } from "gatsby"
 import styled from "styled-components"
 import Seo from "../components/seo/seo"
 import Layout from "../components/layout/layout"
 import { Post } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import { Social } from "../components/social/social"
+import { ThemeContext } from "../components/context"
+import SvgPicker from "../util/svgPicker"
 
-type TemplateProps = {
-  uri: string
-  data: {
-    site: {
-      siteMetadata: {
-        siteUrl: string
-      }
+type DataType = {
+  site: {
+    siteMetadata: {
+      siteUrl: string
     }
-    markdownRemark: {
-      html: string
-      frontmatter: Post
-    }
+  }
+  markdownRemark: {
+    html: string
+    frontmatter: Post
+    fileAbsolutePath: string
   }
 }
 
-export default function Template(props: TemplateProps): JSX.Element {
+export default function Template(props: PageProps<DataType>): JSX.Element {
+  const { isDark } = useContext(ThemeContext)
+  const location = props.data.markdownRemark.fileAbsolutePath.split("/").pop()
   const { markdownRemark } = props.data
   const { frontmatter, html } = markdownRemark
   //@ts-ignore
@@ -35,6 +37,14 @@ export default function Template(props: TemplateProps): JSX.Element {
         <StyledSubtitle>
           <h3>{frontmatter.date}</h3>
         </StyledSubtitle>
+        <a
+          href={`https://github.com/harrisoncramer/harrisoncramer.me/tree/develop/src/markdown-pages/${location}`}
+        >
+          <SvgWrapper isDark={isDark}>
+            <p>Edit this page on Github</p>
+            <SvgPicker isDark={isDark} tag={"github"} />
+          </SvgWrapper>
+        </a>
         {image && frontmatter.imageDescription && (
           <GatsbyImage image={image} alt={frontmatter.imageDescription} />
         )}
@@ -59,6 +69,7 @@ export const pageQuery = graphql`
   query TemplatePageQuery($path: String!) {
     markdownRemark(frontmatter: { path: { eq: $path } }) {
       html
+      fileAbsolutePath
       frontmatter {
         date(formatString: "MMMM DD, YYYY")
         path
@@ -81,6 +92,27 @@ export const pageQuery = graphql`
   }
 `
 
+const SvgWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  svg {
+    height: 18px;
+    padding-left: 0.2em;
+  }
+
+  p {
+    color: black;
+    font-size: 0.8em;
+    margin: 0.2em;
+    ${({ isDark }: { isDark: number }) =>
+      isDark &&
+      `
+    color: white; 
+    `}
+  }
+`
 const PostTitle = styled.h1`
   margin-bottom: 0;
 `

@@ -5,13 +5,13 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import React from "react"
+import React, { useContext } from "react"
 import Header from "../header/header"
 
 // Global styling
 import "normalize.css"
 import { main, mainDark, mainLight, contentWrapper } from "./global.module.css"
-import { ThemeContext } from "../theme/Theme"
+import { ThemeContext } from "../context"
 
 type LayoutProps = {
   title: string
@@ -19,7 +19,7 @@ type LayoutProps = {
 }
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
-  const [isDark, setIsDark] = React.useState(1)
+  const { isDark, setIsDark } = useContext(ThemeContext)
 
   React.useEffect(() => {
     const parsedCount = Number(localStorage.getItem("isDark") || 1)
@@ -31,12 +31,10 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   }, [isDark])
 
   return (
-    <ThemeContext.Provider value={isDark}>
-      <main className={`${main} ${isDark ? mainDark : mainLight}`}>
-        <Header setIsDark={setIsDark} />
-        <main className={contentWrapper}>{children}</main>
-      </main>
-    </ThemeContext.Provider>
+    <main className={`${main} ${isDark ? mainDark : mainLight}`}>
+      <Header />
+      <main className={contentWrapper}>{children}</main>
+    </main>
   )
 }
 
