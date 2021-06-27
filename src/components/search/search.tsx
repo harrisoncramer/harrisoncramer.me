@@ -1,5 +1,5 @@
 import { Link } from "gatsby"
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { ThemeContext } from "../context"
 
@@ -43,6 +43,7 @@ const StyledH4 = styled.h4`
 `
 
 export const Search = (): React.ReactElement => {
+  const searchRef = useRef(null)
   const { isDark } = useContext(ThemeContext)
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<Result[]>([])
@@ -61,12 +62,29 @@ export const Search = (): React.ReactElement => {
     setResults(res)
   }, [query, setResults])
 
+  const pageClickEvent = (e: React.MouseEvent) => {
+    if (searchRef && searchRef.current === null) return
+    if (!searchRef.current.contains(e.target)) {
+      setQuery("")
+    }
+  }
+
+  useEffect(() => {
+    // If the item is active (ie open) then listen for clicks
+    window.addEventListener("click", pageClickEvent)
+    // Clean up
+    return () => {
+      window.removeEventListener("click", pageClickEvent)
+    }
+  }, [])
+
   return (
-    <StyledForm>
+    <StyledForm ref={searchRef}>
       <StyledInput
         type="text"
         onChange={e => setQuery(e.target.value)}
         placeholder={"Search"}
+        value={query}
       />
       <StyledResultListWrapper isDark={!!isDark} queryLength={!query.length}>
         <ResultList results={results} query={query} />
