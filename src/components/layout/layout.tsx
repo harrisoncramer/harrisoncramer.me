@@ -11,7 +11,7 @@ import Header from "../header/header"
 // Global styling
 import "normalize.css"
 import { main, mainDark, mainLight, contentWrapper } from "./global.module.css"
-import { ThemeContext } from "../theme/Theme"
+import { ThemeContext } from "../context"
 
 type LayoutProps = {
   title: string
@@ -31,12 +31,10 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   }, [isDark])
 
   return (
-    <ThemeContext.Provider value={isDark}>
-      <main className={`${main} ${isDark ? mainDark : mainLight}`}>
-        <Header setIsDark={setIsDark} />
-        <main className={contentWrapper}>{children}</main>
-      </main>
-    </ThemeContext.Provider>
+    <main className={`${main} ${isDark ? mainDark : mainLight}`}>
+      <Header />
+      <main className={contentWrapper}>{children}</main>
+    </main>
   )
 }
 
