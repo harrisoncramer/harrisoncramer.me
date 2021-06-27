@@ -5,7 +5,7 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import React from "react"
+import React, { useContext } from "react"
 import Header from "../header/header"
 
 // Global styling
@@ -19,7 +19,7 @@ type LayoutProps = {
 }
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
-  const [isDark, setIsDark] = React.useState(1)
+  const { isDark, setIsDark } = useContext(ThemeContext)
 
   React.useEffect(() => {
     const parsedCount = Number(localStorage.getItem("isDark") || 1)
