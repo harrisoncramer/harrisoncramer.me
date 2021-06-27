@@ -88,6 +88,52 @@ module.exports = {
         ],
       },
     },
+    // Index title, tags, and description for search
+    {
+      resolve: "gatsby-plugin-flexsearch",
+      options: {
+        languages: ["en"],
+        type: "MarkdownRemark",
+        fields: [
+          {
+            name: "path",
+            indexed: true,
+            resolver: "frontmatter.path",
+            attributes: {
+              encode: "balance",
+              tokenize: "strict",
+              threshold: 6,
+              depth: 3,
+            },
+            store: true,
+          },
+          {
+            name: "title",
+            indexed: true,
+            resolver: "frontmatter.title",
+            attributes: {
+              encode: "balance",
+              tokenize: "strict",
+              threshold: 6,
+              depth: 3,
+            },
+            store: true,
+          },
+          {
+            name: "description",
+            indexed: true,
+            resolver: "frontmatter.description",
+            attributes: {
+              encode: "balance",
+              tokenize: "strict",
+              threshold: 6,
+              depth: 3,
+            },
+            store: true,
+          },
+        ],
+      },
+    },
     // Images
     {
       resolve: `gatsby-source-filesystem`,
