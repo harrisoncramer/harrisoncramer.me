@@ -218,16 +218,18 @@ workflows:
           <<: *slack_fail_post_step
           context:
             - slack_context
+          filters: &only_develop
+            branches:
+              only:
+                - develop
       - lint:
           <<: *slack_fail_post_step
           context:
             - slack_context
           requires:
             - install_packages
-          filters: &only_develop
-            branches:
-              only:
-                - develop
+          filters:
+            <<: *only_develop
       - gatsby_build:
           <<: *slack_fail_post_step
           context:
