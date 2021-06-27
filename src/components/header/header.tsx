@@ -2,6 +2,7 @@ import React, { useContext } from "react"
 import { Dropdown } from "../dropdown/dropdown"
 import styled from "styled-components"
 import { ThemeContext } from "../context"
+import { Search } from "../search/search"
 
 const Header = (): JSX.Element => {
   const { isDark, setIsDark } = useContext(ThemeContext)
@@ -11,7 +12,10 @@ const Header = (): JSX.Element => {
 
   return (
     <StyledHeader isDark={!!isDark}>
-      <Dropdown />
+      <StyledRightHand>
+        <Dropdown />
+        <Search />
+      </StyledRightHand>
       <StyledSvg
         isDark={!!isDark}
         onClick={changeTheme}
@@ -33,6 +37,12 @@ const StyledSvg = styled.svg`
     `
   fill: white;
 `}
+`
+
+const StyledRightHand = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1em;
 `
 
 const StyledHeader = styled.header`

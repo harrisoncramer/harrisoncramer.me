@@ -5,7 +5,7 @@ import { ThemeContext } from "../context"
 
 export const Dropdown = (): JSX.Element => {
   const dropdownRef = useRef(null)
-  const isDark = useContext(ThemeContext)
+  const { isDark } = useContext(ThemeContext)
   const [isActive, setIsActive] = useState(false)
   const onClick = () => setIsActive(!isActive)
 
