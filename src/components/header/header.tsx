@@ -1,14 +1,10 @@
-import React, { Dispatch, SetStateAction, useContext } from "react"
+import React, { useContext } from "react"
 import { Dropdown } from "../dropdown/dropdown"
 import styled from "styled-components"
-import { ThemeContext } from "../theme/Theme"
+import { ThemeContext } from "../context"
 
-type HeaderProps = {
-  setIsDark: Dispatch<SetStateAction<number>>
-}
-
-const Header = ({ setIsDark }: HeaderProps): JSX.Element => {
-  const isDark = useContext(ThemeContext)
+const Header = (): JSX.Element => {
+  const { isDark, setIsDark } = useContext(ThemeContext)
   const changeTheme = () => {
     setIsDark(isDark > 0 ? 0 : 1)
   }

@@ -1,13 +1,12 @@
-import { fileURLToPath } from "url"
 import React, { useContext } from "react"
-import { graphql, Link, PageProps } from "gatsby"
+import { graphql, PageProps } from "gatsby"
 import styled from "styled-components"
 import Seo from "../components/seo/seo"
 import Layout from "../components/layout/layout"
 import { Post } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import { Social } from "../components/social/social"
-import { ThemeContext } from "../components/theme/Theme"
+import { ThemeContext } from "../components/context"
 import SvgPicker from "../util/svgPicker"
 
 type DataType = {
@@ -26,7 +25,6 @@ type DataType = {
 export default function Template(props: PageProps<DataType>): JSX.Element {
   const { isDark } = useContext(ThemeContext)
   const location = props.data.markdownRemark.fileAbsolutePath.split("/").pop()
-  console.log(location)
   const { markdownRemark } = props.data
   const { frontmatter, html } = markdownRemark
   //@ts-ignore
@@ -39,14 +37,14 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
         <StyledSubtitle>
           <h3>{frontmatter.date}</h3>
         </StyledSubtitle>
-        <Link
-          to={`https://github.com/harrisoncramer/harrisoncramer.me/tree/develop/src/markdown-pages/${location}`}
+        <a
+          href={`https://github.com/harrisoncramer/harrisoncramer.me/tree/develop/src/markdown-pages/${location}`}
         >
-          <SvgWrapper>
+          <SvgWrapper isDark={isDark}>
             <p>Edit this page on Github</p>
             <SvgPicker isDark={isDark} tag={"github"} />
           </SvgWrapper>
-        </Link>
+        </a>
         {image && frontmatter.imageDescription && (
           <GatsbyImage image={image} alt={frontmatter.imageDescription} />
         )}
@@ -108,6 +106,11 @@ const SvgWrapper = styled.div`
     color: black;
     font-size: 0.8em;
     margin: 0.2em;
+    ${({ isDark }: { isDark: number }) =>
+      isDark &&
+      `
+    color: white; 
+    `}
   }
 `
 const PostTitle = styled.h1`

@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useContext } from "react"
 import { Link } from "gatsby"
 import styled from "styled-components"
-import { ThemeContext } from "../theme/Theme"
+import { ThemeContext } from "../context"
 
 export const Dropdown = (): JSX.Element => {
   const dropdownRef = useRef(null)

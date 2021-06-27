@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from "react"
-import { ThemeContext } from "./src/components/theme/Theme"
+import { ThemeContext } from "./src/components/context"
 
 export const wrapRootElement = ({ element }) => {
   return <Application element={element} />
