@@ -19,7 +19,6 @@ const ResultList = ({
   query: string
 }): React.ReactElement => {
   if (results.length > 0 && query.length > 2) {
-    console.log(results)
     return (
       <>
         {results.map(({ node }, i) => (
@@ -85,6 +84,7 @@ export const Search = (): React.ReactElement => {
         onChange={e => setQuery(e.target.value)}
         placeholder={"Search"}
         value={query}
+        isDark={!!isDark}
       />
       <StyledResultListWrapper isDark={!!isDark} queryLength={!query.length}>
         <ResultList results={results} query={query} />
@@ -98,6 +98,13 @@ const StyledInput = styled.input`
   border: 0;
   outline: none;
   border-bottom: 1px solid #eee;
+  ${({ isDark }: { isDark: boolean }) =>
+    isDark &&
+    `
+    background: black;
+    color: white;
+  border-bottom: 1px solid #282828;
+`}
 `
 const StyledResultListWrapper = styled.div`
   padding: 0.5em;
