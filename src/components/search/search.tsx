@@ -49,6 +49,8 @@ export const Search = (): React.ReactElement => {
 
   useEffect(() => {
     //@ts-ignore (window is unavailable on the client)
+    if (!window.__FLEXSEARCH__) return
+    //@ts-ignore (window is unavailable on the client)
     const store = window.__FLEXSEARCH__.en.store
     const res = store.filter(({ node }: Result) => {
       const title = node.title.toLowerCase()
