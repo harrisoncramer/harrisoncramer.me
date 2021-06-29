@@ -12,6 +12,21 @@ There are lots of pre-baked applications that let you set up Docker quickly, but
 
 This tutorial will show you how to get an EC2 instance (or many) up and running with Docker installed in a repeatable, and stateful way.
 
+## What are we building?
+
+We'll create a number of components:
+1. The VPC (virtual private cloud) that holds our resources
+2. The subnet within the VPC
+3. The Route Table and Internet Gateway to make our resources available to the internet at specific IP addresses 
+4. The EC2 instance, with Docker installed
+5. Security Groups (like a firewall) to manage access to the instance
+
+This may seem like a lot of configuration for a simple Docker container—it is! Normally, you can create the EC2 instances into the default VPC. Why shouldn't we do that here?
+
+In Terraform, it's best practice to create _all_ your infrastructure from scratch so that when you cleanup, or run `terrafom destroy`, all of your resources will be deleted, including your VPC.
+
+This architecture will allow us to easily deploy more containers in the future if we choose, and easily tear down our application.
+
 ## Configuring the AWS provider
 
 Within your project directory (I'm partial to creating a separate infrastructure folder for my Terraform files) create a `main.tf` file. This file will contain our AWS provider.
