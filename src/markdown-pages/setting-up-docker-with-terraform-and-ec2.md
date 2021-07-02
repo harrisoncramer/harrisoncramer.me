@@ -12,18 +12,21 @@ There are lots of pre-baked applications that let you set up Docker quickly, but
 
 This tutorial will show you how to get an EC2 instance (or many) up and running with Docker installed in a repeatable, and stateful way.
 
+In order to get the most out of this tutorial, you should have a basic understanding of Terraform and some of the AWS resources that we're creating, which relate mostly to networking and the VPC. Maximilian Schwarzmuller does an <a href="https://www.youtube.com/watch?v=bGDMeD6kOz0">amazing job</a> explaining those different components.
+
+The complete source files for this tutorial are online <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/infrastructure.tar.gz">here.</a>
+
 ## What are we building?
 
 We'll create a number of components:
-1. The VPC (virtual private cloud) that holds our resources
-2. The subnet within the VPC
-3. The Route Table and Internet Gateway to make our resources available to the internet at specific IP addresses 
+1. The VPC (virtual private cloud) that holds our subnet
+2. The subnet within the VPC that holds our EC2 instance
+3. The Route Table that configures routing for the subnet
+4. The Internet Gateway to make our resources available to the internet at specific IP addresses 
 4. The EC2 instance, with Docker installed
-5. Security Groups (like a firewall) to manage access to the instance
+5. Security Groups (like a firewall) to manage access to the EC2 instance
 
-This may seem like a lot of configuration for a simple Docker container—it is! Normally, you can create the EC2 instances into the default VPC. Why shouldn't we do that here?
-
-In Terraform, it's best practice to create _all_ your infrastructure from scratch so that when you cleanup, or run `terrafom destroy`, all of your resources will be deleted, including your VPC.
+This may seem like a lot of configuration for a simple Docker container! However, when using Terraform it's best practice to create _all_ your infrastructure from scratch so that when you cleanup, or run `terrafom destroy`, all of your resources will be deleted, including your VPC.
 
 This architecture will allow us to easily deploy more containers in the future if we choose, and easily tear down our application.
 
@@ -135,7 +138,7 @@ resource "aws_eip" "my_app" {
 }
 ```
 
-You'll notice that we're referencing the `aws_instance` which is our EC2 server. We'll create the actual EC2 instance resource in the next section.
+You'll notice that we're referencing the `aws_instance` which is our EC2 server. We'll create the actual EC2 instance resource in the next section. Terraform is smart enough to create our resources in the correct order, which lets us split our code across multiple files and not have to worry about runtime order.
 
 Next, we'll create a subnet within the range that we defined for our VPC. The `cidrsubnet` function <a href="https://www.terraform.io/docs/language/functions/cidrsubnet.html">calculates</a> a subnet address within the given VPC's CIDR block:
 
@@ -170,7 +173,7 @@ resource "aws_route_table" "my_app" {
 }
 ```
 
-We also need to associate this route table with our subnet.
+We also need to associate this route table with our subnet. Strangely, this is actually a different resource in AWS than the subnet and the route table:
 
 ```hcl{20-23}:title=infrastructure/subnet.tf
 resource "aws_subnet" "my_app" {
@@ -214,7 +217,7 @@ Whew! We're done with the network. Let's move on to the server itself.
 ## Creating the EC2 Instance
 
 
-Start by creating a new `aws_key_pair` that we'll include in our EC2 instance to give us shell access. If we need to manually connect to the server at some point in the future, we'll use the private key that corresponds with this credential.
+Start by creating a new `aws_key_pair` resource that we'll include in our EC2 instance. This will give us shell access. If we need to manually connect to the server at some point in the future, we'll use the private key on our local machine that corresponds with this credential.
 
 ```hcl:title=infrastructure/ec2.tf
 resource "aws_key_pair" "ssh-key" {
@@ -223,7 +226,7 @@ resource "aws_key_pair" "ssh-key" {
 }
 ```
 
-Next create the EC2 instance. We're referencing many of the variables that we already set up, for the type, the size, and the availablity zone. We're also creating it within the subnet we created earlier.
+Next create the EC2 instance. We're referencing many of the variables that we already set up, for the type, the size, and the availablity zone. We're also creating it within the subnet we created earlier, and we're passing it a security group, which we'll create in a moment, which will control access.
 
 ```hcl{6-27}:title=infrastructure/ec2.tf
 resource "aws_key_pair" "ssh-key" {
@@ -267,7 +270,7 @@ Finally, I'm setting the time zone of the server to match my timezone in New Yor
 
 ## Creating the Security Group
 
-The last resource we need to configure is the security group, which defines ingress access rules for our VPC.
+The last resource we need to configure is the security group, which defines access to the specific EC2 instance.
 
 Let's create the security group that will open up the ports required for our application to function. First, we'll allow SSH access on Port 22 from any IP. We could narrow this down if we only want a smaller group of computers to be able to access our resource for security reasons.
 
@@ -287,9 +290,9 @@ resource "aws_security_group" "my_app" {
 }
 ```
 
-Next, we'll allow all outgoing traffic as well with an egress rule.
+Now let's allow traffic on port 80 to reach port 80 on our machine. We do that through the use of another ingress rule
 
-```hcl{14-19}:title=infrastructure/security_group.tf
+```hcl{14-21}:title=infrastructure/security_group.tf
 resource "aws_security_group" "my_app" {
   name   = "SSH + Port 3005 for API"
   vpc_id = aws_vpc.main.id
@@ -301,6 +304,42 @@ resource "aws_security_group" "my_app" {
     from_port = 22
     to_port   = 22
     protocol  = "tcp"
+  }
+
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+  }
+}
+```
+
+Next, we'll allow all outgoing traffic with an egress rule.
+
+```hcl{23-28}:title=infrastructure/security_group.tf
+resource "aws_security_group" "my_app" {
+  name   = "SSH + Port 3005 for API"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+  }
+
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
   }
 
   egress {
@@ -347,13 +386,33 @@ $ terraform plan
 $ terraform apply --auto-approve
 ```
 
-That's it! We now have an EC2 container with Docker, running inside of a VPC. 
+## Applying our infrastucture
+
+Create the infrastructure by running `terraform apply` inside you infrastructure folder. You can also see what will be created with the `terraform plan` command.
+
+Once your resources are created, you should get an output (from our output.tf file) that will show you the IP of the EC2 instance you've created.
+
+We can then connect to that IP address (you may be using a different root user):
 
 ```shell
-$ ssh ubuntu@your_ip_here # From the output of the apply command
-$ docker ps
-Docker version 20.10.7, build f0df350
-
+$ ssh ubuntu@your_ip_here
 ```
 
-The complete source files for this tutorial are online <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/infrastructure.tar.gz">here.</a>
+Note that in order to run the docker commands as the ubuntu user we'll need our groups to be refreshed. No big deal, just lot out and log back in:
+```shell
+$ exit
+$ ssh ubutnu@your_ip_here
+```
+Now that we're back in the container, let's run a simple webserver and bind it to port 80 of the machine (which is exposed to the internet):
+
+```shell
+$ docker run -dit -p 80:80 nginxdemos/hello
+```
+
+Now when we visit `your_ip_here` we should see the Nginx server up and running!
+
+![The landing page of our Nginx server when our docker container is running properly.](../images/posts/nginx-terraform-and-docker.png "The landing page of our application after our infrastructure is running.")
+
+Keep in mind that we may still want to configure other pieces of our webserver if this were a production application, such as SSL certificates for HTTPS and perhaps even software like <a href="https://www.fail2ban.org/wiki/index.php/Main_Page">fail2ban</a> which blocks repeated SSH attempts from specific IP addresses, to make your Port 22 more secure. Alternatively, you could setup stricter routing rules for your security groups or even add a <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html">NACL</a> for the VPC to control traffic more broadly.
+
+That's it! If you've got any questions or problems, feel free to drop me a line on Twitter.
