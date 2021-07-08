@@ -27,11 +27,17 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
   const location = props.data.markdownRemark.fileAbsolutePath.split("/").pop()
   const { markdownRemark } = props.data
   const { frontmatter, html } = markdownRemark
+  const siteUrl = props.data.site.siteMetadata.siteUrl
   //@ts-ignore
   const image = getImage(frontmatter.featuredImage)
+  const socialImage = `${siteUrl}${image?.images?.fallback?.src}`
   return (
     <Layout title={frontmatter.title}>
-      <Seo title={frontmatter.title} description={frontmatter.description} />
+      <Seo
+        title={frontmatter.title}
+        description={frontmatter.description}
+        image={socialImage}
+      />
       <div>
         <PostTitle>{frontmatter.title}</PostTitle>
         <StyledSubtitle>
@@ -51,7 +57,7 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
         <Social
           title={frontmatter.title}
           uri={props.uri}
-          siteUrl={props.data.site.siteMetadata.siteUrl}
+          siteUrl={siteUrl}
           quote={markdownRemark.frontmatter.description}
         />
         <PostContent>

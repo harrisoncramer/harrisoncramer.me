@@ -12,10 +12,11 @@ import { useStaticQuery, graphql } from "gatsby"
 type SeoProps = {
   description: string
   title: string
+  image?: string
   meta?: string
 }
 
-function Seo({ description, title }: SeoProps): JSX.Element {
+function Seo({ description, title, image }: SeoProps): JSX.Element {
   const { site } = useStaticQuery(
     graphql`
       query {
@@ -63,6 +64,10 @@ function Seo({ description, title }: SeoProps): JSX.Element {
           content: site.siteMetadata?.author || ``,
         },
         {
+          name: `twitter:image`,
+          content: image || ``,
+        },
+        {
           name: `twitter:title`,
           content: title,
         },
@@ -71,7 +76,6 @@ function Seo({ description, title }: SeoProps): JSX.Element {
           content: metaDescription,
         },
       ]}
-      //.concat(meta)}
     ></Helmet>
   )
 }

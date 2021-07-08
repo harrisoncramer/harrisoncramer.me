@@ -18,7 +18,7 @@ The working files for this tutorial are online <a href="https://s3.amazonaws.com
 
 Before we start writing our code, let's review our what our directory structure should eventually look like:
 
-```terminal:title=directory
+```shell:title=directory
 my_scraper/
   src/
     setupPuppeteer.ts
@@ -44,7 +44,7 @@ $ npm install ts-node -D
 
 Great, now our directory should look like this:
 
-```terminal:title=directory
+```shell:title=directory
 my_scraper/
   src/
     index.ts
