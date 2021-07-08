@@ -2,8 +2,6 @@ import React from "react"
 import {
   FacebookShareButton,
   FacebookIcon,
-  LinkedinShareButton,
-  LinkedinIcon,
   RedditShareButton,
   RedditIcon,
   TwitterShareButton,
