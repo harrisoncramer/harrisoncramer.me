@@ -25,13 +25,13 @@ export const Social = ({
   const size = 32
   return (
     <StyledDiv>
-      <FacebookShareButton url={`${siteUrl}${uri}`} quote={quote}>
+      <FacebookShareButton url={`${siteUrl}${uri}/`} quote={quote}>
         <FacebookIcon size={size} />
       </FacebookShareButton>
-      <TwitterShareButton url={`${siteUrl}${uri}`} title={quote}>
+      <TwitterShareButton url={`${siteUrl}${uri}/`} title={quote}>
         <TwitterIcon size={size} />
       </TwitterShareButton>
-      <RedditShareButton url={`${siteUrl}${uri}`} title={title}>
+      <RedditShareButton url={`${siteUrl}${uri}/`} title={title}>
         <RedditIcon size={size} />
       </RedditShareButton>
     </StyledDiv>
