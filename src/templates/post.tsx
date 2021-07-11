@@ -6,6 +6,7 @@ import Layout from "../components/layout/layout"
 import { Post } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import { Social } from "../components/social/social"
+import { Comments } from "../components/comments/comments"
 import { ThemeContext } from "../components/context"
 import SvgPicker from "../util/svgPicker"
 
@@ -31,6 +32,9 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
   //@ts-ignore
   const image = getImage(frontmatter.featuredImage)
   const socialImage = `${siteUrl}${image?.images?.fallback?.src}`
+  const makeGithubUrl = (branch: string) =>
+    `https://github.com/harrisoncramer/harrisoncramer.me/tree/${branch}/src/markdown-pages/${location}`
+
   return (
     <Layout title={frontmatter.title}>
       <Seo
@@ -43,9 +47,7 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
         <StyledSubtitle>
           <h3>{frontmatter.date}</h3>
         </StyledSubtitle>
-        <a
-          href={`https://github.com/harrisoncramer/harrisoncramer.me/tree/develop/src/markdown-pages/${location}`}
-        >
+        <a href={makeGithubUrl("develop")}>
           <SvgWrapper isDark={isDark}>
             <p>Edit this page on Github</p>
             <SvgPicker isDark={isDark} tag={"github"} />
@@ -66,6 +68,7 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
             dangerouslySetInnerHTML={{ __html: html }}
           ></div>
         </PostContent>
+        <Comments isDark={!!isDark} />
       </div>
     </Layout>
   )
