@@ -68,7 +68,7 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
             dangerouslySetInnerHTML={{ __html: html }}
           ></div>
         </PostContent>
-        <Comments isDark={isDark} />
+        <Comments isDark={!!isDark} />
       </div>
     </Layout>
   )
