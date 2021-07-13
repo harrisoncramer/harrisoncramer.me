@@ -1,7 +1,7 @@
 ---
 title: Using Terraform with EC2 Servers and Docker
 date: 2021-06-25
-path: /setting-up-docker-with-terraform
+path: /setting-up-docker-with-terraform/
 description: How to get an EC2 container up and running with Docker using Terraform.
 imageDescription: View of a container shipyard.
 featuredImage: ../images/posts/container.png

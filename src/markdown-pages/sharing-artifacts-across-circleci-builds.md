@@ -1,7 +1,7 @@
 ---
 title: Speeding up CircleCI Builds with Caching
 date: 2021-06-23
-path: /speeding-up-circleci-builds-with-caching
+path: /speeding-up-circleci-builds-with-caching/
 description: Redownloading dependencies for every step in your CI/CD pipeline can be time consuming. You can dramatically speed up the build time of your application with caching, making your team more responsive to breaking changes and ultimately more productive. Here's how to do it.
 imageDescription: An image of a child staring at steps.
 featuredImage: ../images/posts/sharing.jpeg
