@@ -1,4 +1,5 @@
 import React, { useEffect } from "react"
+import styled from "styled-components"
 
 export const Comments = ({ isDark }: { isDark: number }): JSX.Element => {
   useEffect(() => {
@@ -14,5 +15,13 @@ export const Comments = ({ isDark }: { isDark: number }): JSX.Element => {
     anchor?.appendChild(script)
   }, [isDark])
 
-  return <div id="inject-comments-for-uterances"></div>
+  return (
+    <StyledCommentWrapper id="inject-comments-for-uterances"></StyledCommentWrapper>
+  )
 }
+
+const StyledCommentWrapper = styled.div`
+  margin-top: 1em;
+  padding-top: -50px;
+  overflow: hidden;
+`
