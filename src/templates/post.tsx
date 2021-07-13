@@ -68,7 +68,8 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
             dangerouslySetInnerHTML={{ __html: html }}
           ></div>
         </PostContent>
-        <Comments isDark={!!isDark} />
+        <br />
+        <Comments isDark={isDark} />
       </div>
     </Layout>
   )
@@ -131,6 +132,10 @@ const StyledSubtitle = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+`
+
+const StyledH2 = styled.h2`
+  margin-bottom: 0px;
 `
 
 const PostContent = styled.div`

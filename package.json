@@ -45,6 +45,7 @@
     "@types/react-helmet": "^6.1.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
+    "gatsby-plugin-remove-trailing-slashes": "^3.9.0",
     "prettier": "2.2.1"
   },
   "keywords": [
