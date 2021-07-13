@@ -15,6 +15,7 @@ type BlogPageProps = {
       edges: [
         {
           node: {
+            published: boolean
             frontmatter: Post
           }
         }
@@ -24,6 +25,7 @@ type BlogPageProps = {
       edges: [
         {
           node: {
+            published: boolean
             frontmatter: Post
           }
         }
@@ -31,8 +33,15 @@ type BlogPageProps = {
     }
   }
 }
+
 const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
-  const featuredPost = data.featured.edges[0]
+  // Filter out posts in production that are not published
+  // This property is added to each node via the node API
+  const posts = data.posts.edges.filter(({ node }) => {
+    return process.env.NODE_ENV === "production" ? node.published : true
+  })
+
+  const featuredPost = posts.shift()
   if (!featuredPost) return <div>No posts.</div>
   return (
     <Layout title="blog">
@@ -42,7 +51,7 @@ const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
       />
       <PostPreview {...featuredPost.node.frontmatter} />
       <StyledPostWrapper>
-        {data.posts.edges.map(({ node }, i) => {
+        {posts.map(({ node }, i) => {
           return <PostPreview {...node.frontmatter} key={i} />
         })}
       </StyledPostWrapper>
@@ -60,38 +69,11 @@ const StyledPostWrapper = styled.div`
 export const query = graphql`
   {
     posts: allMarkdownRemark(
-      filter: { frontmatter: { draft: { ne: true } } }
       sort: { fields: frontmatter___date, order: DESC }
-      skip: 1
     ) {
       edges {
         node {
-          frontmatter {
-            title
-            date
-            path
-            description
-            tags
-            imageDescription
-            featuredImage {
-              childImageSharp {
-                gatsbyImageData(
-                  placeholder: BLURRED
-                  formats: [AUTO, WEBP, AVIF]
-                )
-              }
-            }
-          }
-        }
-      }
-    }
-    featured: allMarkdownRemark(
-      filter: { frontmatter: { draft: { ne: true } } }
-      sort: { fields: frontmatter___date, order: DESC }
-      limit: 1
-    ) {
-      edges {
-        node {
+          published
           frontmatter {
             title
             date
