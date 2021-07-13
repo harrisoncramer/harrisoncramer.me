@@ -1,7 +1,7 @@
 ---
 title: Scraping data with Puppeteer and Docker
 date: 2021-07-06
-path: /scraping-data-with-puppeteer-and-docker
+path: /scraping-data-with-puppeteer-and-docker/
 description: Configuring a web scraper with puppeteer can be tricky to run in production. This guide will show you how to bundle your scraper inside a Docker container.
 imageDescription: View of a container shipyard.
 featuredImage: ../images/posts/puppet.jpeg
