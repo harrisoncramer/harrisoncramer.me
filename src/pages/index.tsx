@@ -25,12 +25,10 @@ const IndexPage = (): JSX.Element => (
       </p>
       <p>
         My goal is to make the blog a reference for myself, but also helpful for
-        others who are interested in the same technologies. It's intended to be
-        fast—not pretty. Built with Gatsby, CircleCI for CI/CD, and Terraform.
-      </p>
-      <p>
-        I'm more than happy to take pull requests to the site if you want to fix
-        a bug or suggest a feature. Please checkout the{" "}
+        others who are interested in the same technologies. It's built with
+        Gatsby, CircleCI for CI/CD, and Terraform. I'm more than happy to take
+        pull requests to the site if you want to fix a bug or suggest a feature.
+        Please checkout the{" "}
         <a href="https://github.com/harrisoncramer/harrisoncramer.me">
           repository
         </a>{" "}

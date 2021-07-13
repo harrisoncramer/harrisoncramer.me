@@ -8,3 +8,5 @@ body,
 a {
   text-decoration: none;
 }
+
+.utterances { margin-top: -50px }
