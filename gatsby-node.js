@@ -11,8 +11,8 @@ exports.createPages = async ({ actions, graphql }) => {
   const { createPage } = actions
 
   const result = await graphql(`
-    {
-      allMarkdownRemark {
+    query CreatePages {
+      allMarkdownRemark(filter: { frontmatter: { draft: { ne: true } } }) {
         edges {
           node {
             fields {
@@ -37,6 +37,7 @@ exports.createPages = async ({ actions, graphql }) => {
   }
 
   result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+    console.log(`Creating page`, node.frontmatter.path)
     createPage({
       path: node.frontmatter.path,
       component: path.resolve(`src/templates/post.tsx`),

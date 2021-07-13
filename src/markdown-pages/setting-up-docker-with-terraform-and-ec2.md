@@ -414,5 +414,3 @@ Now when we visit `your_ip_here` we should see the Nginx server up and running!
 ![The landing page of our Nginx server when our docker container is running properly.](../images/posts/nginx-terraform-and-docker.png "The landing page of our application after our infrastructure is running.")
 
 Keep in mind that we may still want to configure other pieces of our webserver if this were a production application, such as SSL certificates for HTTPS and perhaps even software like <a href="https://www.fail2ban.org/wiki/index.php/Main_Page">fail2ban</a> which blocks repeated SSH attempts from specific IP addresses, to make your Port 22 more secure. Alternatively, you could setup stricter routing rules for your security groups or even add a <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html">NACL</a> for the VPC to control traffic more broadly.
-
-That's it! If you've got any questions or problems, feel free to drop me a line on Twitter.

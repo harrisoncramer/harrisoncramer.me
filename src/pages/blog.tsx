@@ -60,6 +60,7 @@ const StyledPostWrapper = styled.div`
 export const query = graphql`
   {
     posts: allMarkdownRemark(
+      filter: { frontmatter: { draft: { ne: true } } }
       sort: { fields: frontmatter___date, order: DESC }
       skip: 1
     ) {
@@ -85,6 +86,7 @@ export const query = graphql`
       }
     }
     featured: allMarkdownRemark(
+      filter: { frontmatter: { draft: { ne: true } } }
       sort: { fields: frontmatter___date, order: DESC }
       limit: 1
     ) {
