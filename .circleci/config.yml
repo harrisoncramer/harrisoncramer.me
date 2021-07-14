@@ -205,7 +205,7 @@ jobs:
                       "url": "${GITHUB_REPO_PULL_URL}"
                     }
                   ]
-                }
+                },
                 {
                   "type": "actions",
                   "elements": [
