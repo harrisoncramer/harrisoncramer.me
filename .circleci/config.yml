@@ -139,16 +139,14 @@ jobs:
       - run:
           name: Deploy to S3
           command: aws --region ${AWS_REGION} s3 sync ~/my_repo/public s3://${AWS_BUCKET_NAME} --delete
-  deploy_to_aws_cloudfront:
+  invalidate_old_cloudfront_distribution:
     executor: app-executor
     steps:
       - checkout
       - *show_branch
       - *install_aws_cli
-      - *restore_cache
-      - *build_project
       - run:
-          name: Deploy to CloudFront (before invalidating old distributions)
+          name: Invalidate old Cloudfront distribution, make users re-fetch content
           command: |
             aws configure set preview.cloudfront true
             aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths /\*
@@ -256,7 +254,7 @@ workflows:
             - slack_context
           requires:
             - install_packages
-      - deploy_to_aws_cloudfront:
+      - invalidate_old_cloudfront_distribution:
           <<: *slack_fail_post_step
           context:
             - slack_context
@@ -268,7 +266,7 @@ workflows:
             <<: *only_production
       - notify_developers:
           requires:
-            - deploy_to_aws_cloudfront
+            - invalidate_old_cloudfront_distribution
           filters:
             <<: *only_production
           context:
