@@ -153,7 +153,6 @@ jobs:
   notify_developers:
     executor: slack-executor
     steps:
-      - run: echo "Slack notification"
       - slack/notify:
           event: "always"
           channel: "general"
@@ -191,6 +190,19 @@ jobs:
                     {
                       "type": "mrkdwn",
                       "text": "*Author*:\n$CIRCLE_PROJECT_USERNAME"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Github Repo"
+                      },
+                      "url": "${GITHUB_REPO_PULL_URL}"
                     }
                   ]
                 },
