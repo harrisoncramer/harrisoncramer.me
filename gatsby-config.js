@@ -54,6 +54,22 @@ module.exports = {
               markdownCaptions: true,
             },
           },
+          // {
+          //   resolve: `gatsby-remark-interactive-gifs`,
+          //   options: {
+          //     root: `./`,
+          //     src: `./src/images/gifs`,
+          //     dest: `./public/static/gifs`,
+          //     play: `./src/images/gifs/play.gif`,
+          //     placeholder: `./src/images/gifs/placeholder.gif`,
+          //     loading: `./src/images/gifs/loading.gif`,
+          //     relativePath: `/static/gifs`,
+          //   },
+          // },
+          // Copies other types of files, so MD can display them
+          {
+            resolve: `gatsby-remark-copy-linked-files`,
+          },
           // Style code inside markdown
           {
             resolve: `gatsby-remark-prismjs`,

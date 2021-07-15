@@ -97,7 +97,7 @@ instance_type = "t2.micro"
 ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQy/pHHnlxKiTFRH/FAbAgtLA2GBS45bTNxrrSP+tqtF0TSe1j/NSKD3+C7GPmVNTOU2SDL3UIu71EfNcDtjRZ9O7AhJvNczOHRQ/gK7Pi88tkVjs5jHImJK3Fx/GgJ1jXCSfR5eD9CAhGBeYS21aq9SCOPDEzY3Pie0pP/KODnCILcdlbX9vVHf/LXXzY41dWEfobuAOjiJ03YjPhPCNCpl2axO0kLPOvkXTkiA8vrn2CpHW/0sy+a2WwaHEJrJ2QARdhrTIi6w8dQWK8AE5xp/vuiTTHCInY04e19m9CZwRi/TbUsyttVaw4DgG9mozxvu7CeC0FLJWE1JGHLBn/ harrisoncramer@myPc.local"
 ```
 
-The `instance_ami` for the specific EC2 server you'd like to use by logging onto AWS, and launching a new EC2 instance. For me, it looks like this:
+The `instance_ami` for the specific EC2 server you'd like to use by logging onto AWS, and launching a new EC2 instance.
 
 ![AWS Dashboard view](../images/inline_images/aws_ami.png "This is where you can find the AMI of the server that you'd like to deploy.")
 
