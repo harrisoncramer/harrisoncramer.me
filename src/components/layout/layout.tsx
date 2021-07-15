@@ -33,7 +33,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   return (
     <main className={`${main} ${isDark ? mainDark : mainLight}`}>
       <Header />
-      <main className={contentWrapper}>{children}</main>
+      <section className={contentWrapper}>{children}</section>
     </main>
   )
 }

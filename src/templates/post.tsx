@@ -42,7 +42,7 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
         description={frontmatter.description}
         image={socialImage}
       />
-      <div>
+      <article>
         <PostTitle>{frontmatter.title}</PostTitle>
         <StyledSubtitle>
           <h3>{frontmatter.date}</h3>
@@ -70,7 +70,7 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
         </PostContent>
         <h2>Comments</h2>
         <Comments isDark={isDark} />
-      </div>
+      </article>
     </Layout>
   )
 }
@@ -196,5 +196,14 @@ const PostContent = styled.div`
   .gatsby-resp-image-figcaption p {
     padding: 0;
     margin: 0.5em;
+  }
+
+  /* Warnings/Quotes */
+  blockquote {
+    border-left: 5px solid red;
+    background: lightgrey;
+    padding: 0.2em;
+    padding-left: 0.8em;
+    color: black;
   }
 `
