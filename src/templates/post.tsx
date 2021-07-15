@@ -134,10 +134,6 @@ const StyledSubtitle = styled.div`
   justify-content: space-between;
 `
 
-const StyledH2 = styled.h2`
-  margin-bottom: 0px;
-`
-
 const PostContent = styled.div`
   .gatsby-highlight {
     background-color: #444444;
