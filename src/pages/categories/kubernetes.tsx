@@ -23,10 +23,8 @@ const KubernetesCategory = (props: PageProps): React.ReactElement => {
     graphql`
       query KubernetesQuery {
         allMarkdownRemark(
-          filter: {
-            fileAbsolutePath: {}
-            frontmatter: { tags: { in: "kubernetes" } }
-          }
+          sort: { fields: frontmatter___date, order: DESC }
+          filter: { frontmatter: { tags: { in: "kubernetes" } } }
         ) {
           edges {
             node {

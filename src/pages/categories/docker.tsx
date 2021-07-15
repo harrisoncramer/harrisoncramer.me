@@ -23,10 +23,8 @@ const DockerCategory = (props: PageProps): React.ReactElement => {
     graphql`
       query DockerQuery {
         allMarkdownRemark(
-          filter: {
-            fileAbsolutePath: {}
-            frontmatter: { tags: { in: "docker" } }
-          }
+          sort: { fields: frontmatter___date, order: DESC }
+          filter: { frontmatter: { tags: { in: "docker" } } }
         ) {
           edges {
             node {

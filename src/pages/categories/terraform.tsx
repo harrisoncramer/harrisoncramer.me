@@ -23,10 +23,8 @@ const TerraformCategory = (props: PageProps): React.ReactElement => {
     graphql`
       query TerraformQuery {
         allMarkdownRemark(
-          filter: {
-            fileAbsolutePath: {}
-            frontmatter: { tags: { in: "terraform" } }
-          }
+          sort: { fields: frontmatter___date, order: DESC }
+          filter: { frontmatter: { tags: { in: "terraform" } } }
         ) {
           edges {
             node {

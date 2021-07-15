@@ -23,10 +23,8 @@ const JavascriptCategory = (props: PageProps): React.ReactElement => {
     graphql`
       query JavascriptQuery {
         allMarkdownRemark(
-          filter: {
-            fileAbsolutePath: {}
-            frontmatter: { tags: { in: "javascript" } }
-          }
+          sort: { fields: frontmatter___date, order: DESC }
+          filter: { frontmatter: { tags: { in: "javascript" } } }
         ) {
           edges {
             node {
