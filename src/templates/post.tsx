@@ -184,6 +184,10 @@ const PostContent = styled.div`
     text-shadow: none;
   }
 
+  .dark__link {
+    color: blue;
+  }
+
   .gatsby-resp-image-figcaption {
     font-size: 0.8em;
     text-align: center;
@@ -198,7 +202,7 @@ const PostContent = styled.div`
   blockquote {
     border-left: 5px solid red;
     background: lightgrey;
-    padding: 0.2em;
+    padding: 0.5em;
     padding-left: 0.8em;
     color: black;
   }
