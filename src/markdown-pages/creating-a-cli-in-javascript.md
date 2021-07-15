@@ -1,5 +1,4 @@
 ---
-draft: true
 title: Publishing your first Javascript CLI
 date: 2021-07-13
 path: /creating-a-cli-in-javascript/
@@ -215,23 +214,134 @@ Next, we'll write the actual logic of the CLI. There are a few libraries out the
 $ npm install inquirer ora
 ```
 
-Let's import our packages and prompt the user with an initial question: Would you like a dad joke or a knock knock joke?
+Let's import our packages and prompt the user with an initial question: Would you like a "dad joke" or a Chuck Norris joke? Yes, I know the Chuck Norris thing is dated, but the API is excellent and simple.
+
+Here's the full code of our CLI:
 
 ```javascript:title=src/index.js
 import inquirer from "inquirer";
+import ora from "ora";
+import https from "https";
+
+function getJoke(hostname, path = "/") {
+  const spinner = ora("Processing humor...");
+  spinner.color = "cyan";
+  spinner.start();
+
+  const options = {
+    method: "GET",
+    hostname,
+    path,
+    headers: {
+      Accept: "application/json",
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, function (res) {
+      const chunks = [];
+
+      res.on("data", function (chunk) {
+        chunks.push(chunk);
+      });
+
+      res.on("end", function (_chunk) {
+        const body = Buffer.concat(chunks);
+        spinner.stop();
+        resolve(JSON.parse(body.toString()));
+      });
+
+      res.on("error", function (error) {
+        reject(error);
+      });
+    });
+    req.end();
+  });
+}
+
+```
+
+Let's break this down. We declare a helper function called `getJoke` at the top of our CLI that returns a promise. The promise will resolve if we can successfully make a call to the URL provided at the given path, and will return JSON data. If the call to the API fails, we will reject the promise with the error. We're also initializing a spinner that will run until our API call is complete.
+
+Next, we use our inquirer package:
+
+```javascript{41-71}:title=src/index.js
+import inquirer from "inquirer";
+import ora from "ora";
+import https from "https";
+
+function getJoke(hostname, path = "/") {
+  const spinner = ora("Processing humor...");
+  spinner.color = "cyan";
+  spinner.start();
+
+  const options = {
+    method: "GET",
+    hostname,
+    path,
+    headers: {
+      Accept: "application/json",
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, function (res) {
+      const chunks = [];
+
+      res.on("data", function (chunk) {
+        chunks.push(chunk);
+      });
+
+      res.on("end", function (_chunk) {
+        const body = Buffer.concat(chunks);
+        spinner.stop();
+        resolve(JSON.parse(body.toString()));
+      });
+
+      res.on("error", function (error) {
+        reject(error);
+      });
+    });
+    req.end();
+  });
+}
 
 inquirer
   .prompt({
     type: "list",
-    name: "pickJoke",
+    name: "jokeType",
     message: "What type of joke do you want to hear?",
-    choices: ["Dad Joke", "Knock Knock"],
+    choices: ["Dad Joke", "Chuck Norris"],
     default: false,
   })
-  .then((answers) => {
-    console.log("DONE");
+  .then(async (answers) => {
+    if (answers.jokeType === "Dad Joke") {
+      try {
+        const jokeData = await getJoke("icanhazdadjoke.com");
+        const { joke } = jokeData;
+        console.log(joke);
+        process.exit(0);
+      } catch (err) {
+        console.error(err);
+        process.exit(1);
+      }
+    } else if (answers.jokeType === "Chuck Norris") {
+      try {
+        const jokeData = await getJoke("api.chucknorris.io", "/jokes/random");
+        const joke = jokeData.value;
+        console.log(joke);
+        process.exit(0);
+      } catch (err) {
+        console.error(err);
+        process.exit(1);
+      }
+    }
   });
 ```
+
+This block of code calls the inquirer package's prompt method, and provide the given object, asking our user to choose between a Dad Joke and a Chuck Norris joke. That will return a promise. Depending on what the user chooses, we either call our helper function with the dad joke API url, or the Chuck Norris API url. You can see how we might expand this in the future to include other kinds of jokes.
+
+We then extract the information from the JSON data returned from the API call, and log it to the console, and exit our program.
 
 ## Publishing our package
 
@@ -280,7 +390,7 @@ We're also adding a new script: the `prePublishOnly` script. This will automatic
     "prepublishOnly": "npm run build"
   },
   "bin": {
-    "mycli": "./shim.js"
+    "joke": "./shim.js"
   },
   "repository": {
     "type": "git",
@@ -320,9 +430,9 @@ If you go to your account you should now see that you have a package published. 
 ```terminal
 $ npm install -g @harrisoncramer/joke
 $ joke
-Hello, World!
+? What type of joke do you want to hear? Dad Joke
+Where do cats write notes?
+Scratch Paper!
 ```
 
 Congratulations! You've now built a CLI tool that anyone can install globally on their machine and run with a simple key word. As you can imagine, the CLI itself could be much more complicated, we've only scratched the surface of the possibilities in this tutorial.
-
-
