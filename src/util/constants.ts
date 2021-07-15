@@ -8,4 +8,5 @@ export const categories = [
   "javascript",
   "react",
   "terraform",
+  "kubernetes",
 ]
