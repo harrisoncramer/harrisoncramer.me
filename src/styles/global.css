@@ -9,4 +9,6 @@ a {
   text-decoration: none;
 }
 
-.utterances { margin-top: -50px }
+.utterances {
+  margin-top: -50px;
+}
