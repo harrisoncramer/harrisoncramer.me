@@ -54,6 +54,10 @@ module.exports = {
               markdownCaptions: true,
             },
           },
+          // Copies other types of files, so MD can display them
+          {
+            resolve: `gatsby-remark-copy-linked-files`,
+          },
           // Style code inside markdown
           {
             resolve: `gatsby-remark-prismjs`,

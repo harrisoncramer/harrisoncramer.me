@@ -1,5 +1,4 @@
 ---
-draft: true
 title: Publishing your first Javascript CLI
 date: 2021-07-13
 path: /creating-a-cli-in-javascript/
@@ -9,11 +8,13 @@ featuredImage: ../images/posts/cli_tools.jpeg
 tags: ["javascript"]
 ---
 
-This blog post will walk you through the steps of building your first CLI in Javascript, and deploying it to the `npm` repository. The project is going to be an executable, which means that other developers will be able to run it from on their machines the same way they might run the `git` or `npm` commands—with a single keyword.
+This blog post will walk you through the steps of building your first command line interface in Javascript, or CLI, and deploying it to the `npm` repository. The project is going to be an executable, which means that other developers will be able to run it from on their machines the same way they might run the `git` or `npm` commands—with a single keyword.
 
 ## What are we building?
 
-We're going to build a simple CLI that tells you jokes. Users will be able to pick the joke type that they want, and the tool will fetch a joke of that type from an external API. 
+We're going to build a simple CLI that tells the user jokes! Users will be able to pick the joke type that they want, and the CLI will fetch a joke from an external API and display it on the screen.
+
+The end result will look like <a href="../images/gifs/jokes.gif">this.</a>
 
 ## Initializing your project structure
 
@@ -25,20 +26,20 @@ $ npm init -y
 ```
 Next, we'll need to tell `npm` that our project includes an executable. We do this by adding a `bin` field to the `package.json` file. This field takes an object, where each key/value pair corresponds with the command and the file we want the command to run, respectively. Let's make a single command called `joke` and point it at the `shim.js` file, which we'll create momentarily.
 
-This `shim.js` file will be the starting point of our entire command line program.
+This `shim.js` file will be the starting point of our entire command line program. We want to make a small tweak and set the `main` field in our `package.json` to reflect that.
 
-```json{9-11}:title=package.json
+```json{5,9-11}:title=package.json
 {
   "name": "joke",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "shim.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
     "joke": "./shim.js"
-  }
+  },
   "keywords": [],
   "author": "Harrison Cramer <kingofcramers.dev@gmail.com> (https://github.com/kingofcramers)",
   "license": "MIT"
@@ -65,9 +66,9 @@ Our project directory structure should now look like this:
 ```terminal
 joke
 |_ build/
-|_ src/
 |_ package.json
 |_ shim.js
+|_ src/
 ```
 
 ## The `shim.js` file
@@ -106,17 +107,18 @@ Here's what each of the packages do:
 
 In order to run Babel, we're going to put a build script in our `package.json` file. The `build` command will grab our source files from the `src` directory, compile them, and place the result into the `build` directory.
 
-```json{7,16-19}:title=package.json
+```json{7,17-20}:title=package.json
 {
   "name": "joke",
   "version": "1.0.0",
   "description": "",
   "main": "shim.js",
   "scripts": {
-    "build": "babel src -d build"
+    "build": "babel src -d build",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "joke": "./build/index.js"
+    "joke": "./shim.js"
   },
   "keywords": [],
   "author": "Harrison Cramer <kingofcramers.dev@gmail.com> (https://github.com/kingofcramers)",
@@ -180,28 +182,30 @@ We're going to combine `nodemon` with Babel. To do that, we need to use another 
 
 Let's add a script to our `package.json` file that will run our `src/index.js` file directly. The `-I` flag lets us pass keystrokes into the CLI, which will make it interactive. The `--exec` flag tells Nodemon that rather than running the following code with node, run it with `babel-node` instead. This is what lets us run code that uses ESM.
 
-```json{10}:title=package.json
+```json{8}:title=package.json
 {
-  "name": "@harrisoncramer/demo-cli",
+  "name": "joke",
   "version": "1.0.0",
   "description": "",
   "main": "shim.js",
-  "access": "public",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src -d build",
     "start": "nodemon -I --exec babel-node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "mycli": "./shim.js"
+    "joke": "./shim.js"
   },
+  "keywords": [],
+  "author": "Harrison Cramer <kingofcramers.dev@gmail.com> (https://github.com/kingofcramers)",
   "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.14.5",
     "@babel/core": "^7.14.6",
     "@babel/node": "^7.14.7",
+    "@babel/preset-env": "^7.14.7",
     "nodemon": "^2.0.12"
-  },
+  }
 }
 ```
 
@@ -215,23 +219,96 @@ Next, we'll write the actual logic of the CLI. There are a few libraries out the
 $ npm install inquirer ora
 ```
 
-Let's import our packages and prompt the user with an initial question: Would you like a dad joke or a knock knock joke?
+Let's import our packages and prompt the user with an initial question: Would you like a "dad joke" or a Chuck Norris joke? Yes, I know the Chuck Norris thing is dated, but the API is excellent and simple.
+
+First, let's write a helper function that will get our joke from an external API that serves up JSON content. We'll save it in another helper file.
+
+```javascript:title=src/api_call.js
+import ora from "ora";
+import https from "https";
+
+export const getJoke = (hostname, path = "/") => {
+  const spinner = ora("Processing humor...");
+  spinner.color = "cyan";
+  spinner.start();
+
+  const options = {
+    method: "GET",
+    hostname,
+    path,
+    headers: {
+      Accept: "application/json",
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, function (res) {
+      const chunks = [];
+
+      res.on("data", function (chunk) {
+        chunks.push(chunk);
+      });
+
+      res.on("end", function (_chunk) {
+        const body = Buffer.concat(chunks);
+        spinner.stop();
+        resolve(JSON.parse(body.toString()));
+      });
+
+      res.on("error", function (error) {
+        spinner.stop();
+        reject(error);
+      });
+    });
+    req.end();
+  });
+}
+```
+
+Let's break this down. We declare a helper function called `getJoke` that returns a promise. The function will slowly build up the data using NodeJS <a href="https://nodejs.dev/learn/nodejs-streams">streams</a> and will concatenate the result onto a local string. The function will resolve the promise will if we can successfully make the call to the URL provided at the given path. If the call to the API fails, we will reject the promise with the error. We're also initializing a spinner that will run until our API call is complete.
+
+Next, we use our inquirer package:
 
 ```javascript:title=src/index.js
 import inquirer from "inquirer";
+import { getJoke } from "./api_call"
 
 inquirer
   .prompt({
     type: "list",
-    name: "pickJoke",
+    name: "jokeType",
     message: "What type of joke do you want to hear?",
-    choices: ["Dad Joke", "Knock Knock"],
+    choices: ["Dad Joke", "Chuck Norris"],
     default: false,
   })
-  .then((answers) => {
-    console.log("DONE");
+  .then(async (answers) => {
+    if (answers.jokeType === "Dad Joke") {
+      try {
+        const jokeData = await getJoke("icanhazdadjoke.com");
+        const { joke } = jokeData;
+        console.log(joke);
+        process.exit(0);
+      } catch (err) {
+        console.error(err);
+        process.exit(1);
+      }
+    } else if (answers.jokeType === "Chuck Norris") {
+      try {
+        const jokeData = await getJoke("api.chucknorris.io", "/jokes/random");
+        const joke = jokeData.value;
+        console.log(joke);
+        process.exit(0);
+      } catch (err) {
+        console.error(err);
+        process.exit(1);
+      }
+    }
   });
 ```
+
+This block of code calls the inquirer package's prompt method, and provide the given object, asking our user to choose between a Dad Joke and a Chuck Norris joke. That will return a promise. Depending on what the user chooses, we either call our helper function with the dad joke API url, or the Chuck Norris API url. You can see how we might expand this in the future to include other kinds of jokes.
+
+We then extract the information from the JSON data returned from the API call, and log it to the console, and exit our program. Test out your code! At this point, your CLI should be fully functional using the `npm start` command.
 
 ## Publishing our package
 
@@ -261,57 +338,57 @@ src
 
 Next, we want to add some fields to our `package.json` file.
 
-The `repository` field contains information about our Github repository, and will help other developers find the source code if they stumble across the package on npm.
+The `repository` field contains information about our Github repository, and will help other developers find the source code if they stumble across the package on npm. We also give our package a description.
 
 We also want to "namespace" our project. This means that we prefix our project name with the `@` symbol and the name of our npm account. This ensures that we don't have a naming conflict with another package that's already been published. In the same vein, we want to add a `publishConfig` field that will make our `npm` package public.
 
 We're also adding a new script: the `prePublishOnly` script. This will automatically run before we publish our package. Inside of it, we want to run our build script—ensuring that the latest build directory is pushed up with each publication of our CLI.
 
 
-```json{2,9,14-20}:title=package.json
+```json{2,4,10,15-21}:title=package.json
 {
   "name": "@harrisoncramer/joke",
   "version": "1.0.0",
-  "description": "",
+  "description": "A CLI for telling jokes.",
   "main": "shim.js",
   "scripts": {
-    "start": "nodemon -I --exec babel-node src/index.js",
     "build": "babel src -d build",
+    "start": "nodemon -I --exec babel-node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "npm run build"
   },
   "bin": {
-    "mycli": "./shim.js"
+    "joke": "./shim.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/harrisoncramer/mycli.git"
+    "url": "https://yourgithubrepo"
   },
   "publishConfig": {
     "access": "public"
   },
+  "keywords": [],
   "author": "Harrison Cramer <kingofcramers.dev@gmail.com> (https://github.com/kingofcramers)",
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.14.5",
     "@babel/core": "^7.14.6",
     "@babel/node": "^7.14.7",
     "@babel/preset-env": "^7.14.7",
     "nodemon": "^2.0.12"
   },
   "dependencies": {
-    "@babel/cli": "^7.14.5",
-    "inquirer": "^8.1.1",
-    "ora": "^5.4.1",
-    "yargs": "^17.0.1"
+    "inquirer": "^8.1.2",
+    "ora": "^5.4.1"
   }
 }
 
 ```
 
-Let's build our CLI, ensure we're logged in, then publish it!
+Now let's publish our CLI. The publish step will automatically build our application using the `prepublishOnly` script.
 
 ```terminal
-$ npm run build
-$ npm login
+$ npm login # Only run this if you aren't logged in.
 $ npm publish
 ```
 
@@ -320,9 +397,9 @@ If you go to your account you should now see that you have a package published. 
 ```terminal
 $ npm install -g @harrisoncramer/joke
 $ joke
-Hello, World!
+? What type of joke do you want to hear? Dad Joke
+Where do cats write notes?
+Scratch Paper!
 ```
 
 Congratulations! You've now built a CLI tool that anyone can install globally on their machine and run with a simple key word. As you can imagine, the CLI itself could be much more complicated, we've only scratched the surface of the possibilities in this tutorial.
-
-
