@@ -273,6 +273,11 @@ Next, we use our inquirer package:
 import inquirer from "inquirer";
 import { getJoke } from "./api_call"
 
+function logAndExit(message, code){
+  console.log(message);
+  process.exit(code);
+}
+
 inquirer
   .prompt({
     type: "list",
@@ -286,21 +291,17 @@ inquirer
       try {
         const jokeData = await getJoke("icanhazdadjoke.com");
         const { joke } = jokeData;
-        console.log(joke);
-        process.exit(0);
+        logAndExit(joke, 0)
       } catch (err) {
-        console.error(err);
-        process.exit(1);
+        logAndExit(err, 1)
       }
     } else if (answers.jokeType === "Chuck Norris") {
       try {
         const jokeData = await getJoke("api.chucknorris.io", "/jokes/random");
-        const joke = jokeData.value;
-        console.log(joke);
-        process.exit(0);
+        const joke = jokeData.value; // This API puts the joke on the "value" property
+        logAndExit(joke, 0)
       } catch (err) {
-        console.error(err);
-        process.exit(1);
+        logAndExit(err, 1)
       }
     }
   });
