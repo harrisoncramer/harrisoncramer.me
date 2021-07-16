@@ -12,7 +12,7 @@ const Footer = (): JSX.Element => (
 )
 
 const StyledFooter = styled.footer`
-  background: white;
+  background: #f7f7f7;
   position: sticky;
   bottom: 0;
   display: flex;

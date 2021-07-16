@@ -127,7 +127,7 @@ const StyledInput = styled.input`
     isDark &&
     `
     background: black;
-    color: white;
+    color: #f7f7f7;
   border-bottom: 1px solid #282828;
 `}
 `
@@ -146,7 +146,7 @@ const StyledResultListWrapper = styled.div`
   border-radius: 3px;
   position: absolute;
   border: 1px solid #eee;
-  background: white;
+  background: #f7f7f7;
 
   ${({ isDark }: { isDark: boolean; queryLength: boolean }) =>
     isDark &&

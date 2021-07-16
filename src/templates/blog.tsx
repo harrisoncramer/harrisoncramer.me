@@ -70,9 +70,8 @@ const BlogPage = ({ data, pageContext }: BlogPageProps): JSX.Element => {
 
 const StyledPostWrapper = styled.div`
   display: grid;
-  width: 100%;
-  gap: 2em;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.3em;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 `
 
 export const query = graphql`

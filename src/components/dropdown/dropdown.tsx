@@ -74,7 +74,7 @@ const StyledSvg = styled.svg`
   ${({ isDark }: { isDark: boolean }) =>
     isDark &&
     `
-  fill: white;
+  fill: #f7f7f7;
 `}
 `
 
@@ -125,16 +125,16 @@ const StyledNav = styled.nav`
   ${({ isDark }: { isDark: boolean; isActive: boolean }) =>
     isDark &&
     `
-      color: white;
+      color: #f7f7f7;
       background: black;
       box-shadow: 0 1px 8px rgba(255, 255, 255, 0.3);
 
     li a {
-      color: white;
+      color: #f7f7f7;
     }
   
     li {
-      color: white;
+      color: #f7f7f7;
       border-bottom: 1px solid #282828;
 
       &:hover {
