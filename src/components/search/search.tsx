@@ -8,6 +8,7 @@ type Result = {
     path: string
     title: string
     description: string
+    isDraft?: boolean
   }
 }
 
@@ -77,7 +78,9 @@ export const Search = (): React.ReactElement => {
     const store = window.__FLEXSEARCH__.en.store
     const res = store.filter(({ node }: Result) => {
       const title = node.title.toLowerCase()
-      const description = node.description.toLowerCase()
+      const description = node.title.toLowerCase()
+      const isDraft = node.isDraft
+      if (isDraft) return false
       return (
         title.includes(query.toLowerCase()) ||
         description.includes(query.toLowerCase())

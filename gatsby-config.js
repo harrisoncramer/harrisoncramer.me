@@ -135,6 +135,18 @@ module.exports = {
             },
             store: true,
           },
+          {
+            name: "isDraft",
+            indexed: true,
+            resolver: "frontmatter.draft",
+            attributes: {
+              encode: "balance",
+              tokenize: "strict",
+              threshold: 6,
+              depth: 3,
+            },
+            store: true,
+          },
         ],
       },
     },
