@@ -71,6 +71,10 @@ export const Search = (): React.ReactElement => {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<Result[]>([])
 
+  // Will only return blog posts that are not marked
+  // with a draft === true in the frontmatter and which
+  // also match the typed value in either their title or
+  // description.
   useEffect(() => {
     //@ts-ignore (window is unavailable on the client)
     if (!window.__FLEXSEARCH__) return
