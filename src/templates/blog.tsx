@@ -67,9 +67,11 @@ const StyledPostWrapper = styled.div`
 `
 
 export const query = graphql`
-  {
+  query BlogListQuery($skip: Int!, $limit: Int!) {
     posts: allMarkdownRemark(
       sort: { fields: frontmatter___date, order: DESC }
+      limit: $limit
+      skip: $skip
     ) {
       edges {
         node {
