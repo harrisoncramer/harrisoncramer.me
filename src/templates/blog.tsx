@@ -5,11 +5,19 @@ import Seo from "../components/seo/seo"
 import { Post } from "../types/markdown"
 import styled from "styled-components"
 import { Post as PostPreview } from "../components/post/post"
+import { Pager } from "../components/pager/pager"
 
+// Styling for code blocks
 import "prismjs/themes/prism-okaidia.css"
 import "prismjs/plugins/line-numbers/prism-line-numbers.css"
 
 type BlogPageProps = {
+  pageContext: {
+    limit: number
+    skip: number
+    numPages: number
+    currentPage: number
+  }
   data: {
     featured: {
       edges: [
@@ -34,7 +42,7 @@ type BlogPageProps = {
   }
 }
 
-const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
+const BlogPage = ({ data, pageContext }: BlogPageProps): JSX.Element => {
   // Filter out posts in production that are not published
   // This property is added to each node via the node API
   const posts = data.posts.edges.filter(({ node }) => {
@@ -55,6 +63,7 @@ const BlogPage = ({ data }: BlogPageProps): JSX.Element => {
           return <PostPreview {...node.frontmatter} key={i} />
         })}
       </StyledPostWrapper>
+      <Pager {...pageContext} />
     </Layout>
   )
 }

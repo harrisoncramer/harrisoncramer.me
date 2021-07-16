@@ -24,11 +24,13 @@ const ResultList = ({
     return (
       <>
         {results.map(({ node }, i) => (
-          <Link key={i} to={node.path}>
-            <StyledH4 isDark={isDark} showUnder={results.length > 1}>
-              {node.title}
-            </StyledH4>
-          </Link>
+          <StyledListItem key={i} isDark={!!isDark}>
+            <Link to={node.path}>
+              <StyledH4 isDark={isDark} showUnder={results.length > 1}>
+                {node.title}
+              </StyledH4>
+            </Link>
+          </StyledListItem>
         ))}
       </>
     )
@@ -129,12 +131,23 @@ const StyledInput = styled.input`
   border-bottom: 1px solid #282828;
 `}
 `
+
+const StyledListItem = styled.div`
+  ${({ isDark }: { isDark: boolean }) =>
+    isDark &&
+    `
+  &:hover {
+    background: #222;
+  }
+`}
+`
+
 const StyledResultListWrapper = styled.div`
-  padding: 0.5em;
   border-radius: 3px;
   position: absolute;
   border: 1px solid #eee;
   background: white;
+
   ${({ isDark }: { isDark: boolean; queryLength: boolean }) =>
     isDark &&
     `
