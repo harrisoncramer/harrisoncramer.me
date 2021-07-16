@@ -100,6 +100,9 @@ const StyledNav = styled.nav`
 
   li {
     border-bottom: 1px solid #dddddd;
+    &:hover {
+      background: #eee;
+    }
   }
 
   li a {
@@ -133,6 +136,11 @@ const StyledNav = styled.nav`
     li {
       color: white;
       border-bottom: 1px solid #282828;
+
+      &:hover {
+        background: #222;
+      }
     }
+     
   `}
 `
