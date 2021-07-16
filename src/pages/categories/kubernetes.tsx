@@ -12,19 +12,19 @@ type Node = {
   }
 }
 
-type TerraformData = {
+type KubernetesData = {
   allMarkdownRemark: {
     edges: Node[]
   }
 }
 
-const TerraformCategory = (props: PageProps): React.ReactElement => {
-  const data: TerraformData = useStaticQuery(
+const KubernetesCategory = (props: PageProps): React.ReactElement => {
+  const data: KubernetesData = useStaticQuery(
     graphql`
-      query TerraformQuery {
+      query KubernetesQuery {
         allMarkdownRemark(
           sort: { fields: frontmatter___date, order: DESC }
-          filter: { frontmatter: { tags: { in: "terraform" } } }
+          filter: { frontmatter: { tags: { in: "kubernetes" } } }
         ) {
           edges {
             node {
@@ -52,8 +52,11 @@ const TerraformCategory = (props: PageProps): React.ReactElement => {
   )
 
   return (
-    <Layout title="Terraform">
-      <Seo description="All posts pertaining to Terraform" title="Terraform" />
+    <Layout title="Kubernetes">
+      <Seo
+        description="All posts pertaining to Kubernetes"
+        title="Kubernetes"
+      />
       <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {
@@ -64,4 +67,4 @@ const TerraformCategory = (props: PageProps): React.ReactElement => {
   )
 }
 
-export default TerraformCategory
+export default KubernetesCategory

@@ -59,6 +59,27 @@ exports.createPages = async ({ actions, graphql }) => {
     console.error(result.errors)
   }
 
+  // Create a new blog page for every n posts,
+  // and append the index value to the URL. Also pass
+  // into the context the skip/limit values to be accessed
+  // within the GQL queries on the page.
+  const edges = result.data.allMarkdownRemark.edges
+  const postsPerPage = 5
+  const numPages = Math.ceil(edges.length / postsPerPage)
+
+  Array.from({ length: numPages }).forEach((_, i) => {
+    createPage({
+      path: i === 0 ? `/blog` : `/blog/${i + 1}`,
+      component: path.resolve("./src/templates/blog.tsx"),
+      context: {
+        limit: postsPerPage,
+        skip: i * postsPerPage,
+        numPages,
+        currentPage: i + 1,
+      },
+    })
+  })
+
   result.data.allMarkdownRemark.edges.forEach(({ node }) => {
     if (!node.published) {
       console.log(`SKIPPING (DRAFT):`, node.frontmatter.path)

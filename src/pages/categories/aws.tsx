@@ -24,6 +24,7 @@ const Aws = (props: PageProps): React.ReactElement => {
       query AwsQuery {
         allMarkdownRemark(
           filter: { fileAbsolutePath: {}, frontmatter: { tags: { in: "aws" } } }
+          sort: { fields: frontmatter___date, order: DESC }
         ) {
           edges {
             node {

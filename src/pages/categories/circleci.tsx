@@ -23,10 +23,8 @@ const CircleCICategory = (props: PageProps): React.ReactElement => {
     graphql`
       query CircleCIQuery {
         allMarkdownRemark(
-          filter: {
-            fileAbsolutePath: {}
-            frontmatter: { tags: { in: "circleci" } }
-          }
+          sort: { fields: frontmatter___date, order: DESC }
+          filter: { frontmatter: { tags: { in: "circleci" } } }
         ) {
           edges {
             node {

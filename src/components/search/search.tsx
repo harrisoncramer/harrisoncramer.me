@@ -12,33 +12,56 @@ type Result = {
 }
 
 const ResultList = ({
+  isDark,
   results,
   query,
 }: {
   results: Result[]
   query: string
+  isDark: boolean
 }): React.ReactElement => {
   if (results.length > 0 && query.length > 2) {
     return (
       <>
         {results.map(({ node }, i) => (
-          <Link key={i} to={node.path}>
-            <StyledH4>{node.title}</StyledH4>
-          </Link>
+          <StyledListItem key={i} isDark={!!isDark}>
+            <Link to={node.path}>
+              <StyledH4 isDark={isDark} showUnder={results.length > 1}>
+                {node.title}
+              </StyledH4>
+            </Link>
+          </StyledListItem>
         ))}
       </>
     )
   } else if (query.length > 2) {
-    return <StyledH4>No results for {query}</StyledH4>
+    return (
+      <StyledH4 isDark={isDark} showUnder={false}>
+        No results for {query}
+      </StyledH4>
+    )
   } else if (query.length > 0) {
-    return <StyledH4>Please insert at least 3 characters</StyledH4>
+    return (
+      <StyledH4 isDark={isDark} showUnder={false}>
+        Please insert at least 3 characters
+      </StyledH4>
+    )
   } else {
     return <span></span>
   }
 }
 
 const StyledH4 = styled.h4`
-  margin: 0.5em;
+  padding: 0.5em;
+  margin: 0px;
+
+  ${({ isDark, showUnder }: { isDark: boolean; showUnder: boolean }) => {
+    if (showUnder && isDark) {
+      return `border-bottom: 1px solid #282828`
+    } else if (showUnder && !isDark) {
+      return `border-bottom: 1px solid #dddddd;`
+    }
+  }}
 `
 
 export const Search = (): React.ReactElement => {
@@ -89,7 +112,7 @@ export const Search = (): React.ReactElement => {
         isDark={!!isDark}
       />
       <StyledResultListWrapper isDark={!!isDark} queryLength={!query.length}>
-        <ResultList results={results} query={query} />
+        <ResultList results={results} query={query} isDark={!!isDark} />
       </StyledResultListWrapper>
     </StyledForm>
   )
@@ -108,17 +131,28 @@ const StyledInput = styled.input`
   border-bottom: 1px solid #282828;
 `}
 `
+
+const StyledListItem = styled.div`
+  ${({ isDark }: { isDark: boolean }) =>
+    isDark &&
+    `
+  &:hover {
+    background: #222;
+  }
+`}
+`
+
 const StyledResultListWrapper = styled.div`
-  padding: 0.5em;
   border-radius: 3px;
   position: absolute;
   border: 1px solid #eee;
   background: white;
+
   ${({ isDark }: { isDark: boolean; queryLength: boolean }) =>
     isDark &&
     `
       border: 1px solid #282828;
-  background: black;
+      background: black;
 `}
   ${({ queryLength }: { isDark: boolean; queryLength: boolean }) =>
     queryLength &&
