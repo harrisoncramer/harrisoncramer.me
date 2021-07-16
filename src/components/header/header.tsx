@@ -35,7 +35,7 @@ const StyledSvg = styled.svg`
   ${({ isDark }: { isDark: boolean }) =>
     isDark &&
     `
-  fill: white;
+  fill: #f7f7f7;
 `}
 `
 
@@ -48,7 +48,7 @@ const StyledRightHand = styled.div`
 const StyledHeader = styled.header`
   top: 0;
   z-index: 1000;
-  background: white;
+  background: #f7f7f7;
   position: sticky;
   display: flex;
   padding: 1em;

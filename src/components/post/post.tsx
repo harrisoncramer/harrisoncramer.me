@@ -4,7 +4,6 @@ import styled from "styled-components"
 import { Post as PostType } from "../../types/markdown"
 import { navigate } from "gatsby"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
-import svgPicker from "../../util/svgPicker"
 import dayjs from "dayjs"
 import { categories } from "../../util/constants"
 
@@ -41,10 +40,7 @@ export const Post = ({
             .filter(tag => categories.includes(tag))
             .map((tag, i) => (
               <StyledTag key={i} onClick={handleGoToCategory}>
-                <StyledSvgContainer>
-                  {tag.toLowerCase()}
-                  {svgPicker({ tag, isDark: 0 })}
-                </StyledSvgContainer>
+                {tag.toLowerCase()}
               </StyledTag>
             ))}
       </StyledTagHolder>
@@ -99,14 +95,6 @@ const StyledTag = styled.div`
   font-size: 0.9em;
   border-top-left-radius: 0.25em;
   border-top-right-radius: 0.25em;
-`
-
-const StyledSvgContainer = styled.div`
-  svg {
-    display: none;
-    height: 20px;
-    width: 20px;
-  }
 `
 
 const StyledTagHolder = styled.div`

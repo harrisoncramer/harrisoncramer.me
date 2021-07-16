@@ -119,7 +119,7 @@ const SvgWrapper = styled.div`
     ${({ isDark }: { isDark: number }) =>
       isDark &&
       `
-    color: white; 
+    color: #f7f7f7; 
     `}
   }
 `
@@ -153,7 +153,7 @@ const PostContent = styled.div`
     font-size: 0.8em;
     font-style: italic;
     background-color: #272822;
-    color: white;
+    color: #f7f7f7;
     text-align: end;
   }
 

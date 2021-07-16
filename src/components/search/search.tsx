@@ -8,6 +8,7 @@ type Result = {
     path: string
     title: string
     description: string
+    isDraft?: boolean
   }
 }
 
@@ -70,6 +71,10 @@ export const Search = (): React.ReactElement => {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<Result[]>([])
 
+  // Will only return blog posts that are not marked
+  // with a draft === true in the frontmatter and which
+  // also match the typed value in either their title or
+  // description.
   useEffect(() => {
     //@ts-ignore (window is unavailable on the client)
     if (!window.__FLEXSEARCH__) return
@@ -77,7 +82,9 @@ export const Search = (): React.ReactElement => {
     const store = window.__FLEXSEARCH__.en.store
     const res = store.filter(({ node }: Result) => {
       const title = node.title.toLowerCase()
-      const description = node.description.toLowerCase()
+      const description = node.title.toLowerCase()
+      const isDraft = node.isDraft
+      if (isDraft) return false
       return (
         title.includes(query.toLowerCase()) ||
         description.includes(query.toLowerCase())
@@ -127,7 +134,7 @@ const StyledInput = styled.input`
     isDark &&
     `
     background: black;
-    color: white;
+    color: #f7f7f7;
   border-bottom: 1px solid #282828;
 `}
 `
@@ -146,7 +153,7 @@ const StyledResultListWrapper = styled.div`
   border-radius: 3px;
   position: absolute;
   border: 1px solid #eee;
-  background: white;
+  background: #f7f7f7;
 
   ${({ isDark }: { isDark: boolean; queryLength: boolean }) =>
     isDark &&
