@@ -40,7 +40,7 @@ In order to create the EKS infrastructure, there are still a few AWS resources t
 >
 > I recommend setting up billing alerts for your AWS before provisioning a cluster, so that if you accidentally leave it on, you'll know if you're spending more than you intended. It's also possible to lodge a complaint with AWS' billing team if you accidentally leave a cluster on. I've done this before, and they refunded my account.
 
-## Setting up your AWS Infrastructure
+## Creating our EKS Cluster
 
 Let's create our AWS infrastructure. First, install the `eksctl` command line tool onto your computer. I'm on a Mac, so I'll use brew:
 
@@ -49,40 +49,158 @@ $ brew tap weaveworks/tap
 $ brew install weaveworks/tap/eksctl
 ```
 
-Next, we want to create a configuration file for our `eksctl` command to build our infrastructure. Although it's possible to simply feed command line arguments into the tool, that's not replicable in the future.
+The `eksctl` CLI takes a number of commands, but the one we're interested in is the `eksctl create cluster`. Let's see the various options available to us with the `--help` command.
 
-Here's what our configuration file looks like:
-
+```terminal
+$ eksctl create cluster --help
 ```
---- 
+
+As you can see, there are a ton of options that we can pass to the command. We could pass these all in as flags, per the AWS documentation <a href="https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html">here</a>.
+
+However, we're not going to pass these in as commands directly. Instead, we're going to define a `.yaml` file that will contain our configuration. We're going to make a configuration file like <a href="https://github.com/weaveworks/eksctl/blob/main/examples/01-simple-cluster.yaml">this</a> from the eksctl repository. This allows us to commit our infrastructure files into our repository for our project. It also is repeatable and tells other developers how our project is configured.
+
+Let's create an `infrastructure` folder and place our file inside of it:
+
+```yaml:title=infrastructure/cluster.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: cluster-4
-  region: eu-north-1
-
-vpc:
-  id: "vpc-0dd338ecf29863c55"  # (optional, must match VPC ID used for each subnet below)
-  cidr: "192.168.0.0/16"       # (optional, must match CIDR used by the given VPC)
-  subnets:
-    # must provide 'private' and/or 'public' subnets by availibility zone as shown
-    private:
-      eu-north-1a:
-        id: "subnet-0b2512f8c6ae9bf30"
-        cidr: "192.168.128.0/19" # (optional, must match CIDR used by the given subnet)
-
-      eu-north-1b:
-        id: "subnet-08cb9a2ed60394ce3"
-        cidr: "192.168.64.0/19"  # (optional, must match CIDR used by the given subnet)
-
-      eu-north-1c:
-        id: "subnet-00f71956cdec8f1dc"
-        cidr: "192.168.0.0/19"   # (optional, must match CIDR used by the given subnet)
-
+  name: TestCluster
+  region: us-east-1
 nodeGroups:
-  - name: ng-1
-    instanceType: m5.xlarge
-    desiredCapacity: 2
-    privateNetworking: true # if only 'Private' subnets are given, this must be enabled
-
+  - name: test-cluster-nodes
+    instanceType: t2.medium
+    desiredCapacity: 3
+    ssh:
+      publicKeyPath: ~/.ssh/id_rsa.pub
 ```
+
+Let's break this down. The first few lines are self-explanatory; we're using a specific version of the `eksctl` tool, we're creating a cluster in a certain region, and we're naming it. The `nodeGroups` field is where we can pass in a list of objects to create worker nodes for our cluster. We're only creating one node group, of `t2.micro` size. Behind the scenes, each node is an EC2 server.
+
+Our worker node group is going to have three of these nodes, and we're enabling shell access to them with an ssh key from our local computer.
+
+In order for `eksctl` to create the resources necessary to run our cluster, we need to give it the necessary privileges on AWS. This can be a complex process, so for the purposes of this tutorial, I'm simply going to give the user administrative programmatic access. Create a new user inside of the Identity Access Management (IAM) console inside of AWS, and grant the user administrative privileges. 
+
+The screen will show you the credentials for the new user, which we're going to save: the `aws_access_key_id` and `aws_access_key_id`. We're putting these inside of the `~/.aws/credentials` file on our computer. This is the file that the AWS CLI picks up when running commands, which we'll install next.
+
+```text:title=~/.aws/credentials
+[eksctl]
+aws_access_key_id=AKIAQHIT7YWF2VDNJRHL
+aws_secret_access_key=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
+```
+Install the <a href="https://aws.amazon.com/cli/">AWS CLI</a> and ensure that it's working.
+
+```terminal
+$ aws --version 
+```
+
+Now, we can switch to the specific user we want (for the current shell) in our terminal, and check that we're using the right user with the `aws iam get-user` command:
+```terminal
+$ export AWS_PROFILE=eksctl
+$ aws iam get-user # Should display information about the eksctl user
+```
+
+We can finally now tell `eksctl` to create our cluster:
+
+```terminal
+$ eksctl create cluster --config-file infrastructure/cluster.yaml
+```
+
+Thie command will take a while. Behind the scenes, it's going to create all the infrastructure necessary to run our cluster. To see all of the resources, head to the AWS console and go to the CloudFormation page, and select your cluster. All of the various AWS resources will be displayed under the resources tab.
+
+We can also get a list of the nodegroups from our command line interface.
+
+```terminal
+$ eksctl get nodegroup --cluster TestCluster
+```
+
+Still don't believe me? You can actually log into the EC2 instances that make up your cluster the same way that you would any other EC2 instance. Go to the EC2 console in AWS, and you'll see three new EC2 instances created, with brand new IP addresses. 
+
+![Our EC2 instances](../images/inline_images/eks-ec2.png "We can see that our EKS is in fact running a bunch of EC2 instances.")
+
+And because we enabled SSH access earlier, you can log into any of them with the ssh key:
+
+```terminal
+$ ssh -i ~/.ssh/id_rsa ec2-user@your_node_ip_here
+```
+
+Great! Our cluster is up and running, and ready to start running our containers. If at any point in the future we need to tear down our cluster, we can follow <a href="https://docs.aws.amazon.com/eks/latest/userguide/delete-cluster.html">these steps</a>. Additionally, make sure that you're using the CLI with the correct user and permissions. The easiest way to do it from the command line is to use the `eksctl delete cluster --region=us-east-1 --name=TestCluster` command.
+
+## Creating our NodeJS API
+
+Now that we have our cluster up and running, let's create a simple API to deploy to it. We're going to create a basic Express server that dishes up some random information at the `/api` route. Let's initialize our npm repository and install a few dependencies:
+
+```terminal
+$ npm init -y
+$ npm install express faker
+```
+
+Now let's create our server file. It's pretty simple, we're using the `faker` package to generate some dummy data every time that request is made to our server and we're dishing up that JSON content at the `/api` route:
+
+```javascript:title=index.js
+const express = require("express");
+const faker = require("faker");
+const app = express();
+
+app.get("/api", (req, res) => {
+  const people = Array(20)
+    .fill()
+    .map(() => {
+      const first = faker.name.firstName();
+      const last = faker.name.lastName();
+      const address = faker.address.streetAddress();
+      const phone = faker.phone.phoneNumber();
+      const vehicle = faker.vehicle.vehicle();
+      return { first, last, address, phone, vehicle };
+    });
+
+  res.status(200).send(people);
+});
+
+app.listen(3000, () => console.log("Listening on port 3000!"));
+```
+
+Not much to say here, we're basically just serving up some random data about people every time we have a GET request. I've deliberately kept this application very simple because this tutorial is meant to focus on Kubernetes.
+
+Let's Dockerize it!
+
+The `Dockerfile` is also going to be pretty bare bones. We're building off of the Node image (I chose version 14 alpine, so it's light weight) we're setting a work directory inside the container, copying over and installing our dependencies, and copying over our code, which will run on startup. The only thing to note here is that the `EXPOSE` keyword <a href="https://docs.docker.com/engine/reference/builder/#expose">does not actually</a> expose that port, we need to do it when we run the container.
+
+```docker:title=Dockerfile
+FROM node:14-alpine
+
+EXPOSE 3000
+WORKDIR /app
+
+COPY package*.json .
+RUN npm install
+COPY index.js index.js
+
+CMD ["node", "index.js"]
+```
+
+Let's build the container. Make sure you prefix it with your username so that you can publish it to Docker Hub.
+
+```terminal
+$ docker build -t kingofcramers/dummy-data .
+```
+
+Let's test it out now locally. Run it on your local machine and curl the endpoint, you should get the dummy data in return:
+
+```terminal
+$ docker run -dit -p 3000:3000 kingofcramers/dummy-data
+$ curl http://localhost:3000/api
+[{"first":"Margot","last":"Prosacco","address":"886 Nader Way","phone":"209-417-3736"...
+```
+
+Finally, we want to push our Docker image up to Docker hub:
+
+```terminal
+$ docker push kingofcramers/dummy-data
+```
+
+We're done with the Docker part of this tutorial. We've now created our application, and pushed the image up to the Docker Hub. We'll pull this image down and run it inside of our Kubernetes cluster.
+
+## Writing our Kubernetes configuration
+
+

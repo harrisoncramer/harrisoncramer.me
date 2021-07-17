@@ -243,16 +243,14 @@ export const getJoke = (hostname, path = "/") => {
 
   return new Promise((resolve, reject) => {
     const req = https.request(options, function (res) {
-      const chunks = [];
-
+      const data = '';
       res.on("data", function (chunk) {
-        chunks.push(chunk);
+        data += chunk;
       });
 
       res.on("end", function (_chunk) {
-        const body = Buffer.concat(chunks);
         spinner.stop();
-        resolve(JSON.parse(body.toString()));
+        resolve(JSON.parse(data)));
       });
 
       res.on("error", function (error) {
