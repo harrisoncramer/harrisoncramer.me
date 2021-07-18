@@ -1,5 +1,4 @@
 ---
-draft: true
 title: Deploying a NodeJS API with Docker and Kubernetes
 date: 2021-07-15
 path: /deploying-a-react-application-with-kubernetes/
