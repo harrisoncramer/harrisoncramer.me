@@ -299,10 +299,10 @@ We can also see the logs of our pod (more precisely, our container). In our case
 
 ```text
 $ k logs test-pod
-Listening on port 3000!
+Listening on port 3005!
 ```
 
-## Introducing Replication Controllers
+## Introducing Replica Sets
 
 This is great, but it's not actually how you'll deploy pods to your cluster. One of the biggest benefits of Kubernetes is that it's self-healing: when a pod goes down, either becuase of traffic spikes or other problems within the application, Kubernetes has the capacity to create a new version of that pod. However, we don't currently have that functionality.
 
@@ -316,57 +316,80 @@ No resources in default namespace
 
 The pod was *not recreated* after it was deleted. 
 
-In order to have our containers be recreated in case of failure, we need to use Replication Controllers. These are another Kubernetes resource that manage our pods on our behalf. We declare how many pods we want, and the replication controller ensures that the state of our application always matches that number by restarting pods when they die. Let's take a look at a new configuration file.
+In order to have our containers be recreated in case of failure, we need to use Replica Sets. These are another Kubernetes resource that manage our pods on our behalf. We declare how many pods we want, and the Replica Set ensures that the state of our application always matches that number by restarting pods when they die. Let's take a look at a new configuration file.
 
-```yaml:title=resources/rc.yaml
-apiVersion: v1
-kind: ReplicationController
+```yaml:title=resources/rs.yaml
+apiVersion: apps/v1
+kind: ReplicaSet
 metadata:
   name: test-rc
 spec:
   replicas: 3
   selector:
-    app: test-pod
+    matchLabels:
+      app: test-pod
   template:
     metadata:
       labels:
         app: test-pod
     spec:
       containers:
-      - name: test-pod
-        image: kingofcramers/random-data
-        ports:
-        - containerPort: 3005
+        - name: test-pod
+          image: kingofcramers/random-data
+          ports:
+            - containerPort: 3005
 ```
 
-When you apply this configuration file, Kubernetes will create three new pods that match the spec provided. It's also going to restart those pods whenever any of them die.
+Replica Sets work by defining a "selector" on both the Replica Set and within the pod. Any pods that match the selector will be managed by the Replica Set.
 
-Let's create our replication controller.
+When you apply this configuration file, Kubernetes will create three new pods that match the specification provided. It's also going to restart those pods whenever any of them die.
 
 ```text
-$ k create -f infrastructure/rc.yaml
-replicationcontroller/test-rc created
+$ k create -f infrastructure/rs.yaml
+replicationcontroller/test-rs created
 ```
 
-Now let's try deleting one of our pods (this command may take a moment). Notice that when we get our pods after doing the delete, the replication controller has already spun up a new pod in order to match the three specified in our configuration.
+Now let's try deleting one of our pods (this command may take a moment). Notice that when we get our pods after doing the delete, the Replica Set has already spun up a new pod in order to match the three specified in our configuration.
 
 ```text{12,15}
 $ k get pods
 NAME            READY   STATUS    RESTARTS   AGE
-test-rc-6phnq   1/1     Running   0          3m53s
-test-rc-b5ptc   1/1     Running   0          3m53s
-test-rc-nh4pk   1/1     Running   0          3m53s
+test-rs-6phnq   1/1     Running   0          3m53s
+test-rs-b5ptc   1/1     Running   0          3m53s
+test-rs-nh4pk   1/1     Running   0          3m53s
 
-$ k delete pod test-rc-6phnq
-pod "test-rc-6phnq" deleted
+$ k delete pod test-rs-6phnq
+pod "test-rs-6phnq" deleted
 
 $ k get pods
 NAME            READY   STATUS              RESTARTS   AGE
-test-rc-6phnq   1/1     Terminating         0          5m46s
-test-rc-b5ptc   1/1     Running             0          5m46s 
-test-rc-nh4pk   1/1     Running             0          5m46s
-test-rc-qsm9p   1/1     ContainerCreating   0          2m14s
+test-rs-6phnq   1/1     Terminating         0          5m46s
+test-rs-b5ptc   1/1     Running             0          5m46s 
+test-rs-nh4pk   1/1     Running             0          5m46s
+test-rs-qsm9p   1/1     ContaineCreating    0          2m14s
 ```
 
-Since the replication controller manages the pods, if we delete the entire replication controller, the pods will also be deleted.
+Since the Replica Set manages the pods, if we delete the entire Replica Set, the pods will also be deleted. We can do this with the `k delete replicasets.apps test-rs` command, but we won't right now.
+
+## Debugging our application with port forwarding
+
+When debugging an application, sometimes the easiest way to connect to the container is to use the `kubectl port-forward` command. This command will forward your local machine's specified port to the port on the target pod. 
+
+Here's a simplified example of what that looks like.
+
+![The port-forward command](../images/inline_images/port-forward.png "The port-forward process is responsible for mapping your requests to the correct port on the pod within the cluster.")
+
+In this example, we'll forward the pod's port (3005) to our local machine's port (3010). We can now curl that address on our local machine and we'll hit the container running inside the pod.
+
+```text
+$ k port-forward test-rs-6phnq 3010:3005
+Forwarding from 127.0.0.1:3005 -> 3005
+Forwarding from [::1]:3005 -> 3005
+$ curl -d '{ "hello": "there" }' -H 'Content-Type: application/json' http://localhost:3005/api
+{"hello":"there"}
+```
+
+## Exposing our Pods with Services
+
+Now that we have our containers running inside of our pods, we need to make them available to traffic from the internet.
 

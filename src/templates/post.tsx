@@ -135,11 +135,53 @@ const StyledSubtitle = styled.div`
 `
 
 const PostContent = styled.div`
+  /* Code blocks */
   .gatsby-highlight {
     background-color: #444444;
     overflow: auto;
+
+    pre[class*="language-"] {
+      margin: 0;
+      box-sizing: border-box;
+      float: left; /* 1 */
+      min-width: 100%; /* 2 */
+      border-radius: 0px;
+    }
+
+    .gatsby-highlight-code-line {
+      background-color: #5f5f5f;
+      display: block;
+      margin-right: -1em;
+      margin-left: -1em;
+      padding-right: 1em;
+      padding-left: 0.75em;
+      border-left: 0.25em solid #f99;
+    }
+
+    /* Apply scrollbar styling to larger devices */
+    @media only screen and (min-width: 700px) {
+      ::-webkit-scrollbar {
+        width: 20px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background-color: #272822;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #a8bbbf;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #d6dee1;
+        border-radius: 20px;
+        border: 6px solid transparent;
+        background-clip: content-box;
+      }
+    }
   }
 
+  /* Code block file name */
   .code-block-file-name {
     padding: 0.5em 1em;
     font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console",
@@ -147,34 +189,11 @@ const PostContent = styled.div`
       "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier,
       monospace;
 
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-
     font-size: 0.8em;
     font-style: italic;
     background-color: #272822;
     color: #f7f7f7;
     text-align: end;
-  }
-
-  .gatsby-highlight pre[class*="language-"] {
-    margin: 0;
-    overflow: initial;
-    box-sizing: border-box;
-    float: left; /* 1 */
-    min-width: 100%; /* 2 */
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-  }
-
-  .gatsby-highlight-code-line {
-    background-color: #5f5f5f;
-    display: block;
-    margin-right: -1em;
-    margin-left: -1em;
-    padding-right: 1em;
-    padding-left: 0.75em;
-    border-left: 0.25em solid #f99;
   }
 
   /* Inline text */
@@ -184,10 +203,7 @@ const PostContent = styled.div`
     text-shadow: none;
   }
 
-  .dark__link {
-    color: blue;
-  }
-
+  /* Images */
   .gatsby-resp-image-figcaption {
     font-size: 0.8em;
     text-align: center;
@@ -205,5 +221,9 @@ const PostContent = styled.div`
     padding: 0.5em;
     padding-left: 0.8em;
     color: black;
+  }
+
+  .dark__link {
+    color: blue;
   }
 `
