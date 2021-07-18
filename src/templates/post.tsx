@@ -136,6 +136,22 @@ const StyledSubtitle = styled.div`
 
 const PostContent = styled.div`
   /* Code blocks */
+
+  p.tip {
+    margin: 0px 2em;
+    background: #b0ffc4;
+    box-shadow: 2px 2px 2px rgba(0 0 0 /8%);
+    border: 2px solid #00bc68;
+    padding: 1em;
+    border-radius: 5px;
+    color: black;
+
+    &:before {
+      font-size: 1.5em;
+      content: "💡 ";
+    }
+  }
+
   .gatsby-highlight {
     background-color: #444444;
     overflow: auto;
@@ -161,7 +177,7 @@ const PostContent = styled.div`
     /* Apply scrollbar styling to larger devices */
     @media only screen and (min-width: 700px) {
       ::-webkit-scrollbar {
-        width: 20px;
+        width: 2em;
       }
 
       ::-webkit-scrollbar-track {
@@ -217,7 +233,7 @@ const PostContent = styled.div`
   /* Warnings/Quotes */
   blockquote {
     border-left: 5px solid red;
-    background: lightgrey;
+    background: #ffd5d6;
     padding: 0.5em;
     padding-left: 0.8em;
     color: black;

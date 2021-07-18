@@ -135,6 +135,7 @@ $ ssh -i ~/.ssh/id_rsa ec2-user@your_node_ip_here
 
 Great! Our cluster is up and running, and ready to start running our containers. If at any point in the future we need to tear down our cluster, we can follow <a href="https://docs.aws.amazon.com/eks/latest/userguide/delete-cluster.html">these steps</a>. Additionally, make sure that you're using the CLI with the correct user and permissions. The easiest way to do it from the command line is to use the `eksctl delete cluster --region=us-east-1 --name=TestCluster` command.
 
+
 ## Creating our NodeJS API
 
 Now that we have our cluster up and running, let's create a simple API to deploy to it. We're going to create a basic Express server that dishes up some random information at the `/api` route. Let's initialize our npm repository and install a few dependencies:
@@ -184,7 +185,7 @@ Not much to say here, we're basically just serving up some random data about peo
 
 In the diagram above, you'll see that the first step is the developer pushing their Dockerfile up to Docker Hub. We're going to do that now.
 
-The `Dockerfile` is also going to be pretty bare bones. We're building off of the Node image (I chose an alpine base image so that the container will be very small). We're setting a work directory inside the container, copying over and installing our dependencies, and copying over our code, which will run on startup. The only thing to note here is that the `EXPOSE` keyword <a href="https://docs.docker.com/engine/reference/builder/#expose">does not actually</a> expose that port, we need to do it when we run the container.
+The `Dockerfile` is also going to be pretty bare bones. We're building off of the Node image (I chose an alpine base image so that the container will be very small). Since the alpine image doesn't come with curl, we'll install that ourselves. We're setting a work directory inside the container, copying over and installing our dependencies, and copying over our code, which will run on startup. The only thing to note here is that the `EXPOSE` keyword <a href="https://docs.docker.com/engine/reference/builder/#expose">does not actually</a> expose that port, we need to do it when we run the container.
 
 ```docker:title=Dockerfile
 FROM node:14-alpine
@@ -246,13 +247,16 @@ Just how the `eksctl` command uses yaml files to create and manage resources, we
 
 Some of the commands that we'll run from here on out will be one-liners, but they will generally only be commands that "get" the current state of our application. We're not going to create or modify resources outside of our configuration files.
 
-> I'd highly recommend setting up an <a class="dark__link" href="https://linuxize.com/post/how-to-create-bash-aliases/">alias</a> for the `kubectl` command, to make it quicker to write. For the rest of this post, I'll be using `k` as an alias. I'd also recommend enabling autocompletion for your shell. I'm using ZSH, and the instructions are <a class="dark__link" href="https://kubernetes.io/docs/tasks/tools/included/optional-kubectl-configs-zsh/">here</a>, but the process is similar for Bash and Powershell.
+<p class="tip">I'd highly recommend setting up an <a class="dark__link" href="https://linuxize.com/post/how-to-create-bash-aliases/">alias</a> for the <code class="language-text">kubectl</code> command, to make it quicker to write. For the rest of this post, I'll be using <code class="language-text">k</code> as an alias. I'd also recommend enabling autocompletion for your shell. I'm using ZSH, and the instructions are <a class="dark__link" href="https://kubernetes.io/docs/tasks/tools/included/optional-kubectl-configs-zsh/">here</a>, but the process is similar for Bash and Powershell</p>
 
 When we do apply our configuration files, `kubectl` will create the resources inside of the "context" in which it's operating. If the context is not your EKS cluster, then switch it:
 
 ```text
 $ k config use-context eksctl@TestCluster.us-east-1.eksctl.io
 ```
+
+Now when we send commands through `kubectl` we will send them to the correct cluster.
+
 
 ## Creating our first EKS Pod
 
@@ -306,10 +310,10 @@ Listening on port 3005!
 
 This is great, but it's not actually how you'll deploy pods to your cluster. One of the biggest benefits of Kubernetes is that it's self-healing: when a pod goes down, either becuase of traffic spikes or other problems within the application, Kubernetes has the capacity to create a new version of that pod. However, we don't currently have that functionality.
 
-Let's delete the pod.
+Let's delete the pod. We can either specify it by name, or we can apply delete and pass in the filename, which will delete all resources in a file.
 
 ```text
-$ k destroy pod test-pod
+$ k destroy pod test-pod # Or k delete -f infrastructure/pods.yaml
 $ k get pods
 No resources in default namespace
 ```
@@ -369,7 +373,7 @@ test-rs-nh4pk   1/1     Running             0          5m46s
 test-rs-qsm9p   1/1     ContaineCreating    0          2m14s
 ```
 
-Since the Replica Set manages the pods, if we delete the entire Replica Set, the pods will also be deleted. We can do this with the `k delete replicasets.apps test-rs` command, but we won't right now.
+Since the Replica Set manages the pods, if we delete the entire Replica Set, the pods will also be deleted. We can do this with the `k delete -f rs.yaml` command, but we won't right now.
 
 ## Debugging our application with port forwarding
 
@@ -389,7 +393,154 @@ $ curl -d '{ "hello": "there" }' -H 'Content-Type: application/json' http://loca
 {"hello":"there"}
 ```
 
-## Exposing our Pods with Services
+Great, we can see that the containers are running inside of our pods, and serving our content as expected.
 
-Now that we have our containers running inside of our pods, we need to make them available to traffic from the internet.
+## Exposing our pods internally with a nodeport service
+
+The `port-forward` command is great for debugging, but it's not really meant for production code. Instead, we're going to create a service. 
+
+Services are Kubernetes resources that give us a single, persistent point of entry into to a group of pods. The IP addresses of pods could change when they become unavailable and are replaced, whereas the IP address of a service will never change. This means we can have a consistent IP for our databases and our frontend applications for clients.
+
+Let's create a Node Port service, which will let us to curl our API *from within the cluster*.
+
+```yaml:title=infrastructure/np.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-node-port
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 3005 # The port on each pod
+  selector:
+    app: test-pod
+```
+
+Create the resource.
+```text
+$ k create -f infrastructure/np.yaml
+```
+
+Let's confirm that the service was created.
+
+```text
+$ k get svc
+NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes       ClusterIP   10.100.0.1      <none>        443/TCP        28h
+test-node-port   NodePort    10.100.37.176   <none>        80:30139/TCP   3m32s
+```
+
+The `CLUSTER-IP` field indicates that our service is now waiting for connections at the IP address of `10.100.37.176` on port 80. Keep in mind, this is an internal IP address and is not available outside the cluster, it's only available to nodes within the cluster.
+
+<p class="tip">We can connect to specific pods within the cluster using <code class="language-text">kubectl</code> with the <code class="language-text">exec</code> command, and the pod name: <code class="language-text">kubectl exec -it pod-name-here -- /bin/sh</code></p>
+
+Let's try it out by using the `exec` command to run curl inside of one of our pods, and curl that IP address.
+
+```text
+$ k get pods
+NAME            READY   STATUS    RESTARTS   AGE
+test-rs-6phnq   1/1     Running   0          3m53s
+test-rs-b5ptc   1/1     Running   0          3m53s
+test-rs-nh4pk   1/1     Running   0          3m53s
+$ k exec test-rs-6phnq -- curl -s http://10.100.37.176/api
+[{"first":"Peter","last":"Turnage","address":"886 Block Drive","phone":"203-419-1013"...
+```
+
+This works, but we want to make our cluster available to the internet at a specific IP address, so that anyone can query our API. 
+
+## Exposing our pods to the internet
+
+In order to make our pods available to anyone on the internet, we actually want to use a LoadBalancer service, rather than a NodePort service.
+
+This service will actually create a different resource depending on where you're deploying your infrastructure. Since we're deploying with EKS, it'll create AWS resources to route traffice to our cluster. Pretty cool!
+
+![Kubernetes load balancer service](../images/inline_images/load-balancer.png "The load balancer will provide one public-facing internet address and balance traffic across all of our nodes.")
+
+Let's first delete our old NodePort service; we don't need that anymore.
+
+```text
+$ k delete -f infrastructure/np.yaml
+```
+
+Now we'll create the configuration file for our load balancer service. It'll look very similar to our NodePort service.
+
+```yaml:title=infrastructure/load-balancer.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-load-balancer
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3005
+  selector:
+    app: test-pod
+```
+
+Let's create it, and get our services. You'll now see a valid public IP address.
+
+```text
+$ k create infrastructure/load-balancer.yaml 
+service/test-load-balancer created
+$ k get svc 
+NAME                 TYPE           CLUSTER-IP      EXTERNAL-IP                                                               PORT(S)        AGE
+kubernetes           ClusterIP      10.100.0.1      <none>                                                                    443/TCP        29h
+test-load-balancer   LoadBalancer   10.100.40.213   a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com   80:32064/TCP   15m
+```
+
+We can now curl the IP address listed at our endpoint, and we'll hit our server! Let's try doing it a few times.
+
+```text
+$ curl -d '{ "hey": "hi" }' -H 'Content-Type: application/json' a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com/api 
+{ "hey": "hi" }
+$ curl -d '{ "some new data": "wow!" }' -H 'Content-Type: application/json' a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com/api 
+{ "some new data": "wow!" }
+$ curl -d '{ "key one": "678" }' -H 'Content-Type: application/json' a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com/api 
+{ "key one": "678" }
+```
+
+We can verify that our load balancer service is routing traffic to our various different pods by getting their log data. You'll notice that the requests were load balanced across all of our pods, and that one did not recieve all of the requests.
+
+```text
+$ k get pods
+NAME            READY   STATUS    RESTARTS   AGE
+test-rs-6phnq   1/1     Running   0          3m53s
+test-rs-b5ptc   1/1     Running   0          3m53s
+test-rs-nh4pk   1/1     Running   0          3m53s
+$ k logs test-rs-nh4pk
+Listening on port 3005!
+POST Request recieved, headers are:  {
+  host: 'a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com',
+  'user-agent': 'curl/7.64.1',
+  accept: '*/*',
+  'content-type': 'application/json',
+  'content-length': '17'
+}
+POST Request recieved, headers are:  {
+  host: 'a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com',
+  'user-agent': 'curl/7.64.1',
+  accept: '*/*',
+  'content-type': 'application/json',
+  'content-length': '17'
+}
+$ k logs test-rs-6phnq
+$ k logs test-rs-b5ptc
+POST Request recieved, headers are:  {
+  host: 'a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com',
+  'user-agent': 'curl/7.64.1',
+  accept: '*/*',
+  'content-type': 'application/json',
+  'content-length': '17'
+}
+```
+
+That's it! Congratulations! 🎉 
+
+## Next Steps
+
+You've now got a load balanced API that's serving up your data at a public IP address. You can easily scale up or scale down your API, destroy it completely. Look into <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/">liveness probes</a> and autoscaling in order to make your API even more reslient.
+
+For more complicated routing from the internet, you could set up an Ingress service. Since they operate on the application layer of the network stack (HTTP) they are capable of doing some things that the load balancer cannot, like cookie-based sesion affinity and intelligent routing.
 
