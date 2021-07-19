@@ -138,7 +138,6 @@ const PostContent = styled.div`
   /* Code blocks */
 
   p.tip {
-    margin: 0px 2em;
     background: #b0ffc4;
     box-shadow: 2px 2px 2px rgba(0 0 0 /8%);
     border: 2px solid #00bc68;
@@ -220,6 +219,11 @@ const PostContent = styled.div`
   }
 
   /* Images */
+
+  figure {
+    margin: 0px;
+  }
+
   .gatsby-resp-image-figcaption {
     font-size: 0.8em;
     text-align: center;
@@ -232,10 +236,11 @@ const PostContent = styled.div`
 
   /* Warnings/Quotes */
   blockquote {
+    margin: 0px;
     border-left: 5px solid red;
     background: #ffd5d6;
     padding: 0.5em;
-    padding-left: 0.8em;
+    padding-left: 1em;
     color: black;
   }
 
