@@ -314,13 +314,7 @@ NAME       READY   STATUS    RESTARTS   AGE
 test-pod   1/1     Running   0          60s
 ```
 
-Congratulations, you've deployed your first container to your Kubernetes cluster! Let's see what other fields Kubernetes created for us by getting the full definition of the running pod.
-
-```text
-$ k get pod test-pod -o yaml
-```
-
-We can also see the logs of our pod (more precisely, our container). In our case, it's the console from our Javascript file. Container logs are rotated daily and whenever the log file reaches 10MB; this command will show the latest version.
+Congratulations, you've deployed your first container to your Kubernetes cluster! We can also see the logs of our pod (more precisely, our container). In our case, it's the console from our Javascript file. Container logs are rotated daily and whenever the log file reaches 10MB; this command will show the latest version.
 
 ```text
 $ k logs test-pod
@@ -341,7 +335,7 @@ No resources in default namespace
 
 The pod was *not recreated* after it was deleted. 
 
-In order to have our containers be recreated in case of failure, we need to use Replica Sets. These are another Kubernetes resource that manage our pods on our behalf. We declare how many pods we want, and the Replica Set ensures that the state of our application always matches that number by restarting pods when they die. Let's take a look at a new configuration file.
+In order to have our containers be recreated in case of failure, we need to use Replica Sets. These are another Kubernetes resource that manage pods on our behalf. We declare how many pods we want, and the Replica Set ensures that the "state" of our application always matches. Let's take a look at a new configuration file.
 
 ```yaml:title=resources/rs.yaml
 apiVersion: apps/v1
@@ -367,14 +361,14 @@ spec:
 
 Replica Sets work by defining a "selector" on both the Replica Set and within the pod. Any pods that match the selector will be managed by the Replica Set.
 
-When you apply this configuration file, Kubernetes will create three new pods that match the specification provided. It's also going to restart those pods whenever any of them die.
+When you apply this configuration file, Kubernetes will create three new pods that match the specification provided. It will restart any pods that die!
 
 ```text
 $ k create -f infrastructure/rs.yaml
 replicationcontroller/test-rs created
 ```
 
-Now let's try deleting one of our pods (this command may take a moment). Notice that when we get our pods after doing the delete, the Replica Set has already spun up a new pod in order to match the three specified in our configuration.
+Now let's try deleting one of our pods (this command may take a moment). Notice that the Replica Set has already spun up a new pod in order to match the three specified in our configuration.
 
 ```text{12,15}
 $ k get pods
@@ -391,10 +385,10 @@ NAME            READY   STATUS              RESTARTS   AGE
 test-rs-6phnq   1/1     Terminating         0          5m46s
 test-rs-b5ptc   1/1     Running             0          5m46s 
 test-rs-nh4pk   1/1     Running             0          5m46s
-test-rs-qsm9p   1/1     ContaineCreating    0          2m14s
+test-rs-qsm9p   1/1     ContainerCreating    0          2m14s
 ```
 
-Since the Replica Set manages the pods, if we delete the entire Replica Set, the pods will also be deleted. We can do this with the `k delete -f rs.yaml` command, but we won't right now.
+Deleting a Replica Set will delete all the pods that it manages. 
 
 ## Debugging our application with port forwarding
 
@@ -423,9 +417,9 @@ Great, we can see that the containers are running inside of our pods, and servin
 
 The `port-forward` command is great for debugging, but it's not really meant for production code. Instead, we're going to create a service. 
 
-Services are Kubernetes resources that give us a single, persistent point of entry into to a group of pods. The IP addresses of pods could change when they become unavailable and are replaced, whereas the IP address of a service will never change. This means we can have a consistent IP for our databases and our frontend applications for clients.
+Services are Kubernetes resources that give us a single, persistent point of entry into to a group of pods. The IP addresses of pods could change when they become unavailable and are replaced, whereas the IP address of a service will never change. This gives us a consistent IP for our API.
 
-Let's create a Node Port service, which will let us to curl our API *from within the cluster*.
+Let's create a NodePort service, which will let us to curl our API *from within the cluster*.
 
 ```yaml:title=infrastructure/np.yaml
 apiVersion: v1
@@ -455,7 +449,7 @@ kubernetes       ClusterIP   10.100.0.1      <none>        443/TCP        28h
 test-node-port   NodePort    10.100.37.176   <none>        80:30139/TCP   3m32s
 ```
 
-The `CLUSTER-IP` field indicates that our service is now waiting for connections at the IP address of `10.100.37.176` on port 80. Keep in mind, this is an internal IP address and is not available outside the cluster, it's only available to nodes within the cluster.
+The CLUSTER-IP field indicates that our service is now waiting for connections at the IP address of `10.100.37.176` on port 80. Keep in mind, this is an internal IP address and is not available outside the cluster.
 
 <p class="tip">We can connect to specific pods within the cluster using <code class="language-text">kubectl</code> with the <code class="language-text">exec</code> command, and the pod name: <code class="language-text">kubectl exec -it pod-name-here -- /bin/sh</code></p>
 
@@ -471,13 +465,13 @@ $ k exec test-rs-6phnq -- curl -s http://10.100.37.176/api
 [{"first":"Peter","last":"Turnage","address":"886 Block Drive","phone":"203-419-1013"...
 ```
 
-This works, but we want to make our cluster available to the internet at a specific IP address, so that anyone can query our API. 
+This works, but we want to make our cluster available *to the entire internet* at a specific IP address, so that anyone can query our API. 
 
 ## Exposing our pods to the internet
 
 In order to make our pods available to anyone on the internet, we actually want to use a LoadBalancer service, rather than a NodePort service.
 
-This service will actually create a different resource depending on where you're deploying your infrastructure. Since we're deploying with EKS, it'll create AWS resources to route traffice to our cluster. Pretty cool!
+This service will create a different resource depending on where you're deploying your infrastructure. Since we're deploying with EKS, it'll create AWS resources to route traffice to our cluster. Pretty cool!
 
 ![Kubernetes load balancer service](../images/inline_images/load-balancer.png "The load balancer will provide one public-facing internet address and balance traffic across all of our nodes.")
 
@@ -487,7 +481,7 @@ Let's first delete our old NodePort service; we don't need that anymore.
 $ k delete -f infrastructure/np.yaml
 ```
 
-Now we'll create the configuration file for our load balancer service. It'll look very similar to our NodePort service.
+Create the configuration file for our load balancer. It'll look very similar to our NodePort service.
 
 ```yaml:title=infrastructure/load-balancer.yaml
 apiVersion: v1
