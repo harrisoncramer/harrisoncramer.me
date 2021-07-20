@@ -1,7 +1,7 @@
 ---
-title: Preventing unsafe commits with CircleCI
+title: Protecting your production branch with CircleCI
 date: 2021-07-19
-path: /preventing-unsafe-commits-with-circleci/
+path: /protecting-your-production-branch-with-circleci/
 description: Avoid merging unclean commits into your main branch by setting up a basic CI pipeline to test and lint your code.
 imageDescription: A hard hat. Protection!
 featuredImage: ../images/posts/protect-main-branch.jpeg
