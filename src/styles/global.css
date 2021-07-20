@@ -3,6 +3,7 @@ body,
 #___gatsby,
 #gatsby-focus-wrapper {
   height: 100%;
+  background-color: black;
 }
 
 a {
