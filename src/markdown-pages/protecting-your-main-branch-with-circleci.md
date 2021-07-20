@@ -1,5 +1,4 @@
 ---
-draft: true
 title: Preventing unsafe commits with CircleCI
 date: 2021-07-19
 path: /preventing-unsafe-commits-with-circleci/
@@ -175,36 +174,91 @@ Finally, the good stuff. The CI/CD tool that we'll be using is called CircleCI. 
 When we commit our code, CircleCI will recognize that we have a configuration file in our project, and will read it. Behind the scenes, it's going to spin up a Docker container that will run all of the steps outlined in the file. The application requires that configuration file to be located at `.circleci/config.yaml` in your project. Let's create it now.
 
 ```yaml:title=.circleci/config.yaml
-orbs:
-  node: circleci/node@2.0.2
 version: 2.1
+orbs:
+  node: circleci/node@4.5.1
 jobs:
-  build_lint_and_test:
-    docker:
-      - image: "cimg/base:stable"
+  start:
+    executor: node/default
     steps:
       - checkout
-      - node/install
-      - run: node --version
+      - node/install-packages
+      - run: |
+          npm run lint
+          npm run build
+          npm run start
 workflows:
-  my_workflow:
-    - build_lint_and_test
+  start_app:
+    jobs:
+      - start
 ```
 
 CircleCI configuration files broadly outline a series of "jobs," which can in turn be combined into "workflows." We can active different workflows on the branches of our repository. For instance, we could have a workflow tied to our development and staging branches that runs all of our tests, and then another workflow tied to our production (or main) branch that deploys the code.
 
-If you haven't already, head over to <a href="https://app.circleci.com/">CircleCI</a> and create an account with your Github username. CircleCI needs permission to access your repositories in order to run your code. Next, we'll create the configuration for CircleCI in our project.
+This configuration file will install our packages (or grab them from the cache, check out <a href="https://harrisoncramer.me/speeding-up-circleci-builds-with-caching/">this</a> post for more information) run our linting step, run our build step, and then run our start, all as a single job.
 
-We're also going to install the circleci <a href="https://circleci.com/docs/2.0/local-cli/">command line tool</a>, because it allows us to validate our configuration files before commiting them. I'm on a Mac, so I'll use Brew.
+<p class="tip">CircleCI provides a handy <a class="dark__link" href="https://circleci.com/docs/2.0/local-cli/">command line tool</a> that allows us to validate our configuration files before commiting them. This can save tons of time debugging our yaml files when we're making some stupid syntax mistake.</p>
 
-```text
-$ brew install circleci
-```
+Now we need to connect our repository to CircleCI. If you haven't already, head over to <a href="https://app.circleci.com/">CircleCI</a> and create an account with your Github username. Then head into the "Projects" panel and you should see your repository. Select the "Set up project" button and tell CircleCI that you've already got a configuration file. It should automatically start running your workflow.
+
+Explore around the GUI for a little bit to get a feel for where everything lives, and then move on to the next step.
 
 ## Protecting our main branch
 
-At the moment, anyone on our team can push code up to our main branch. Let's change that.
+At the moment, anyone on our team can push code up to our main branch. Let's change that. Navigate to your Github repository in the browser and open up the "Settings" tab. 
 
-Navigate to your repository in the browser and open up the "Settings" tab. Next, click on the 
+![Github Settings Tab](../images/inline_images/github-settings.png)
 
-Let's now add our Circle
+Next, click on the "Branches" tab. Then we want to add a rule.
+
+![Github branch rules](../images/inline_images/github-branch-rules.png)
+
+This rule is going to prevent anyone from pushing or merging changes into our master branch until our CircleCI jobs have passed on their code. In the "Branch name pattern" field, we want to write the name of the branch. In this case, main. Then we want to require status checks to pass before merging (these are coming from CircleCI) and we want to select the status checks. In our case, we called the workflow start_app in our configuration file.
+
+Finally, we want to include administrators, so that even they cannot merge into main without passing our checks.
+
+![Branch rules](../images/inline_images/branch-protection.png)
+
+> Make sure that you press "Create" at the bottom to create the new branch rule. If you exit this screen without pressing create, the rule won't go into effect.
+
+Great, everything is now setup to protect the main branch.
+
+## Testing our defenses!
+
+Now that we have these branch protection rules set up, we can deliberately cause our CircleCI workflow to fail. This should make merging into main impossible.
+
+First, let's create a new branch. 
+
+```text
+$ git checkout -b new-branch
+```
+
+Then, we can try adding a change to our code. In this case, let's just throw an error inside of our code.
+
+```javascript{7}:title=src/index.js
+export const add = (a, b) => {
+  const result = a + b;
+  console.log(`The result is ${result}`);
+};
+
+add(1, 2);
+throw new Error("I threw this intentionally.");
+```
+
+Let's commit our changes and push them up to the new branch.
+
+```text
+$ git add .
+$ git commit -m 'commit that should throw an error'
+$ git push --set-upstream origin new-branch
+```
+
+Head over to CircleCI, and you'll see that the error we threw is breaking our pipeline.
+
+![CircleCI Error](../images/inline_images/circle-error.png)
+
+Not only that, but when we create a pull request for the main branch from our current branch, we cannot merge. Github now tells us that the status checks are required to pass before merging.
+
+![Github status checks](../images/inline_images/github-no-error-merge.png)
+
+And that's it! Congratulations, you've now protected your main branch from dirty commits. In the future, you could build your pipeline out to include more robust testing, like with Jest or other test runners. Good luck!

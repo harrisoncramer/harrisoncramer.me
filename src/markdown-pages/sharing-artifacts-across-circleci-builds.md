@@ -192,4 +192,34 @@ Validating cache...
 
 Unarchiving cache...
 ```
-Notice how the hashes of the cache matches. And that's it! Now, every time you want to add another step to your workflow, you can just reference the cache created earlier and you'll only have to download the dependencies once. 
+Notice how the hashes of the cache matches. Now, every time you want to add another step to your workflow, you can just reference the cache created earlier and you'll only have to download the dependencies once. 
+
+## Using orbs
+
+This seems really tedious—and it is! There's a way of replacing all of this functionality with a <a href="https://circleci.com/docs/2.0/orb-intro/">feature</a> that CircleCI has called "orbs."
+
+Orbs are basically blocks of configuration that give us a shortcut to writing out commonly used commands. Nearly every NodeJS developer wants to be able to install their project and cache the dependencies. Instead of manually writing all of this out every time, we can just reference the NodeJS orb in the top of our configuration file. That gives us access to special steps inside of our jobs. 
+
+Here's the same functionality re-written with Orbs:
+
+```yaml{2-3,6,9}:title=.circleci/config.yml
+version: 2.1
+orbs:
+  node: circleci/node@4.5.1
+jobs:
+  start:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages
+      - run: |
+          npm run lint
+workflows:
+  start_app:
+    jobs:
+      - start
+```
+
+Notice that we specify we want to use the orb on lines 2 and 3, and we pass in the `node/default` as our executor. Then, inside of the steps, we have access to a special step provided by that orb: the `node/install-packages` step. This step will take care of all of our caching for us.
+
+Why did we go through the pain of writing out this whole thing manually? Because it's important to understand what's happening behind the scenes when we use the Orb! And now you know.
