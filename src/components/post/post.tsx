@@ -50,7 +50,7 @@ export const Post = ({
       <StyledMetaContainer>
         <StyledTitleAndDate>
           <h2>{title}</h2>
-          <StyledDate>{dayjs(date).format("DD/MM/YYYY")}</StyledDate>
+          <StyledDate>{dayjs(date).format("MMMM DD, YYYY")}</StyledDate>
         </StyledTitleAndDate>
       </StyledMetaContainer>
       <p>{description}</p>
