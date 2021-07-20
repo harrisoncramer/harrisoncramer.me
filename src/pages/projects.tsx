@@ -12,7 +12,14 @@ const ProjectsPage = (): JSX.Element => (
       title="projects"
       description="This page contains all of my personal projects"
     />
-    <StyledH1>Projects page</StyledH1>
+    <StyledH1>Projects</StyledH1>
+    <p>
+      This site is built with Gatsby, a React JAM stack framework. It's written
+      in Typescript. It's is hosted on AWS, and the infrastructure was
+      provisioned with Terraform. Integration and deployments are run through
+      CircleCI.
+    </p>
+    <p>Here are some of my other projects.</p>
     <div>
       <StyledH2>Cloture</StyledH2>
       <StyledFeatureParagraph>
@@ -33,6 +40,11 @@ const ProjectsPage = (): JSX.Element => (
         </a>
         .
       </StyledFeatureParagraph>
+      <StyledFeatureParagraph>
+        stack (v2): PostgreSQL+TypeORM, Apollo GQL, React, Typescript, AWS,
+        Docker <br />
+        stack (v1): MongoDB, Express, React, MaterialUI, Digital Ocean
+      </StyledFeatureParagraph>
       <p>
         This application was built to compile congressional hearing information
         from around the web into a single database. These websites are poorly
@@ -44,9 +56,22 @@ const ProjectsPage = (): JSX.Element => (
         by reporters on Capitol Hill, particularly at my former employer
         National Journal.
       </p>
+      <StyledH2>MasamiCooks</StyledH2>
+      <StyledFeatureParagraph>
+        Demo: <a href="https://www.masamicooks.com">masamicooks.com</a>
+      </StyledFeatureParagraph>
+      <StyledFeatureParagraph>
+        stack: Hugo, Terraform, AWS
+      </StyledFeatureParagraph>
+      <p>
+        This cooking blog features the latest and greatest recipes from my
+        partner, Masami, who is an amazing cook. It's built using a Golang-based
+        static site generator called Hugo. The site lives on AWS infrastructure
+        provisioned by Terraform—just like this site does.
+      </p>
       <StyledH2>D3 Visualizations</StyledH2>
       <StyledFeatureParagraph>
-        <a href="https://bl.ocks.org/harrisoncramer">Live online here</a>
+        Demo: <a href="https://bl.ocks.org/harrisoncramer">Live online here</a>
       </StyledFeatureParagraph>
       <p>
         My earliest foray into the Javascript world revolved around the{" "}
@@ -66,16 +91,6 @@ const ProjectsPage = (): JSX.Element => (
           story
         </a>{" "}
         for the Century Foundation in 2017.
-      </p>
-      <StyledH2>MasamiCooks</StyledH2>
-      <StyledFeatureParagraph>
-        <a href="https://www.masamicooks.com">masamicooks.com</a>
-      </StyledFeatureParagraph>
-      <p>
-        This cooking blog features the latest and greatest recipes from my
-        partner, Masami, who is an amazing cook. It's built using a Golang-based
-        static site generator called Hugo. The site lives on AWS infrastructure
-        provisioned by Terraform—just like this site does.
       </p>
     </div>
   </Layout>
