@@ -34,6 +34,18 @@ module.exports = {
         path: `${__dirname}/src/markdown-pages`,
       },
     },
+    // Google Analytics
+    {
+      resolve: `gatsby-plugin-google-gtag`,
+      options: {
+        trackingIds: ["G-9H508NLRKY"],
+        pluginConfig: {
+          head: false,
+          respectDNT: true,
+          exclude: [],
+        },
+      },
+    },
     {
       resolve: `gatsby-transformer-remark`,
       options: {
