@@ -54,13 +54,13 @@
   ],
   "license": "0BSD",
   "scripts": {
-    "build": "npx gatsby build",
-    "develop": "npx gatsby develop",
-    "format": "npx prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "start": "npm run develop",
-    "lint": "npx eslint src/**/*.ts*",
-    "serve": "npx gatsby serve",
-    "clean": "npx gatsby clean",
+    "lint": "eslint src/**/*.ts*",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
   },
   "repository": {
