@@ -20,7 +20,7 @@ The end result will look like <a href="../images/gifs/jokes.gif">this.</a>
 
 Let's initialize the repository, using an empty folder.
 
-```terminal
+```text
 $ mkdir joke && cd joke
 $ npm init -y
 ```
@@ -50,20 +50,20 @@ Next, let's create the two folders that our project will rely on: the `src` fold
 
 The `build` folder will eventually contain our compiled code. This is what we're going to publish to NPM (a package respository) so that others can *use* our tool. We won't publish the `build` directory to version control.
 
-```terminal
+```text
 $ mkdir src
 $ mkdir build
 ```
 
 Finally, we'll create the `shim.js` file, which will run the code inside of our build folder.
 
-```terminal
+```text
 $ touch shim.js
 ```
 
 Our project directory structure should now look like this:
 
-```terminal
+```text
 joke
 |_ build/
 |_ package.json
@@ -84,7 +84,7 @@ require("./build/index.js")
 
 We also need to make this file executable.
 
-```terminal
+```text
 $ chmod 700 shim.js
 ```
 
@@ -94,7 +94,7 @@ At the moment, we don't have anything inside of our build folder. In fact, we wo
 
 We're going to use <a href="https://babeljs.io/">Babel</a> to compile our code, to ensure that we can write newer Javascript features (like ESM) but remain compatible with older versions of NodeJS. It's an `npm` dependency, so we'll install it. We're also going to install a few helper packages along with it.
 
-```terminal
+```text
 $ npm install --save-dev @babel/core @babel/cli @babel/preset-env @babel/node
 ```
 
@@ -159,13 +159,13 @@ console.log('Hello, world!')
 
 Next, we can run our build script. This will compile the `index.js` file and place the compiled version inside of the build folder.
 
-```terminal
+```text
 $ npm run build
 ```
 
 Finally, we can test our executable directly. This will run the compiled version of our code. 
 
-```terminal
+```text
 $ ./shim.js
 Hello, world!
 ```
@@ -174,7 +174,7 @@ Hello, world!
 
 It would be extremely time consuming to have to manually build our script every time we want to run it in development. Let's setup a script so that every time we make changes, the CLI will get rebuilt. To do this, we're going to rely on <a href="https://www.npmjs.com/package/nodemon">nodemon</a>. This package let's us re-run Javascript files every time a change is made. 
 
-```terminal
+```text
 $ npm install -D nodemon
 ```
 
@@ -215,7 +215,7 @@ Phew! We've got everything set up, and we can now run `npm start` to run our scr
 
 Next, we'll write the actual logic of the CLI. There are a few libraries out there that are useful for building CLI tools, but the one we'll use for this tutorial is called <a href="https://www.npmjs.com/package/inquirer">Inquirer</a> to create some questions for our CLI. We'll also use <a href="https://www.npmjs.com/package/ora">ora</a> to show a loading spinner when we make calls to our API.
 
-```terminal
+```text
 $ npm install inquirer ora
 ```
 
@@ -319,7 +319,7 @@ Once you've created an account on npm, we'll initialize our project with git. Th
 
 I highly recommend installing Github's relatively new <a href="https://cli.github.com/">CLI tool</a>, which lets you create repositories without bothering with a web browser. It's what I'll use in the code below (the CLI's alias is "gh").
 
-```terminal
+```text
 $ git init
 $ echo "node_modules\nbuild" > .gitignore
 $ git add .
@@ -330,7 +330,7 @@ $ git push --set-upstream origin main
 
 We also want to add an `.npmignore` file to our folder. Without it, npm will ignore files listed in `.gitignore` which we don't want! Recall that we want to ignore the `src` folder when we publish to Github so that other developers can edit our code, but we want to publish our `build` folder to npm, because that's what's used in our production code. Create the new file:
 
-```terminal:title=.npmignore
+```text:title=.npmignore
 node_modules
 src
 ```
@@ -386,14 +386,14 @@ We're also adding a new script: the `prePublishOnly` script. This will automatic
 
 Now let's publish our CLI. The publish step will automatically build our application using the `prepublishOnly` script.
 
-```terminal
+```text
 $ npm login # Only run this if you aren't logged in.
 $ npm publish
 ```
 
 If you go to your account you should now see that you have a package published. We can now test to see that it works on our local machine by installing it globally.
 
-```terminal
+```text
 $ npm install -g @harrisoncramer/joke
 $ joke
 ? What type of joke do you want to hear? Dad Joke

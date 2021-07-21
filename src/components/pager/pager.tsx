@@ -13,7 +13,6 @@ export const Pager = ({
   currentPage,
   numPages,
 }: PagerProps): React.ReactElement => {
-  console.log(numPages, currentPage)
   const handleGoForward = () => {
     navigate(`/blog/${currentPage - 1 <= 1 ? "" : currentPage - 1}`)
   }
