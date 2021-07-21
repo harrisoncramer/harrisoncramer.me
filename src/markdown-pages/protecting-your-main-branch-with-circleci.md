@@ -14,6 +14,8 @@ When working in a team, it can be difficult to ensure that everyone is linting a
 
 We're going to set up a simple *continuous integration* rool for a Github project, that will automatically run tests whenever anyone pushes their code up to a feature branch. That way, we'll ensure that branches cannot be merged into the main (or production) branch unless they pass certain tests. This will ensure that our main branch stays in an always deployable state. It'll also keep our code clean and seriously reduce the amount of bugs in our production codebase.
 
+The repository for this application can be downloaded <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/circleci.tar.gz">here</a>.
+
 ## Setting up the project
 
 The files that we're going to build, test, and lint will be very simple. We're mainly going to be writing a configuration file for CircleCI, which is the continuous integration tool we'll be using. Let's create our Javascript project and initialize the Githube repository.
