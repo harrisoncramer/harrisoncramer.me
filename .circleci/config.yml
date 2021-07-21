@@ -3,10 +3,6 @@ orbs:
   slack: circleci/slack@4.1
   node: circleci/node@4.5.1
 executors:
-  app-executor:
-    docker:
-      - image: cimg/node:15.2.0
-    working_directory: ~/my_repo
   slack-executor:
     docker:
       - image: cimg/base:stable
@@ -97,7 +93,7 @@ jobs:
       - *show_branch
       - node/install-packages
   lint:
-    executor: app-executor
+    executor: node/default
     steps:
       - checkout
       - *show_branch
@@ -125,7 +121,7 @@ jobs:
           name: Deploy to S3
           command: aws --region ${AWS_REGION} s3 sync ~/my_repo/public s3://${AWS_BUCKET_NAME} --delete
   invalidate_old_cloudfront_distribution:
-    executor: app-executor
+    executor: node/default
     steps:
       - checkout
       - *show_branch
@@ -136,7 +132,7 @@ jobs:
             aws configure set preview.cloudfront true
             aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths /\*
   notify_developers:
-    executor: slack-executor
+    executor: node/default
     steps:
       - slack/notify:
           event: "always"
