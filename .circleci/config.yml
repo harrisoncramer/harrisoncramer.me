@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   slack: circleci/slack@4.1
+  node: circleci/node@4.5.1
 executors:
   app-executor:
     docker:
@@ -16,19 +17,6 @@ aliases:
     run:
       name: Show current branch after checkout
       command: echo ${CIRCLE_BRANCH}
-  - &restore_cache
-    restore_cache:
-      keys:
-        - node-deps-{{ .Branch }}-{{checksum "package-lock.json"}}
-  - &install_dependencies
-    run:
-      name: Install dependencies
-      command: npm ci
-  - &save_cache
-    save_cache:
-      key: node-deps-{{ .Branch }}-{{checksum "package-lock.json"}}
-      paths:
-        - node_modules
   - &install_aws_cli
     run:
       name: Installing AWS CLI
@@ -103,38 +91,35 @@ aliases:
 
 jobs:
   install_packages:
-    executor: app-executor
+    executor: node/default
     steps:
       - checkout
       - *show_branch
-      - *restore_cache
-      - *install_dependencies
-      - *save_cache
+      - node/install-packages
   lint:
     executor: app-executor
     steps:
       - checkout
       - *show_branch
-      - *restore_cache
-      - *install_dependencies
+      - node/install-packages
       - run:
           name: Run linting with ESLint + Prettier
           command: |
             npm run lint
   gatsby_build:
-    executor: app-executor
+    executor: node/default
     steps:
       - checkout
       - *show_branch
-      - *restore_cache
+      - node/install-packages
       - *build_project
   deploy_to_aws_s3:
-    executor: app-executor
+    executor: node/default
     steps:
       - checkout
       - *show_branch
       - *install_aws_cli
-      - *restore_cache
+      - node/install-packages
       - *build_project
       - run:
           name: Deploy to S3
