@@ -116,6 +116,7 @@ jobs:
       - checkout
       - *show_branch
       - *restore_cache
+      - *install_dependencies
       - run:
           name: Run linting with ESLint + Prettier
           command: |
