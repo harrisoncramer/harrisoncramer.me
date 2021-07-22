@@ -1,7 +1,7 @@
 ---
 title: Deploying a NodeJS API with Docker and Kubernetes
 date: 2021-07-15
-path: /deploying-a-react-application-with-kubernetes/
+path: /deploying-a-nodejs-api-on-eks/
 description: Ever wanted to deploy an application to production using Amazon's hosted Kubernetes services, EKS? This is for you!
 imageDescription: An orchestra, all playing together.
 featuredImage: ../images/posts/orchestra.jpeg
@@ -20,8 +20,8 @@ Let's review the infrastructure briefly. Here's a simplified diagram:
 
 What are all these different parts? Let's go through it step by step.
 
-1. The developer writes up some configuration file. These are typically written as `.yaml` files, and describe the resources that we want to create.
-2. The developer pushes image files to the container registry, likely DockerHub. These files specify how to create the Docker containers that the Kubernetes cluster is going to run.
+1. The developer creates a Docker image and pushes it to a container registry, likely DockerHub. These files specify how to create the Docker containers that the Kubernetes cluster is going to run.
+2. The developer writes up some configuration file. These are typically written as `.yaml` files, and describe the resources that we want to create.
 3. The developer uses the `kubectl` command to pass that data to the Control Plane, specifically the Kubernetes API server.
 4. The API server processes the file and, working with other parts of the Control Plane which aren't pictured here, communicates with your worker nodes via their respective kublets.
 5. The API server will determine whether, based on the configuration provided, any containers need to run or be destroyed. If it need to create new ones, it'll schedule them on the worker nodes that have space.
