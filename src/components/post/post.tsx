@@ -1,11 +1,10 @@
 import React, { MouseEvent } from "react"
 
 import styled from "styled-components"
-import { Post as PostType } from "../../types/markdown"
+import { PostType } from "../../types/markdown"
 import { navigate } from "gatsby"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import dayjs from "dayjs"
-import { categories } from "../../util/constants"
 
 const handleGoToCategory = (e: MouseEvent) => {
   const input = e.target as HTMLElement
@@ -36,13 +35,11 @@ export const Post = ({
     <StyledPost onClick={() => handleClickPost(path)}>
       <StyledTagHolder>
         {tags &&
-          tags
-            .filter(tag => categories.includes(tag))
-            .map((tag, i) => (
-              <StyledTag key={i} onClick={handleGoToCategory}>
-                {tag.toLowerCase()}
-              </StyledTag>
-            ))}
+          tags.map((tag, i) => (
+            <StyledTag key={i} onClick={handleGoToCategory}>
+              {tag.toLowerCase()}
+            </StyledTag>
+          ))}
       </StyledTagHolder>
       {image && imageDescription && (
         <GatsbyImage image={image} alt={imageDescription} />

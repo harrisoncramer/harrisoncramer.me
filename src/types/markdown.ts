@@ -1,5 +1,5 @@
 import { IGatsbyImageData } from "gatsby-plugin-image"
-export type Post = {
+export type PostType = {
   title: string
   date: string
   path: string

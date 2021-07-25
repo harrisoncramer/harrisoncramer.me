@@ -3,7 +3,7 @@ import { graphql, PageProps } from "gatsby"
 import styled from "styled-components"
 import Seo from "../components/seo/seo"
 import Layout from "../components/layout/layout"
-import { Post } from "../types/markdown"
+import { PostType } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import { Social } from "../components/social/social"
 import { Comments } from "../components/comments/comments"
@@ -18,7 +18,7 @@ type DataType = {
   }
   markdownRemark: {
     html: string
-    frontmatter: Post
+    frontmatter: PostType
     fileAbsolutePath: string
   }
   allMarkdownRemark: {
