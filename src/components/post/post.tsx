@@ -12,7 +12,7 @@ const handleGoToCategory = (e: MouseEvent) => {
   const category = input.innerText
   // Don't navigate if we're on the same page and clutter up the history
   if (!window.location.href.endsWith(category)) {
-    navigate(`/categories/${category}`)
+    navigate(`/blog/${category}`)
   }
   e.stopPropagation()
 }

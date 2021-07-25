@@ -63,6 +63,10 @@ exports.createPages = async ({ actions, graphql }) => {
   // and append the index value to the URL. Also pass
   // into the context the skip/limit values to be accessed
   // within the GQL queries on the page.
+  //
+  // NOTE: Gatsby automatically generates pages for the
+  // pages inside of /page and we have to keep programatically
+  // generated pages in a different folder.
   const edges = result.data.allMarkdownRemark.edges
   const postsPerPage = 5
   const numPages = Math.ceil(edges.length / postsPerPage)
@@ -70,12 +74,36 @@ exports.createPages = async ({ actions, graphql }) => {
   Array.from({ length: numPages }).forEach((_, i) => {
     createPage({
       path: i === 0 ? `/blog/` : `/blog/${i + 1}`,
-      component: path.resolve("./src/pages/blog.tsx"),
+      component: path.resolve("./src/templates/blog.tsx"),
       context: {
         limit: postsPerPage,
         skip: i * postsPerPage,
         numPages,
         currentPage: i + 1,
+      },
+    })
+  })
+
+  const categories = [
+    "aws",
+    "circleci",
+    "docker",
+    "javascript",
+    "react",
+    "terraform",
+    "kubernetes",
+  ]
+
+  categories.forEach((category, i) => {
+    createPage({
+      path: `/blog/${category}`,
+      component: path.resolve("./src/templates/category.tsx"),
+      context: {
+        limit: postsPerPage,
+        skip: i * postsPerPage,
+        numPages,
+        currentPage: i + 1,
+        category,
       },
     })
   })
@@ -87,7 +115,7 @@ exports.createPages = async ({ actions, graphql }) => {
     }
     createPage({
       path: node.frontmatter.path,
-      component: path.resolve(`src/pages/post.tsx`),
+      component: path.resolve(`src/templates/post.tsx`),
     })
   })
 }

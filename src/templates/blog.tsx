@@ -45,6 +45,7 @@ type BlogPageProps = {
 const BlogPage = ({ data, pageContext }: BlogPageProps): JSX.Element => {
   // Filter out posts in production that are not published
   // This property is added to each node via the node API
+  console.log(pageContext)
   const posts = data.posts.edges.filter(({ node }) => {
     return process.env.NODE_ENV === "production" ? node.published : true
   })

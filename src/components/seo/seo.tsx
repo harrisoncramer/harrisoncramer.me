@@ -79,7 +79,7 @@ function Seo({ description, title, image, slug }: SeoProps): JSX.Element {
         },
       ]}
     >
-      <link rel="canonical" href={`${site.siteMetadata.siteUrl}${slug}/`} />
+      <link rel="canonical" href={`${site.siteMetadata.siteUrl}${slug}`} />
     </Helmet>
   )
 }
