@@ -141,11 +141,21 @@ exports.createPages = async ({ actions, graphql }) => {
 
 // On the creation of each .md node, create a slug that
 // we can then access inside of the page for the purposes of setting
-// it's correct location for SEO
+// it's correct location for SEO.
+// Make sure that the slug is the same location as the page
+// which is created in the previous step using the frontmatter
 exports.onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions
   if (node.internal.type === `MarkdownRemark`) {
     const slug = createFilePath({ node, getNode, basePath: `pages` })
+    // If the slug is not equal to the name provided in the frontmatter
+    if (node.frontmatter.path !== slug) {
+      throw new Error(
+        `Filename and slug do not match, for ${slug}.
+         Recieved filepath: ${node.frontmatter.path}
+        `
+      )
+    }
     createNodeField({
       node,
       name: `slug`,
