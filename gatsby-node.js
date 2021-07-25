@@ -1,5 +1,4 @@
-/**
- * Implement Gatsby's Node APIs in this file.
+/** Implement Gatsby's Node APIs in this file.
  *
  * See: https://www.gatsbyjs.com/docs/node-apis/
  */
@@ -42,6 +41,7 @@ exports.createPages = async ({ actions, graphql }) => {
               slug
             }
             frontmatter {
+              tags
               path
               featuredImage {
                 childImageSharp {
@@ -59,17 +59,36 @@ exports.createPages = async ({ actions, graphql }) => {
     console.error(result.errors)
   }
 
+  // The only valid categories for our site.
+  // We will only create "category" pages for these strings
+  // Furthermore, our blog will not display tags for anything other than these
+  // categories.
+  const categories = [
+    "aws",
+    "circleci",
+    "docker",
+    "javascript",
+    "react",
+    "terraform",
+    "kubernetes",
+    "non-technical",
+  ]
+
   // Create a new blog page for every n posts,
   // and append the index value to the URL. Also pass
   // into the context the skip/limit values to be accessed
   // within the GQL queries on the page.
+  //
+  // NOTE: Gatsby automatically generates pages for the
+  // pages inside of /page and we have to keep programatically
+  // generated pages in a different folder.
   const edges = result.data.allMarkdownRemark.edges
   const postsPerPage = 5
   const numPages = Math.ceil(edges.length / postsPerPage)
 
   Array.from({ length: numPages }).forEach((_, i) => {
     createPage({
-      path: i === 0 ? `/blog` : `/blog/${i + 1}`,
+      path: i === 0 ? `/blog/` : `/blog/${i + 1}`,
       component: path.resolve("./src/templates/blog.tsx"),
       context: {
         limit: postsPerPage,
@@ -80,11 +99,39 @@ exports.createPages = async ({ actions, graphql }) => {
     })
   })
 
+  categories.forEach((category, i) => {
+    createPage({
+      path: `/blog/${category}`,
+      component: path.resolve("./src/templates/category.tsx"),
+      context: {
+        limit: postsPerPage,
+        skip: i * postsPerPage,
+        numPages,
+        currentPage: i + 1,
+        category,
+      },
+    })
+  })
+
+  // Build the actual .md pages, ensuring that we don't create the
+  // ones with a draft in their frontmatter and also ensuring that
+  // we have some tags, and that all the tags are valid.
   result.data.allMarkdownRemark.edges.forEach(({ node }) => {
     if (!node.published) {
       console.log(`SKIPPING (DRAFT):`, node.frontmatter.path)
       return
     }
+
+    if (!Array.isArray(node.frontmatter.tags))
+      throw new Error(
+        `Must include at least one tag for post ${node.frontmatter.path}`
+      )
+
+    node.frontmatter.tags.forEach(tag => {
+      if (!categories.includes(tag))
+        throw new Error(`"${tag}" is not a valid tag.`)
+    })
+
     createPage({
       path: node.frontmatter.path,
       component: path.resolve(`src/templates/post.tsx`),
@@ -92,6 +139,9 @@ exports.createPages = async ({ actions, graphql }) => {
   })
 }
 
+// On the creation of each .md node, create a slug that
+// we can then access inside of the page for the purposes of setting
+// it's correct location for SEO
 exports.onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions
   if (node.internal.type === `MarkdownRemark`) {

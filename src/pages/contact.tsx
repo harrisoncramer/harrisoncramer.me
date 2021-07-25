@@ -3,7 +3,6 @@ import * as React from "react"
 import ReactTooltip from "react-tooltip"
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
-import { StyledH1 } from "../components/styled-components/text"
 import styled from "styled-components"
 
 const ContactPage = (): JSX.Element => (
@@ -11,8 +10,9 @@ const ContactPage = (): JSX.Element => (
     <Seo
       title="contact"
       description="This page includes my contact information like my Twitter handle and my Github account and my developer email. It also includes my resume."
+      slug="/contact"
     />
-    <StyledH1>Contact</StyledH1>
+    <h1>Contact</h1>
     <StyledDiv>
       <StyledP>
         Twitter:{" "}

@@ -23,6 +23,7 @@ const IndexPage = ({ data }: IndexPageData): JSX.Element => {
       <Seo
         title="harrisoncramer.me"
         description="Harrison Cramer personal blog site."
+        slug="/"
       />
       <div>
         <h1>Hello 👋</h1>

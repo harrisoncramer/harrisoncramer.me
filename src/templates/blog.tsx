@@ -2,9 +2,9 @@ import * as React from "react"
 import { graphql } from "gatsby"
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
-import { Post } from "../types/markdown"
+import { PostType } from "../types/markdown"
 import styled from "styled-components"
-import { Post as PostPreview } from "../components/post/post"
+import { Post } from "../components/post/post"
 import { Pager } from "../components/pager/pager"
 
 // Styling for code blocks
@@ -17,6 +17,7 @@ type BlogPageProps = {
     skip: number
     numPages: number
     currentPage: number
+    categories: string[]
   }
   data: {
     featured: {
@@ -24,7 +25,7 @@ type BlogPageProps = {
         {
           node: {
             published: boolean
-            frontmatter: Post
+            frontmatter: PostType
           }
         }
       ]
@@ -34,7 +35,7 @@ type BlogPageProps = {
         {
           node: {
             published: boolean
-            frontmatter: Post
+            frontmatter: PostType
           }
         }
       ]
@@ -45,10 +46,12 @@ type BlogPageProps = {
 const BlogPage = ({ data, pageContext }: BlogPageProps): JSX.Element => {
   // Filter out posts in production that are not published
   // This property is added to each node via the node API
+  const { categories } = pageContext
   const posts = data.posts.edges.filter(({ node }) => {
     return process.env.NODE_ENV === "production" ? node.published : true
   })
 
+  const myCats = pageContext.categories
   const featuredPost = posts.shift()
   if (!featuredPost) return <div>No posts.</div>
   return (
@@ -56,11 +59,12 @@ const BlogPage = ({ data, pageContext }: BlogPageProps): JSX.Element => {
       <Seo
         title="blog"
         description="This blog contains posts about what I'm learning as a software engineer. Topics include Javascript, DevOps, Cloud, Go/Golang, Typescript, Docker, Kubernetes, and much more!"
+        slug={`/blog/${pageContext.currentPage}`}
       />
-      <PostPreview {...featuredPost.node.frontmatter} />
+      <Post {...featuredPost.node.frontmatter} />
       <StyledPostWrapper>
         {posts.map(({ node }, i) => {
-          return <PostPreview {...node.frontmatter} key={i} />
+          return <Post {...node.frontmatter} key={i} />
         })}
       </StyledPostWrapper>
       <Pager {...pageContext} />

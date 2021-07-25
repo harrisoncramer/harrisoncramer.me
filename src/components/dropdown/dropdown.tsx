@@ -55,7 +55,7 @@ export const Dropdown = (): JSX.Element => {
             <Link to="/contact">Contact</Link>
           </li>
           <li>
-            <Link to="/projects">My Projects</Link>
+            <Link to="/projects">Projects</Link>
           </li>
           <li>
             <Link to="/blog">Blog</Link>
