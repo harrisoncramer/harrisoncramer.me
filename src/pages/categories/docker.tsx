@@ -53,7 +53,11 @@ const DockerCategory = (props: PageProps): React.ReactElement => {
 
   return (
     <Layout title="Docker">
-      <Seo description="All posts pertaining to Docker" title="Docker" />
+      <Seo
+        description="All posts pertaining to Docker"
+        title="Docker"
+        slug="/categories/docker"
+      />
       <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {

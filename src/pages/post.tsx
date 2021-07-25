@@ -21,6 +21,17 @@ type DataType = {
     frontmatter: Post
     fileAbsolutePath: string
   }
+  allMarkdownRemark: {
+    edges: [
+      {
+        node: {
+          fields: {
+            slug: string
+          }
+        }
+      }
+    ]
+  }
 }
 
 export default function Template(props: PageProps<DataType>): JSX.Element {
@@ -28,7 +39,8 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
   const location = props.data.markdownRemark.fileAbsolutePath.split("/").pop()
   const { markdownRemark } = props.data
   const { frontmatter, html } = markdownRemark
-  const siteUrl = props.data.site.siteMetadata.siteUrl
+  const { siteUrl } = props.data.site.siteMetadata
+  const { slug } = props.data.allMarkdownRemark.edges[0].node.fields
   //@ts-ignore
   const image = getImage(frontmatter.featuredImage)
   const socialImage = `${siteUrl}${image?.images?.fallback?.src}`
@@ -41,6 +53,7 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
         title={frontmatter.title}
         description={frontmatter.description}
         image={socialImage}
+        slug={slug}
       />
       <article>
         <PostTitle>{frontmatter.title}</PostTitle>
@@ -97,6 +110,15 @@ export const pageQuery = graphql`
     site {
       siteMetadata {
         siteUrl
+      }
+    }
+    allMarkdownRemark(filter: { frontmatter: { path: { eq: $path } } }) {
+      edges {
+        node {
+          fields {
+            slug
+          }
+        }
       }
     }
   }

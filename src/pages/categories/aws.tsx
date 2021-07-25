@@ -53,7 +53,11 @@ const Aws = (props: PageProps): React.ReactElement => {
 
   return (
     <Layout title="aws">
-      <Seo description="All posts pertaining to aws" title="aws" />
+      <Seo
+        description="All posts pertaining to aws"
+        title="aws"
+        slug="/categories/aws"
+      />
       <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {

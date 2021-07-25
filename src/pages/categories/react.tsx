@@ -53,7 +53,11 @@ const ReactCategory = (props: PageProps): React.ReactElement => {
 
   return (
     <Layout title="React">
-      <Seo description="All posts pertaining to React" title="React" />
+      <Seo
+        description="All posts pertaining to React"
+        title="React"
+        slug="/categories/react"
+      />
       <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {

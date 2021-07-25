@@ -53,7 +53,11 @@ const TerraformCategory = (props: PageProps): React.ReactElement => {
 
   return (
     <Layout title="Terraform">
-      <Seo description="All posts pertaining to Terraform" title="Terraform" />
+      <Seo
+        description="All posts pertaining to Terraform"
+        title="Terraform"
+        slug="/categories/terraform"
+      />
       <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {

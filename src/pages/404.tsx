@@ -9,7 +9,11 @@ const browser = typeof window !== "undefined" && window
 
 const NotFoundPage = (): JSX.Element => (
   <Layout title="404">
-    <Seo description="This page returned a 404 error." title="404" />
+    <Seo
+      description="This page returned a 404 error."
+      title="404"
+      slug="/404"
+    />
     <h1>404: Not Found</h1>
     <p>You just hit a route that doesn&#39;t exist... the sadness. 😭</p>
     <p>

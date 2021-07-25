@@ -53,7 +53,11 @@ const CircleCICategory = (props: PageProps): React.ReactElement => {
 
   return (
     <Layout title="CircleCI">
-      <Seo description="All posts pertaining to CircleCI" title="CircleCI" />
+      <Seo
+        description="All posts pertaining to CircleCI"
+        title="CircleCI"
+        slug="/categories/circleci"
+      />
       <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
         {data.allMarkdownRemark.edges.map(({ node }, i) => {

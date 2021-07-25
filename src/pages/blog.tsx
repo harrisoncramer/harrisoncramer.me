@@ -56,6 +56,7 @@ const BlogPage = ({ data, pageContext }: BlogPageProps): JSX.Element => {
       <Seo
         title="blog"
         description="This blog contains posts about what I'm learning as a software engineer. Topics include Javascript, DevOps, Cloud, Go/Golang, Typescript, Docker, Kubernetes, and much more!"
+        slug={`/blog/${pageContext.currentPage}`}
       />
       <PostPreview {...featuredPost.node.frontmatter} />
       <StyledPostWrapper>

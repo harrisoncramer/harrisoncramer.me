@@ -56,6 +56,7 @@ const JavascriptCategory = (props: PageProps): React.ReactElement => {
       <Seo
         description="All posts pertaining to Javascript"
         title="Javascript"
+        slug="/categories/javascript"
       />
       <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>

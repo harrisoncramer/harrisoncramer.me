@@ -56,6 +56,7 @@ const KubernetesCategory = (props: PageProps): React.ReactElement => {
       <Seo
         description="All posts pertaining to Kubernetes"
         title="Kubernetes"
+        slug="/categories/kubernetes"
       />
       <h2>Category: {props.location.pathname.split("/").pop()}</h2>
       <>
