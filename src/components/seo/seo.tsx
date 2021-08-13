@@ -14,9 +14,10 @@ type SeoProps = {
   title: string
   image?: string
   meta?: string
+  slug: string
 }
 
-function Seo({ description, title, image }: SeoProps): JSX.Element {
+function Seo({ description, title, image, slug }: SeoProps): JSX.Element {
   const { site } = useStaticQuery(
     graphql`
       query {
@@ -25,6 +26,7 @@ function Seo({ description, title, image }: SeoProps): JSX.Element {
             title
             description
             author
+            siteUrl
           }
         }
       }
@@ -76,7 +78,9 @@ function Seo({ description, title, image }: SeoProps): JSX.Element {
           content: metaDescription,
         },
       ]}
-    ></Helmet>
+    >
+      <link rel="canonical" href={`${site.siteMetadata.siteUrl}${slug}`} />
+    </Helmet>
   )
 }
 

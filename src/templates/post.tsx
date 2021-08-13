@@ -3,7 +3,7 @@ import { graphql, PageProps } from "gatsby"
 import styled from "styled-components"
 import Seo from "../components/seo/seo"
 import Layout from "../components/layout/layout"
-import { Post } from "../types/markdown"
+import { PostType } from "../types/markdown"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 import { Social } from "../components/social/social"
 import { Comments } from "../components/comments/comments"
@@ -18,8 +18,19 @@ type DataType = {
   }
   markdownRemark: {
     html: string
-    frontmatter: Post
+    frontmatter: PostType
     fileAbsolutePath: string
+  }
+  allMarkdownRemark: {
+    edges: [
+      {
+        node: {
+          fields: {
+            slug: string
+          }
+        }
+      }
+    ]
   }
 }
 
@@ -28,7 +39,8 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
   const location = props.data.markdownRemark.fileAbsolutePath.split("/").pop()
   const { markdownRemark } = props.data
   const { frontmatter, html } = markdownRemark
-  const siteUrl = props.data.site.siteMetadata.siteUrl
+  const { siteUrl } = props.data.site.siteMetadata
+  const { slug } = props.data.allMarkdownRemark.edges[0].node.fields
   //@ts-ignore
   const image = getImage(frontmatter.featuredImage)
   const socialImage = `${siteUrl}${image?.images?.fallback?.src}`
@@ -41,6 +53,7 @@ export default function Template(props: PageProps<DataType>): JSX.Element {
         title={frontmatter.title}
         description={frontmatter.description}
         image={socialImage}
+        slug={slug}
       />
       <article>
         <PostTitle>{frontmatter.title}</PostTitle>
@@ -97,6 +110,15 @@ export const pageQuery = graphql`
     site {
       siteMetadata {
         siteUrl
+      }
+    }
+    allMarkdownRemark(filter: { frontmatter: { path: { eq: $path } } }) {
+      edges {
+        node {
+          fields {
+            slug
+          }
+        }
       }
     }
   }

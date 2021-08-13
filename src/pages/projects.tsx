@@ -2,17 +2,16 @@ import * as React from "react"
 
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
-import { StyledH1 } from "../components/styled-components/text"
 import styled from "styled-components"
-import { StaticImage } from "gatsby-plugin-image"
 
 const ProjectsPage = (): JSX.Element => (
   <Layout title="projects">
     <Seo
       title="projects"
       description="This page contains all of my personal projects"
+      slug="/projects"
     />
-    <StyledH1>Projects</StyledH1>
+    <h1>Projects</h1>
     <p>
       This site is built with Gatsby, a React JAM stack framework. It's written
       in Typescript. It's is hosted on AWS, and the infrastructure was
@@ -56,9 +55,25 @@ const ProjectsPage = (): JSX.Element => (
         by reporters on Capitol Hill, particularly at my former employer
         National Journal.
       </p>
+      <StyledH2>ClipNotes</StyledH2>
+      <StyledFeatureParagraph>
+        Code:{" "}
+        <a href="https://github.com/harrisoncramer/clipNotes">
+          https://github.com/harrisoncramer/clipNotes
+        </a>
+      </StyledFeatureParagraph>
+      <StyledFeatureParagraph>
+        A simple Chrome extension that allows users to take site-specific notes,
+        that won <a href="https://codesmith.io/">Codesmith's</a> "hackathon"
+        contest. Built in ~6 hours for Codesmith's "hackathon" and won first
+        place. Available on the Chrome web store for download!
+      </StyledFeatureParagraph>
+      <StyledFeatureParagraph>stack: React</StyledFeatureParagraph>
+      <StyledFeatureParagraph></StyledFeatureParagraph>
       <StyledH2>MasamiCooks</StyledH2>
       <StyledFeatureParagraph>
-        Demo: <a href="https://www.masamicooks.com">masamicooks.com</a>
+        Demo:{" "}
+        <a href="https://www.masamicooks.com">https://www.masamicooks.com</a>
       </StyledFeatureParagraph>
       <StyledFeatureParagraph>
         stack: Hugo, Terraform, AWS

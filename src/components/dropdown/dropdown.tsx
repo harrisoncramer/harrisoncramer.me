@@ -7,6 +7,7 @@ export const Dropdown = (): JSX.Element => {
   const dropdownRef = useRef(null)
   const { isDark } = useContext(ThemeContext)
   const [isActive, setIsActive] = useState(false)
+
   const onClick = () => setIsActive(!isActive)
 
   const pageClickEvent = (e: React.MouseEvent) => {
@@ -48,13 +49,13 @@ export const Dropdown = (): JSX.Element => {
       >
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/">About</Link>
           </li>
           <li>
             <Link to="/contact">Contact</Link>
           </li>
           <li>
-            <Link to="/projects">My Projects</Link>
+            <Link to="/projects">Projects</Link>
           </li>
           <li>
             <Link to="/blog">Blog</Link>

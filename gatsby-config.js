@@ -9,6 +9,9 @@ module.exports = {
     `gatsby-plugin-react-helmet`,
     `gatsby-plugin-no-sourcemaps`,
     {
+      resolve: `gatsby-plugin-sitemap`,
+    },
+    {
       resolve: `gatsby-plugin-manifest`,
       options: {
         name: `harrisoncramer.me`,
@@ -32,6 +35,18 @@ module.exports = {
       options: {
         name: `markdown-pages`,
         path: `${__dirname}/src/markdown-pages`,
+      },
+    },
+    // Google Analytics
+    {
+      resolve: `gatsby-plugin-google-gtag`,
+      options: {
+        trackingIds: ["G-9H508NLRKY"],
+        pluginConfig: {
+          head: false,
+          respectDNT: true,
+          exclude: [],
+        },
       },
     },
     {

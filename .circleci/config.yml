@@ -9,6 +9,15 @@ executors:
     resource_class: small
 
 aliases:
+  - &restore_gatsby_cache
+    restore_cache:
+      keys:
+        - gatsby-build-{{ .Branch }}
+  - &save_gatsby_cache
+    save_cache:
+      key: gatsby-build-{{ .Branch }}
+      paths:
+        - .cache
   - &show_branch
     run:
       name: Show current branch after checkout
@@ -108,7 +117,9 @@ jobs:
       - checkout
       - *show_branch
       - node/install-packages
+      - *restore_gatsby_cache
       - *build_project
+      - *save_gatsby_cache
   deploy_to_aws_s3:
     executor: node/default
     steps:
@@ -116,6 +127,7 @@ jobs:
       - *show_branch
       - *install_aws_cli
       - node/install-packages
+      - *restore_gatsby_cache
       - *build_project
       - run:
           name: Deploy to S3
