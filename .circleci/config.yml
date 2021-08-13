@@ -131,7 +131,7 @@ jobs:
       - *build_project
       - run:
           name: Deploy to S3
-          command: aws --region ${AWS_REGION} s3 sync ~/project/public s3://${AWS_BUCKET_NAME} --delete
+          command: aws --region ${AWS_REGION} s3 sync ~/public s3://${AWS_BUCKET_NAME} --delete
   invalidate_old_cloudfront_distribution:
     executor: node/default
     steps:
