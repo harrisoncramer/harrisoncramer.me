@@ -75,3 +75,9 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+##############################
+### GOOGLE SEO VERFICATION ###
+##############################
+
+google*.html
