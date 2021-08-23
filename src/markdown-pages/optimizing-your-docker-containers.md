@@ -2,8 +2,8 @@
 title: Optimizing Docker images for production
 date: 2021-08-22
 path: /optimizing-your-docker-containers/
-description: This is a template post that shows what's possible with my blog.
-imageDescription: View of some code on a monitor.
+description: Docker containers can get bloated very quickly. Put your on a diet and keep your production build fast and secure.
+imageDescription: Make your CI/CD pipeline fast, like these bikers!
 featuredImage: ../images/posts/docker_optimized.jpeg
 tags: ["docker", "javascript"]
 ---
