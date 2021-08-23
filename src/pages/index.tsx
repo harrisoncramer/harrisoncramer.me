@@ -29,28 +29,16 @@ const IndexPage = ({ data }: IndexPageData): JSX.Element => {
         <h1>Hello 👋</h1>
         <p>
           My name is Harrison and I'm a former defense reporter turned software
-          engineer. I'm currently in the June cohort of{" "}
-          <a href="https://codesmith.io/">Codesmith</a> where I'm studying
-          Javascript and cloud native infrastructure.
-        </p>
-        <CenterImage>
-          {image && (
-            <GatsbyImage
-              className="profileImage"
-              image={image}
-              alt={"A profile shot of this site's author, Harrison Cramer."}
-            />
-          )}
-        </CenterImage>
-        <p>
-          I'm originally from Wellesley, Massachusetts, and currently reside in
-          Seattle with my partner. This is my personal site, where I'll{" "}
-          <Link to="/blog">post</Link> about the different technologies that I'm
-          learning and how others can use them, from DevOps and Kubernetes to
-          React and GraphQL.
+          engineer. I'm currently in the June cohort of Codesmith where I'm
+          studying Javascript and cloud native infrastructure.
         </p>
         <p>
-          This site is built with Gatsby, CircleCI for CI/CD, and Terraform.
+          This is my personal site, where I'll <Link to="/blog">post</Link>{" "}
+          about the different technologies that I'm learning and how others can
+          use them, from DevOps and Kubernetes to React and GraphQL. The site is
+          built with Gatsby, CircleCI for CI/CD, and Terraform.
+        </p>
+        <p>
           Please make a pull request if you want to fix a bug or suggest a
           feature. The{" "}
           <a href="https://github.com/harrisoncramer/harrisoncramer.me">
@@ -60,8 +48,9 @@ const IndexPage = ({ data }: IndexPageData): JSX.Element => {
         </p>
         <p>
           I'm also happy to <Link to="/contact">connect</Link> to talk about
-          software, politics, the Red Sox, or anything else that's on your mind.
-          I'm always looking for new topics to write about. Happy coding!
+          software, politics, or anything else that's on your mind. I'm always
+          looking for new architectures and workflows to write about. Happy
+          coding!
         </p>
       </div>
     </Layout>
@@ -83,4 +72,14 @@ const CenterImage = styled.div`
     max-height: 800px;
   }
 `
+// <CenterImage>
+//   {image && (
+//     <GatsbyImage
+//       className="profileImage"
+//       image={image}
+//       alt={"A profile shot of this site's author, Harrison Cramer."}
+//     />
+//   )}
+// </CenterImage>
+
 export default IndexPage
