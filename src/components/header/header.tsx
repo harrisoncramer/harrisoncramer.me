@@ -16,6 +16,7 @@ const Header = (): JSX.Element => {
 
   useEffect(() => {
     const onScroll = e => {
+      if (document.documentElement.scrollTop < 400) return // Only fade after 200px
       setScrollTop(e.target.documentElement.scrollTop)
       setScrolling(e.target.documentElement.scrollTop < scrollTop)
     }

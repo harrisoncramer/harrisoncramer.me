@@ -9,6 +9,7 @@ export const Dropdown = (): JSX.Element => {
   const [isActive, setIsActive] = useState(false)
 
   const onClick = () => setIsActive(!isActive)
+  const handleClickLink = () => setIsActive(false)
 
   const pageClickEvent = (e: React.MouseEvent) => {
     if (dropdownRef && dropdownRef.current === null) return
@@ -49,16 +50,24 @@ export const Dropdown = (): JSX.Element => {
       >
         <ul>
           <li>
-            <Link to="/">About</Link>
+            <Link to="/" onClick={handleClickLink}>
+              About
+            </Link>
           </li>
           <li>
-            <Link to="/contact">Contact</Link>
+            <Link to="/contact" onClick={handleClickLink}>
+              Contact
+            </Link>
           </li>
           <li>
-            <Link to="/projects">Projects</Link>
+            <Link to="/projects" onClick={handleClickLink}>
+              Projects
+            </Link>
           </li>
           <li>
-            <Link to="/blog">Blog</Link>
+            <Link to="/blog" onClick={handleClickLink}>
+              Blog
+            </Link>
           </li>
         </ul>
       </StyledNav>

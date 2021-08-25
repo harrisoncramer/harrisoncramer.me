@@ -28,6 +28,12 @@ const IndexPage = ({ data }: IndexPageData): JSX.Element => {
       <div>
         <h1>Hello 👋</h1>
         <p>
+          You're probably looking for the <Link to="/blog">software blog</Link>,
+          where I post about React, DevOps, and other modern programming tools
+          and tips.
+        </p>
+        <h2>What is this site?</h2>
+        <p>
           My name is Harrison and I'm a former defense reporter turned software
           engineer. I'm currently in the June cohort of Codesmith where I'm
           studying Javascript and cloud native infrastructure.
