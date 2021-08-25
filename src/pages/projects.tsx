@@ -58,9 +58,7 @@ const ProjectsPage = (): JSX.Element => (
       <StyledH2>ClipNotes</StyledH2>
       <StyledFeatureParagraph>
         Code:{" "}
-        <a href="https://github.com/harrisoncramer/clipNotes">
-          https://github.com/harrisoncramer/clipNotes
-        </a>
+        <a href="https://github.com/harrisoncramer/clipNotes">ClipNotes</a>
       </StyledFeatureParagraph>
       <StyledFeatureParagraph>
         A simple Chrome extension that allows users to take site-specific notes,
@@ -72,8 +70,7 @@ const ProjectsPage = (): JSX.Element => (
       <StyledFeatureParagraph></StyledFeatureParagraph>
       <StyledH2>MasamiCooks</StyledH2>
       <StyledFeatureParagraph>
-        Demo:{" "}
-        <a href="https://www.masamicooks.com">https://www.masamicooks.com</a>
+        Demo: <a href="https://www.masamicooks.com">Demo Code</a>
       </StyledFeatureParagraph>
       <StyledFeatureParagraph>
         stack: Hugo, Terraform, AWS
