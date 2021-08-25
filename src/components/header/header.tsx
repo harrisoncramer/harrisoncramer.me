@@ -11,7 +11,7 @@ const Header = (): JSX.Element => {
     setIsDark(isDark > 0 ? 0 : 1)
   }
 
-  const [scrolling, setScrolling] = useState(false)
+  const [scrolling, setScrolling] = useState(true)
   const [scrollTop, setScrollTop] = useState(0)
 
   useEffect(() => {
