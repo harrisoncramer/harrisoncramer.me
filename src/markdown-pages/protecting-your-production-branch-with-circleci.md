@@ -5,7 +5,7 @@ path: /protecting-your-production-branch-with-circleci/
 description: Avoid merging unclean commits into your main branch by setting up a basic CI pipeline to test and lint your code.
 imageDescription: A hard hat. Protection!
 featuredImage: ../images/posts/protect-main-branch.jpeg
-tags: ["circleci"]
+tags: ["circleci", "ci/cd"]
 ---
 
 When working in a team, it can be difficult to ensure that everyone is linting and testing their code before making pull requests on the main branch. Don't you wish there was an easy way to ensure that other developers can't merge into your main branch until they pass a set of tests? There is!
