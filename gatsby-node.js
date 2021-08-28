@@ -72,6 +72,8 @@ exports.createPages = async ({ actions, graphql }) => {
     "terraform",
     "kubernetes",
     "non-technical",
+    "ci/cd",
+    "github",
   ]
 
   // Create a new blog page for every n posts,

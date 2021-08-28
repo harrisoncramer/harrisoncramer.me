@@ -23,7 +23,7 @@ const ProjectsPage = (): JSX.Element => (
       <StyledH2>Cloture</StyledH2>
       <StyledFeatureParagraph>
         Demo:{" "}
-        <a href="http://3.222.87.34/?maxDate=2021-06-30&minDate=2021-06-01">
+        <a href="http://3.222.87.34/dashboard/houseCommittees?maxDate=2021-03-30&minDate=2021-03-02&subcollections=hapc&subcollections=hasc&subcollections=nrgy">
           Mirrored version on AWS
         </a>
       </StyledFeatureParagraph>
