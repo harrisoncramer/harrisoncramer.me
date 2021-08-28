@@ -18,3 +18,6 @@ This tutorial will walk through the process of setting up GA for a few common us
 ## Github Actions: The basics
 
 Github Actions is an event-based system. Every time an event occurs, such as committing code, raising an issue, joining as a contributor, or any number of other events, an "action" is fired in response automatically.
+
+We can 
+

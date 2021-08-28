@@ -158,9 +158,9 @@ const socket = io();
 socket.emit("Hello from the client.");
 ```
 
-Now, inside of the server file, we need to listen for events. For now, let's use the `onAny` method, which listens for all events. That accepts a callback, which accepts the event data as arguments. If we passed multiple strings, they would be picked up in sequence.
+Now, inside of the server file, we need to listen for events. Let's use the `onAny` method, which listens for all events. That accepts a callback, which takes the event data as arguments. If we passed multiple strings, they would be picked up in sequence.
 
-This function should be setup inside of the callback after the connection occurs. The `socket` variable in this case refers to the specific connection to the connected client.
+The function should be put inside the connection callback, because each `socket` variable refers to a client's connection to the server.
 
 ```javascript{11-13}:title=server.js
 const express = require("express");
@@ -195,9 +195,9 @@ If we make a new connection to this server, we should now see "Hello from the cl
 
 ## Introducing Namespaces
 
-The way we have structured this code currently doesn't make a whole lot of sense. The client can emit data back to the data, but the server has no way of distinguishing between messages of different types. What if we had a realtime architecture that needed to segregate administrative and user access, side by side? We need a way to tell different data streams apart.
+The way we have structured this code currently doesn't make a whole lot of sense. The client can emit data back to the server, but the server has no way of distinguishing between messages of different types. What if we had a realtime architecture that needed to segregate administrative and user access, side by side? We need a way to tell different data streams apart.
 
-This is where "namespaces" come into play. SocketIO provides us with the ability for us to create special namespaces. We could then setup different event handlers for those various namespaces, so that our logic is divided within our application. Clients will be connected to the `/` namespace (the default namespace) if they don't specify one at connection time.
+This is where "namespaces" come into play. Namespaces let us use different event handlers for different kinds of namespaces, so that our logic is divided within our application. Clients will be connected to the `/` namespace (the default namespace) if they don't specify one initially.
 
 Since we're creating a "chat" application, it makes sense to create a chat namespace. Let's modify our client code, so that the user only emits this data to the "chat" namespace. 
 
@@ -240,7 +240,7 @@ server.listen(3000, () => {
 });
 ```
 
-We should now still see the chat coming from the client. The difference here is that if our client emitted a "message" event to the "chat" namespace.
+We should now still see the chat coming from the client. The difference here is that our client emitted a "message" event specically to the "chat" namespace.
 
 ## Wiring up event listeners
 
@@ -270,7 +270,7 @@ socket.on('chat', (data) => {
 });
 ```
 
-Now when the form is submitted, the user (who is connected to the "chat" namespace) will emit a "message" that will contain the form's contents. We'll then clear the form.
+When the form is submitted, the user (who is connected to the "chat" namespace) will emit a "message" that will contain the form's contents. We'll then clear the form.
 
 On the backend, we can listen for the "message" event and respond by re-emitting the message out to anyone inside of the "chat" namespace. The `socket.broadcast.emit()` method lets us send the message out to everyone *except* for the user who initially sent it.
 
@@ -313,7 +313,7 @@ As you can see in the diagram, we could in theory push this data out to many dif
 
 ## Adding Rooms
 
-What if we wanted further separation between our users? For instance, what if we wanted users to be able to join specific rooms after joining our application—a common use case for a chatroom—in order to get messages. We can accomplish this with SocketIO's "rooms" functionality.
+What if we wanted further separation between our users? For instance, what if we wanted users to be able to join specific rooms after joining our application—a common use case for a chatroom—in order to get messages? We can accomplish this with SocketIO's "rooms" functionality.
 
 > Rooms are a server only construct. A client will not actually know what "rooms" they have joined. All of the work of joining a socket to a room and leaving a room is done on the server.
 

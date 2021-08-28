@@ -11,14 +11,19 @@ const Header = (): JSX.Element => {
     setIsDark(isDark > 0 ? 0 : 1)
   }
 
-  const [scrolling, setScrolling] = useState(true)
+  const [scrolling, setScrolling] = useState(false)
   const [scrollTop, setScrollTop] = useState(0)
 
   useEffect(() => {
     const onScroll = e => {
-      if (document.documentElement.scrollTop < 400) return // Only fade after 200px
       setScrollTop(e.target.documentElement.scrollTop)
-      setScrolling(e.target.documentElement.scrollTop < scrollTop)
+      // If scrolling up, set scrolling to false immediately.
+      // If scrolling down, only set scrolling to be true if we are further than 400px from top of page.
+      if (e.target.documentElement.scrollTop < scrollTop) setScrolling(false)
+      else {
+        if (document.documentElement.scrollTop < 400) return // Only fade after 400px
+        setScrolling(e.target.documentElement.scrollTop > scrollTop)
+      }
     }
     window.addEventListener("scroll", onScroll)
 
@@ -26,7 +31,7 @@ const Header = (): JSX.Element => {
   }, [scrollTop])
 
   return (
-    <Fade in={scrolling}>
+    <Fade in={!scrolling}>
       <StyledHeader isDark={!!isDark}>
         <StyledRightHand>
           <Dropdown />
