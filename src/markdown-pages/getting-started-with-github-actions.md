@@ -1,11 +1,11 @@
 ---
-title: Setting up Github Actions for Continuous Integration
-date: 2021-08-25
-path: /setting-up-github-actions-for-continuous-integration/
-description: Github now has a full-blown CI/CD infrastructure. Automate your workflow with Github actions.
-imageDescription: Why turn to outside companies when Github has your CI/CD pipeline built in?
+title: Getting started with Github actions
+date: 2021-09-13
+path: /getting-started-with-github-actions/
+description: Redownloading dependencies for every step in your CI/CD pipeline can be time consuming. You can dramatically speed up the build time of your application with caching, making your team more responsive to breaking changes and ultimately more productive. Here's how to do it.
+imageDescription: An image of a child staring at steps.
 featuredImage: ../images/posts/skydivers.jpeg
-tags: ["github", "ci/cd"]
+tags: ["ci/cd",]
 draft: true
 ---
 
