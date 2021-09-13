@@ -17,7 +17,6 @@ The completed project can be downloaded <a href="">here</a>.
 ## The project structure
 
 Our project is going to have only a few files. Here's what the entirety of our structure will be once we're done:
- will be once we're done.
 ```text
 node_modules/
 package.json
