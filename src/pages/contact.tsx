@@ -37,14 +37,6 @@ const ContactPage = (): JSX.Element => (
     >
       Signal is a secure messenging application.
     </ReactTooltip>
-    <StyledDiv>
-      <StyledP>
-        Email:{" "}
-        <a href="mailto:kingofcramers.dev@gmail.com">
-          kingofcamers.dev@gmail.com
-        </a>
-      </StyledP>
-    </StyledDiv>
   </Layout>
 )
 

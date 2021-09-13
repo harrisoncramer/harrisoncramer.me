@@ -3,22 +3,7 @@ import * as React from "react"
 import Layout from "../components/layout/layout"
 import Seo from "../components/seo/seo"
 import { Link, graphql } from "gatsby"
-// import { getImage, IGatsbyImageData, GatsbyImage } from "gatsby-plugin-image"
-// import styled from "styled-components"
-
-// type IndexPageData = {
-//   data: {
-//     file: {
-//       childImageSharp: {
-//         gatsbyImageData: IGatsbyImageData
-//       }
-//     }
-//   }
-// }
-// For code highlighting
-//{ data }: IndexPageData
 const IndexPage = (): JSX.Element => {
-  // const image = getImage(data.file.childImageSharp.gatsbyImageData)
   return (
     <Layout title="harrisoncramer.me">
       <Seo
@@ -29,21 +14,21 @@ const IndexPage = (): JSX.Element => {
       <div>
         <h1>Welcome!</h1>
         <p>
-          You're probably looking for the <Link to="/blog">software blog</Link>,
-          where I post about React, DevOps, and other modern programming tools
-          and tips.
+          You're probably looking for the <Link to="/blog">software blog</Link>.
         </p>
-        <h2>What is this site?</h2>
+        <h2>About me</h2>
         <p>
-          My name is Harrison Cramer and I'm a former defense reporter turned
-          software engineer. I'm currently in the June cohort of Codesmith where
-          I'm studying Javascript and cloud native infrastructure.
+          My name is Harrison Cramer, and I'm a full-stack developer living in
+          Seattle. Prior to my career in software I was a reporter in
+          Washington, where I covered the the foreign policy under the Trump
+          administration.
         </p>
+        <h2>What is this blog?</h2>
         <p>
-          This is my personal site, where I'll <Link to="/blog">post</Link>{" "}
-          about the different technologies that I'm learning and how others can
-          use them, from DevOps and Kubernetes to React and GraphQL. The site is
-          built with Gatsby, CircleCI for CI/CD, and Terraform.
+          This blog is intended to serve as a resource for other developers
+          using the same technologies that I am, including Docker, Kubernetes,
+          React, GraphQL and much more. The site is built with Gatsby, CircleCI
+          for CI/CD, and Terraform.
         </p>
         <p>
           Please make a pull request if you want to fix a bug or suggest a
