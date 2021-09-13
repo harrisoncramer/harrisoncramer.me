@@ -8,17 +8,19 @@ featuredImage: ../images/posts/webpack.jpeg
 tags: ["javascript", "react"]
 ---
 
-Myself and some other engineers were in the process of deploying <a href="https://loql.land">loql.land</a> to a production environment last weekend, and I noticed that we had forgotten to optimize the webpack build. The lighthouse scores were horrific: We were shipping 9MB to clients, and our lighthouse performance score was abysmal. After a few hours of work (most of which was just research) we were able to cut our bundle size down to less than 100KB. 
+Myself and some other engineers were in the process of deploying <a href="https://loql.land">loql.land</a> to a production environment last weekend, and I noticed that we had forgotten to optimize the webpack build. The lighthouse scores were horrific: We were shipping around 9MB to the client! After a few hours of work (mostly research) we were able to cut our bundle size to less than 100KB. 
 
-Here are some of the steps we took, and which you can apply to your own projects to slim down your final build. This tutorial is written for Webpack v5, and assumes you have a simple working repository that you would like to optimize. If you'd rather start with the same boilerplate as me, you can download it <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/loql.tar.gz">here</a>.
+Here are some of the steps we took, which are generally applicable to all projects. This tutorial is written for Webpack v5, and assumes you have a simple working repository that you would like to optimize. If you'd rather view our finished code, you can download it <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/loql.tar.gz">here</a>.
 
 <p class="tip">If you're unfamiliar with tar files, <a class="dark__link" href="https://linuxize.com/post/how-to-extract-unzip-tar-gz-file/">this</a> guide will help you expand the repository!</p>
 
 ## Split up your webpack files
 
-The first thing that you'll notice about this repository is that we have multiple webpack configuration files, instead of just one. Our production file contains all of the optimizations that we're going to use when we are running a production build, and the development configuration file contains all of the configuration we need to do only in development, such as running the development server with hot reloading.
+This isn't an optimization per-se, but an important prerequisite that will make optimizing your bundle easier.
 
-To merge these files together, we're going to rely on `webpack-merge` which is an open-source plugin. First, let's take a look at our common webpack file. The file is split up here for readability.
+For this project, we have multiple webpack configuration files. Our `webpack.prod.js` file contains all of our production optimizations, and the `webpack.dev.js` contains our development server. The `webpack.common.js` has all of the boilerplate necessary for both environments to run, like entry points and babel.
+
+We used `webpack-merge` to merge these configuration files together. Let's take a look at our common webpack file first. The file is split up here for readability.
 
 ```javascript:title=webpack.common.js
 const path = require('path');
@@ -93,7 +95,9 @@ Here, we're running all of our javascript files through babel in order to compil
 };
 ```
 
-Finally, we're using a few plugins here. One will grab environment variables from our environment files. Those files are going to be named according to the environment that we're in, either as `.development.env` or `.production.env`, respectively. Lastly, we're using another plugin to dynamically create our HTML file. Let's take a look at our production file now.
+Finally, we're using a few plugins here. One will grab environment variables from our environment files. Those files are going to be named according to the environment that we're in, either as `.development.env` or `.production.env`, respectively. Lastly, we're using another plugin to dynamically create our HTML file. 
+
+Let's take a look at our production file now.
 
 
 ```javascript:title=webpack.prod.js
@@ -129,7 +133,7 @@ module.exports = merge(common, {
 });
 ```
 
-This file is shorter because it's additive—we are going to run these optimizations when we are building a production version of our site. To accomplish this, we are calling the `merge` function and exporting the result. In order to pick up this configuration, we point the webpack CLI at the production file using the `--config` flag.
+This file is shorter because it's additive—we run these optimizations when we are building a production version of our site. To accomplish this, we are calling the `merge` function and exporting the result. In order to pick up this configuration, we point the webpack CLI at the production file using the `--config` flag.
 
 ```json{10}:title=package.json
 {
@@ -152,9 +156,9 @@ This file is shorter because it's additive—we are going to run these optimizat
 
 Great, now that we actually understand how these files are getting merged and run, what are the actual optimizations that are in place?
 
-## Use production mode
+## Production mode
 
-This one may seem obvious, but it's easy to miss. Make sure that you are using production mode in your `webpack.config` file. This is going to enable a number of default settings, including the <a href="https://webpack.js.org/plugins/terser-webpack-plugin/">Terser</a> plugin, which helps minify and uglify your code.
+This one may seem obvious, but it's easy to miss. Make sure that Webpack is in production mode. This enables a some important defaults, including the <a href="https://webpack.js.org/plugins/terser-webpack-plugin/">Terser</a> plugin, which helps minify and uglify your code.
 
 ```javascript{8}:title=webpack.prod.js
 const { merge } = require('webpack-merge');
@@ -189,7 +193,7 @@ module.exports = merge(common, {
 });
 ```
 
-Behind the scenes, webpack uses the <a href="https://webpack.js.org/plugins/terser-webpack-plugin/">Terser</a> plugin to do this. In previous versions of webpack, you had to manually configure this functionality yourself. It's now provided by default!
+In previous versions of webpack, you had to manually configure this functionality yourself. It's now provided by default!
 
 ## Remove source maps
 
@@ -228,7 +232,7 @@ When you set the production mode, webpack will automatically minify and uglify y
 
 We _also_ want to minify and uglify our stylesheets. To do this, we installed <a href="https://webpack.js.org/plugins/mini-css-extract-plugin/">one plugin</a> to pull our CSS out of our Javascript bundle, and <a href="https://webpack.js.org/plugins/css-minimizer-webpack-plugin/">another</a> to actually minify and uglify the code.
 
-<p class="tip">When it compiles your code, webpack will normally pack all of your styles alongside your Javascript code. The css is then dynamically run and applied when your code is shipped to the browser. That's why you <em>could</em> have just one output file, like a <code>bundle.js</code> file, which would contain all the code needed to run your application. In our case, we want to pull the CSS out of that bundle so that we can minify and uglify it.</p>
+<p class="tip">When it compiles your code, webpack will normally pack all of your styles alongside your Javascript code. The css is then pulled out when your code is run. That's why you <em>could</em> have just one output file, like a <code>bundle.js</code> file. We want to pull the CSS out of that bundle so that we can minify and uglify it.</p>
 
 ```javascript{14,19,24,29}:title=webpack.prod.js
 const { merge, unique } = require('webpack-merge');
@@ -271,9 +275,9 @@ This optimization is particularly useful if you're relying on an external librar
 
 ## Analyze your bundle and & remove large packages
 
-If the only optimizations you're running are in your webpack files, you're doing something wrong. You should *also* check to make sure that none of the dependencies of your project are extremely large or bloated.
+Tweaking the webpack configuration is only going to get you so far if the code itself is unnecessarily bloated. You should also examine your application code and ensure that you aren't relying on large or bloated libraries.
 
-The easiest way to do this is to install the <a href="https://www.npmjs.com/package/webpack-bundle-analyzer">webpack bundle analyzer</a>, which shows you the overall size of your bundle. We've set up a separate script to use our bundle analyzer with our production configuration file. To do this, we're passing an environment variable.
+The easiest way to do this is to install the <a href="https://www.npmjs.com/package/webpack-bundle-analyzer">webpack bundle analyzer</a>, which shows you which libraries are taking up the most space in your bundle. We wrote a separate script to use our bundle analyzer with our production configuration file. To do this, we're passing the `ANALYZE` environment variable and using that variable to load the plugin after our build is complete.
 
 ```json{12}:title=package.json
 {
@@ -296,7 +300,7 @@ The easiest way to do this is to install the <a href="https://www.npmjs.com/pack
 
 ```
 
-This variable is picked up inside of our configuration file and is used to add the plugin. This expression will expand the value in the array (in this case, just the plugin) if the `ANALYZER` variable is true, otherwise it'll expand an empty array and won't add anything to the plugins array.
+This variable is picked up inside of our configuration file and is used to add the plugin.
 
 
 ```javascript{3}:title=webpack.prod.js
@@ -314,7 +318,7 @@ The analyzer plugin will startup a server on `localhost:8888` that will show a n
 
 The biggest dependencies for this particular project are bootstrap and ChartJS, particularly the latter. How can we slim these down?
 
-One of the most important things to check is your import statements. Make sure that you're not importing the entire package and then destructuring different functions and properties off of the entire object. Instead, only import the values that you need. For instance, try to avoid imports like this whenever possible.
+First and foremost, check your import statements. Make sure that you're not importing the entire package and then destructuring different functions and properties off of it. Instead, only import the values that you need. For instance, try to avoid imports like this whenever possible.
 
 ```javascript
 import * as myObject from "my-dependency";
@@ -327,7 +331,7 @@ Instead, only import the stuff you need.
 import myObject from "my-dependency/lib/myObject";
 ```
 
-This can dramatically reduce your bundle size, especially with big libraries like Bootstrap. Notice in our project, for instance, that we're importing all of our bootstrap components like this. For instance, with the footer.
+This can dramatically reduce your bundle size, especially with big libraries like Bootstrap. Notice in our project, for instance, that we're importing all of our bootstrap components like this. For instance, in the footer component.
 
 
 ```javascript{3-5}:title=Footer.js
@@ -343,15 +347,15 @@ const Footer = () => {
 ...
 ```
 
-If this isn't possible, really think hard about what dependencies you need. In our case, I'm considering swapping out ChartJS for D3 because of how heavy the former is. We're only using it to render a few bar charts, is it really worth that extra bloat in our codebase? Probably not.
+If the library requires you import it wholesale, and the library is very bloated, think hard about about removing it. In our case, we may swap out ChartJS for D3. We're only using ChartJS to render a few bar charts, is it really worth that extra bloat in our codebase? Probably not.
 
-## Use lazy loading
+## Lazy loading
 
 This is another step that will require to you refactor your code slighly, but it's worth it. 
 
-The idea of "lazy" loading code is to only make users load code for the components they are currently using. Webpack accomplishes this by splitting your code into "chunks" and then only loading the chunks needed to render a particular page.
+Lazy loading lets users download your application in pieces. Rather than downloading everything at once, which would take a long time, lazy loading lets users download the code for the current view. When they switch views, they make another, small network request for another portion of your code. Webpack accomplishes this by splitting your code into "chunks."
 
-In this project, we're lazy loading our code according to specific routes in our router. Let's take a look at our `app.jsx` file, which contains our routing.
+In loQL, we lazy load according to specific routes in our router. Let's take a look at our `app.jsx` file, which contains our routing.
 
 ```javascript{11-14,5}:title=app.jsx
 import '@fontsource/roboto';
@@ -373,7 +377,7 @@ const DocsContainer = lazy(() => import('./containers/DocsContainer'));
 
 ```
 
-To make the `lazy` function work, we also need to wrap the routes in the `Suspense` component, also supplied by React, and provide a fallback to render when the fetch is occuring. In our case, we're going to render a loading component.
+To make the `lazy` function work, we also need to wrap the routes in the `Suspense` component, also supplied by React, and provide a fallback to render when the fetch is occuring. In our case, we render a loading component.
 
 ```jsx:title=app.jsx
 ...
@@ -411,7 +415,7 @@ export default App;
 The `lazy` function that we're importing from React returns a promise. Intead of directly importing our various views and then adding those to our router, we're using the lazy function to only import them when the user navigates to the relevant page in our router.
 
 
-Weback is smart enough to see this code and split our code into chunks, which will be loaded piecemeal when the user navigates around our site. They won't have to download code they aren't going to use, and the overall experience of the application is going to be better.
+Weback is smart enough to see this code and split our code into chunks, which will be loaded piecemeal when the user navigates around our site. They won't have to download code they won't to use, and the overall experience of the application will be better.
 
 ## Optimize your media
 
@@ -456,7 +460,7 @@ const SplashPage = () => {
 
 For more detail on this process, this <a href="https://web.dev/replace-gifs-with-videos/">post</a> is very helpful.
 
-## Serve your files with compression
+## Compression (gzip, brotli)
 
 This step is not necessarily going to happen inside of webpack, but it's worth mentioning. Make sure that however you're serving up your content, you're using some sort of compression, like gzip for instance. 
 
