@@ -12,7 +12,7 @@ Adding real-time chat functionality can be a great way of spicing up an otherwis
 
 This post will walk through the basics of setting up a SocketIO server. We'll keep the rest of the application very simple—using vanilla Javascript, with no CSS styling. The same principles would apply here for a production-grade application using Webpack and React, however.
 
-The completed project can be downloaded <a href="">here</a>.
+The completed project can be downloaded <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/socketio.tar.gz">here</a>.
 
 ## The project structure
 
