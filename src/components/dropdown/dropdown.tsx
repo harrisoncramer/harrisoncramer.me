@@ -60,11 +60,6 @@ export const Dropdown = (): JSX.Element => {
             </Link>
           </li>
           <li>
-            <Link to="/projects" onClick={handleClickLink}>
-              Projects
-            </Link>
-          </li>
-          <li>
             <Link to="/blog" onClick={handleClickLink}>
               Blog
             </Link>

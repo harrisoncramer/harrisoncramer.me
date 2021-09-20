@@ -85,7 +85,7 @@ exports.createPages = async ({ actions, graphql }) => {
   // pages inside of /page and we have to keep programatically
   // generated pages in a different folder.
   const edges = result.data.allMarkdownRemark.edges
-  const postsPerPage = 5
+  const postsPerPage = 6
   const numPages = Math.ceil(edges.length / postsPerPage)
 
   Array.from({ length: numPages }).forEach((_, i) => {

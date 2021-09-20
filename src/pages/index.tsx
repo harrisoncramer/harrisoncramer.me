@@ -19,16 +19,14 @@ const IndexPage = (): JSX.Element => {
         <h2>About me</h2>
         <p>
           My name is Harrison Cramer, and I'm a full-stack developer living in
-          Seattle. Prior to my career in software I was a reporter in
-          Washington, where I covered the the foreign policy under the Trump
-          administration.
+          Seattle. Prior to my career in software, I was a reporter in
+          Washington, where I covered foreign policy and the military.
         </p>
-        <h2>What is this blog?</h2>
+        <h2>What is this site?</h2>
         <p>
           This blog is intended to serve as a resource for other developers
-          using the same technologies that I am, including Docker, Kubernetes,
-          React, GraphQL and much more. The site is built with Gatsby, CircleCI
-          for CI/CD, and Terraform.
+          using Docker, Kubernetes, React, GraphQL and much more. It's built
+          with Gatsby, CircleCI for CI/CD, and Terraform.
         </p>
         <p>
           Please make a pull request if you want to fix a bug or suggest a
