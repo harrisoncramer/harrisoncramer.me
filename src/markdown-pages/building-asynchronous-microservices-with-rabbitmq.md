@@ -3,10 +3,9 @@ title: Designing asynchronous microservices with RabbitMQ
 date: 2021-09-29
 path: /building-asynchronous-microservices-with-rabbitmq/
 description: RabbitMQ is an open-source message broker that can help you decouple your microservices and keep your application fault-tolerant and fast.
-imageDescription: This is a rabbit.
+imageDescription: Message brokers let you manage complex communication across a distributed application.
 featuredImage: ../images/posts/traffic.jpeg
-tags: ["javascript", "microservices"]
-draft: true
+tags: ["javascript", "microservices", "docker"]
 ---
 
 Message brokers are a powerful inter-service communication tool when building a distributed application. Rather than forcing every service to communicate synchronously, likely through HTTP requests, message brokers let us decouple the services from each other and communicate <em>asynchronously</em> instead. This can make our application more fault-tolerant, because if one service fails, the entire request will not necessarily fail, and more performant, because our producer can immediately continue executing after it sends a message off to the broker.
