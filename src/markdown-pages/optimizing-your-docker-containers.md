@@ -58,7 +58,7 @@ $ dive nginxdemos/hello
 
 The output of running this command is an interactive CLI, that shows us what files were added to the filesystem with each layer.
 
-![You can use the dive tool to inspect the layers of an image more closely](../images/inline_images/dive_layers.png)
+![You can use the dive tool to inspect the layers of an image more closely](../images/inline_images/dive_layers.png "Wow")
 
 As you can see in the above image, the Dockerfile ran `ADD hello.conf /etc/nginx/conf.d/`, which created a single file inside the `/etc/nginx/conf.d` directory. The resulting layer was just 373 bytes in size, which is quite small. The base OS for this image is 5.6MB, which is 5.6 million bytes!
 

@@ -5,7 +5,7 @@ path: /deploying-a-nodejs-api-on-eks/
 description: Ever wanted to deploy an application to production using Amazon's hosted Kubernetes services, EKS? This is for you!
 imageDescription: An orchestra, all playing together.
 featuredImage: ../images/posts/orchestra.jpeg
-tags: ["kubernetes", "docker"]
+tags: ["kubernetes", "docker", "microservices", "javascript"]
 ---
 
 Let's say you've built an amazing API using NodeJS, and you want to deploy it online to make it available for your users (or your frontend, for that matter). You deploy it to a server, but the application gets flooded with requests and crashes. Normally, you'd have to manually restart the application, perhaps by connecting to your server remotely.

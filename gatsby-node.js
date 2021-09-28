@@ -68,6 +68,7 @@ exports.createPages = async ({ actions, graphql }) => {
     "circleci",
     "docker",
     "javascript",
+    "microservices",
     "react",
     "terraform",
     "kubernetes",
