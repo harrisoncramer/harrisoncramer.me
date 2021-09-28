@@ -2,7 +2,7 @@
 name: Deploy to S3 and Cloudfront
 on:
   push:
-    branches: ["dev"]
+    branches: ["develop"]
 jobs:
   build:
     runs-on: ubuntu-latest
