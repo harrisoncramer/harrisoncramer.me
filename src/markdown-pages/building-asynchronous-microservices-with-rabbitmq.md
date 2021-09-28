@@ -10,7 +10,7 @@ tags: ["javascript", "microservices", "docker"]
 
 Message brokers are a powerful inter-service communication tool when building a distributed application. Rather than forcing every service to communicate synchronously, likely through HTTP requests, message brokers let us decouple the services from each other and communicate <em>asynchronously</em> instead. This can make our application more fault-tolerant, because if one service fails, the entire request will not necessarily fail, and more performant, because our producer can immediately continue executing after it sends a message off to the broker.
 
-One of the most popular open-source message brokers is RabbitMQ. This blog is designed to demonstrate the very basics of RabbitMQ's functionality in Node, and to show how you can convert a potentially synchronous process using the tool. The code for this post is online <a href="https://google.com">here</a>.
+One of the most popular open-source message brokers is RabbitMQ. This blog is designed to demonstrate the very basics of RabbitMQ's functionality in Node, and to show how you can convert a potentially synchronous process using the tool. The code for this post is online <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/rabbitmq.tar.gz">here</a>.
 
 This tutorial leans heavily on Ashley Davis' book "Bootstrapping Microservices" which I'd <a href="https://www.manning.com/books/bootstrapping-microservices-with-docker-kubernetes-and-terraform">highly recommend</a> getting if you are interested in distributed applications.
 
