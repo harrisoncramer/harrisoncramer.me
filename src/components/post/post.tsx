@@ -46,6 +46,11 @@ export const Post = ({
       )}
       <StyledMetaContainer>
         <StyledTitleAndDate>
+          {
+            /* This is for SEO */ <a
+              href={`https://harrisoncramer.me${path}`}
+            ></a>
+          }
           <h2>{title}</h2>
           <StyledDate>{dayjs(date).format("MMMM DD, YYYY")}</StyledDate>
         </StyledTitleAndDate>
