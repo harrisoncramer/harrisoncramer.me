@@ -107,7 +107,7 @@ Then in the callign code, we could access `foo.bar` as a variable. This is the b
 
 ## Plugin Installation
 
-I'm currently using Packer to manage my plugins. My `init.lua` loads in `~/.config/nvim/lua/plugins/init.lua` which holds the installation.
+I'm currently using <a href="https://github.com/wbthomason/packer.nvim">Packer</a> to manage my plugins. My `init.lua` loads in `~/.config/nvim/lua/plugins/init.lua` which holds the installation.
 
 The instructions for Packer are pretty straightforward, you basically just list the plugins you want installed and they're installed for you when you run `:PackerSync`.
 
@@ -163,9 +163,7 @@ These two functions let me easily keep all of my configuration or mappings for a
 
 ## Search
 
-This blog isn't meant to address basic searching with `/` and `?` so if you're looking for advice like that, please look elsewhere.
-
-When I talk about search, I'm referring to **project-wide**, intelligent fuzzy search. The best plugin for this in Neovim is, hands-down, <a href="https://github.com/nvim-telescope/telescope.nvim">Telescope</a>. Not only does Telescope provide you with the ability to search for files and folders, it's API is extremely well designed and lets you build your own custom pickers, if you want to.
+For **project-wide**, intelligent fuzzy search, the best plugin in Neovim is <a href="https://github.com/nvim-telescope/telescope.nvim">Telescope</a>, hands-down. Not only does Telescope provide you with the ability to search for files and folders, it's API is extremely well designed and lets you build your own custom pickers, if you want to.
 
 For instance, I have the following user-defined `:Stash` ex-command that creates a stash for my current changes, named after the current branch:
 
@@ -178,14 +176,35 @@ vim.api.nvim_create_user_command("Stash", function(opts)
 end, { nargs = "?" })
 ```
 
-Then within Telescope, I can easily scroll through branch-specific stashes for the current branch and <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/telescope/pickers.lua">apply them</a>. Going through all of the specifics of how to configure and use Telescope is beyond the socpe of this post. I'm even using it for file creation and navigation right now with the <a href="https://github.com/nvim-telescope/telescope-file-browser.nvim">file browser</a> extension. I'd highly recommend installing it if you've not yet.
+Then within Telescope, I can easily scroll through branch-specific stashes for the current branch and <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/telescope/pickers.lua">apply them</a>. Here's what the function looks like:
 
-Within a file, I'm generally just using relative line-number jumps to get where I need to go vertically, followed by forward and backward word jumping. For instance, in normal mode, I might press this combination of keystrokes:
+```lua:title=~/.config/nvim/lua/plugins/telescope/pickers.lua
+local actions = require("telescope.actions")
+local finders = require("telescope.finders")
+local conf = require("telescope.config").values
+local previewers = require("telescope.previewers")
+local pickers = require("telescope.pickers")
 
-```terminal
-19k3W
+local stash_filter = function()
+	local opts = { show_branch = false }
+	opts.show_branch = vim.F.if_nil(opts.show_branch, true)
+	opts.entry_maker = vim.F.if_nil(opts.entry_maker, make_entry.gen_from_git_stash(opts))
+
+	pickers.new(opts, {
+		prompt_title = "Git Stash",
+		finder = finders.new_oneshot_job({ "git", "--no-pager", "stash", "list" }, opts),
+		previewer = previewers.git_stash_diff.new(opts),
+		sorter = conf.file_sorter(opts),
+		attach_mappings = function()
+			actions.select_default:replace(actions.git_apply_stash)
+			return true
+		end,
+	}):find()
+end
 ```
-This would jump me up 19 lines, and forward three words. If you're looking for another approach, I'd recommend <a href-"https://github.com/ggandor/leap.nvim">leap</a>, which I use occasionally to jump to specific locations in a file.
+
+Going through all of the specifics of how to configure and use Telescope is beyond the socpe of this post, especially given that it has it's own plugins which can be configured. But highly recommend checking it out if you're using bare FZF, AG, RG, or another searching tool. My configuration for Telescope is <a href="https://github.com/harrisoncramer/nvim/tree/main/lua/plugins/telescope">here</a>.
+
 
 ## Testing
 
@@ -197,11 +216,27 @@ The output of the process is also directly available within the editor, which is
 
 ![Neotest](../images/inline_images/neotest-2.png "")
 
-My configuration for Neotest is <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/neotest.lua">here</a>.
+There are of course times where you'll want to split your test runner into a separate terminal. But I've largely found that Neotest gives me the ability to target specific tests more easily, track output, view error messages, and everything else that I need without context switching from the editor. My configuration for Neotest is <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/neotest.lua">here</a>.
 
 ## Git
 
-Since it's at the heart of any software engineer's workflow, tight integrations with Git is super important. I'm currently using several different plugins and mappings to handle git-related functionality.
+Since it's at the heart of any software engineer's workflow, tight integrations with Git is super important. I'm currently using several different plugins and mappings to handle git-related functionality. This is because I'm pretty picky when it comes to git workflows, and I've not found one plugin that handles all of these different things elegantly.
+
+The first and probably most essential Git plugin is <a href="https://github.com/tpope/vim-fugitive">Fugitive</a>. This plugin provides a number of useful utilities that let you interact with your git repository without leaving Neovim. I'm primarily using the `:Git` ex-command to pull up a quick view of the changed, deleted, and added files in a given repository. The status window lets you commit files, view an inline-diff for changes, and make commit messages.
+
+![Gstatus](../images/inline_images/fugitive.png "You can add files, change commit messages, and more from within the status window.")
+
+Fugitive also gives a variety of other super useful commands that let you interact with the history of your repository. The most useful for me are `:Gedit` and `:Gread` commands which, respectively, open up a file or read a file from a specific commit. These are super powerful when combined with Neovim's `%` symbol, which represents the current buffer. For instance, if you're in file `foo.js`, the command `:Gedit 30dks91:%` will open up `foo.js` in new buffer as it existed at the `30dks91` commit. You can easily restore an old version of a file like this or view an older version.
+
+Another helpful command is the `:Gvdiffsplit` command, which lets you see the difference between the current buffer and the same file at some point in the past. For instance, `:Gvdiffsplit HEAD~1:%` lets you see the difference between the current file and one commit back.
+
+Generally speaking, however, when it comes to surfing the git history of a given repository, I prefer to use <a href="https://github.com/sindrets/diffview.nvim">diffview.nvim</a>, which provides a nicer interface.
+
+![Diffview](../images/inline_images/diffview.png "Diffview provides a great interface for browsing through your git history. It even has a built-in merge conflict tool.")
+
+The third plugin that I consider essential to my git workflow is <a href="https://github.com/lewis6991/gitsigns.nvim">gitsigns.nvim</a>, which provides git integrations within a single file.
+
+For instance, you can use this tool to do hunk-wise staging of changes, and to see what has changed at a given point in a file without opening up another status window. Combined together, these three plugins let me pretty much stay in my editor all the time. The only time I'm ever really leaving for git is to rebase, or to do a bisect.
 
 ## Terminals
 
