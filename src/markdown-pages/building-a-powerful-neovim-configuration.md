@@ -238,10 +238,55 @@ The third plugin that I consider essential to my git workflow is <a href="https:
 
 For instance, you can use this tool to do hunk-wise staging of changes, and to see what has changed at a given point in a file without opening up another status window. Combined together, these three plugins let me pretty much stay in my editor all the time. The only time I'm ever really leaving for git is to rebase, or to do a bisect.
 
+![Gitsigns](../images/inline_images/gitsigns.png "Gitsigns lets you see diffs on a line-by-line basis as you edit a file, and add specific hunks directly within a buffer.")
+
+It also places helpful hints in the current buffer's gutter (the blank space on the far left of a buffer) that indicate whether a line has been changed or modified. Super helpful.
+
 ## Terminals
 
-## Aesthetics and Theming
+Sometimes you need to leave Neovim. I've got two approaches to this. Primarily, I'm using tmux to keep open several windows, with Neovim open in one of them.
+
+Often, though, the terminal command that I need is very small (like an `ls` or `grep` or something like that). In those cases, I use <a href="https://github.com/numToStr/FTerm.nvim">FTerm.nvim</a>. It's a simple terminal toggle that you can switch open/closed when you need it. No frills, gets the job done.
+
+A terminal theming tool that I'd recommend is <a href="https://github.com/romkatv/powerlevel10k">powerlevel10k</a>, a ZSH theme that lets you get git status information, AWS environment information, and other goodies in your shell. Finally, I'm using Tmux. I've tried a few different configuration tools but have opted to just roll my own. It's quite simple, and it's <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/tmux/.tmux.conf">here</a>.
 
 ## LSPs
 
+Setting up language servers can be quite challenging, if you're new to the Neovim space. 
+
+The important thing to understand at the outset: Neovim *does not have debuggers, language servers, or formatters built in.* In order to use these tools, you have to install them separately and tell Neovim how to connect to them. This is a fundamentally different approach from other editors, like VSCode, where most of these things are installed and configured out of the box with the editor.
+
+Say you want to run a language server to give you autcomplete suggestions for a Golang codebase. Not only do you need to install the Golang language server (likely a separate binary, which will run as an independent process). You also need to set up Neovim so that it can communicate with that server, using the LSP, or Language Server Protocol.
+
+The language server protocol is relatively new, and was built originally to standardize the way that different language servers communicated diagnostic and other information to clients (often editors) during a session. With this standard interface, it becomes much easier to connect Neovim to a variety of different language servers, so long as they all implement the protocol.
+
+Just a few years ago, the installation of these langauge servers was tedious, and you had to individuall install them, keep them up-to-date, ensure they were in your path, and so forth. Fortunately, a lot of the pain of setting up these tools is easier with <a href="https://github.com/williamboman/mason.nvim">Mason</a>, a plugin that lets you "easily install and manage LSP servers, DAP servers, linters, and formatters." Why do you need a plugin to install other tools? 
+
+
 ## Debugging
+
+## Theming
+
+Personally, I'm not into the whole "ricing" of Linux setups, although I do appreciate a clean configuration. For me, it's more about utility -- what colors, fonts, icons, and so forth will give me additional context or information, without being too distracting?
+
+To that end, I've unified the colorscheme across my entire development environment -- Alacritty, Tmux, and Neovim -- to use the <a href="https://github.com/rebelot/kanagawa.nvim">Kanagawa</a> colorscheme. The repository has an <a href="https://github.com/rebelot/kanagawa.nvim/blob/master/extras/alacritty_kanagawa.yml">Alacritty</a> configuration file which is works great.
+
+Like most good colorshemes, Kanagawa integrates directly with <a href="https://github.com/nvim-treesitter/nvim-treesitter">Treesitter</a>, an absolute **must** for any Neovim configuration. Back in the bad old days, Vim and Neovim used to rely on complicated regular expressions to parse buffers and apply syntax highlighting. That's no longer necessary thanks to tools like Treesitter, which parse the file into an abstract syntax tree and apply highlighting from there. This also gives you fine-grained control over which colors to use. For instance, I work a lot in VueJS, and have defined a few different highlight groups to work with Treesitter tags:
+
+```lua:title=~/.config/nvim/lua/colorscheme.lua
+local colorMap = {
+  sumiInk3      = "#363646",
+  sumiInk4      = "#54546D",
+  waveBlue1     = "#223249",
+  ...
+  katanaGray    = "#717C7C"
+}
+vim.api.nvim_set_hl(0, "@tag", { fg = colorMap.lightBlue })
+vim.api.nvim_set_hl(0, "@tag.delimiter", { fg = colorMap.lightBlue, })
+vim.api.nvim_set_hl(0, "@tag.attribute", { fg = colorMap.sakuraPink })
+```
+
+The color map is taken from Kanagawa's github page. To make your own overrides, you can run the ex-command `:TSHighlightCapturesUnderCursor` which will tell you which capture group you're currently hovering over. You can also install <a href="https://github.com/nvim-treesitter/playground">treesitter playground</a> to look at the AST for a given buffer.
+
+Changes are, if you're using Neovim as your primary development tool, you're also using other terminal tools. Beyond color schemes, it's also important to have a font that can support all sorts of symbols. I'm using Hack Nerd Font, but most <a href="https://github.com/ryanoasis/nerd-fonts">nerd fonts</a> will work. This is not a Neovim configuration but worth mentioning here (for me, I set these in my <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/alacritty/linux/.alacritty.yml">Alacritty</a> config).
+
