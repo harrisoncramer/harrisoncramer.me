@@ -6,7 +6,6 @@ description: Neovim is an unbelievably powerful tool, if you know how to use it.
 imageDescription: An image of my Neovim configuration.
 featuredImage: ../images/posts/neovim-config.jpeg
 tags: ["neovim"]
-draft: true
 ---
 
 I've been using Neovim as my primary editor for about three years. In that span, the editor and community surrounding the tool has undergone a dizzying amount of change. People moved onto Lua, the core team integrated LSPs directly into the editor, and the plugin ecosystem exploded. Much like the ever-changing frontend world, it can be hard to keep up with the latest and greatest with Neovim core, let alone the plugin ecosystem. 
