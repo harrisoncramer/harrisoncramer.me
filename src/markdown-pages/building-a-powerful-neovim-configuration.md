@@ -2,8 +2,8 @@
 title: Building A Powerful Neovim Configuration
 date: 2022-12-07
 path: /building-a-powerful-neovim-configuration/
-description: Neovim is an unbelievably powerful tool, if you know how to use it. Here are some lessons I've learned from using it as my primary editor for the past few years.
-imageDescription: An image of a modern neovim configuration
+description: Neovim is an unbelievably powerful tool, if you know how to use it. Here are some of my personal takeaways from using it as my primary editor for the past few years.
+imageDescription: An image of my Neovim configuration.
 featuredImage: ../images/posts/neovim-config.jpeg
 tags: ["neovim"]
 draft: true
@@ -138,13 +138,13 @@ end
 
 -- Simply requires the module and calls it's setup method, if it exists
 local default = function(mod)
-  local status = pcall(require, mod)
+  local status, m = pcall(require, mod)
   if not status then
     print(mod .. " is not downloaded.")
     return
   else
-    if type(mod.setup) == "function" then
-      mod.setup()
+    if type(m.setup) == "function" then
+      m.setup()
     end
   end
 end
@@ -257,28 +257,6 @@ For instance, you can use this tool to do hunk-wise staging of changes, and to s
 
 It also places helpful hints in the current buffer's gutter (the blank space on the far left of a buffer) that indicate whether a line has been changed or modified. Super helpful.
 
-## Terminals
-
-Sometimes you need to leave Neovim. I've got two approaches to this. Primarily, I'm using tmux to keep open several windows, with Neovim open in one of them.
-
-Often, though, the terminal command that I need is very small (like an `ls` or `grep` or something like that). In those cases, I use <a href="https://github.com/numToStr/FTerm.nvim">FTerm.nvim</a>. It's a simple terminal toggle that you can switch open/closed when you need it. No frills, gets the job done.
-
-A terminal theming tool that I'd recommend is <a href="https://github.com/romkatv/powerlevel10k">powerlevel10k</a>, a ZSH theme that lets you get git status information, AWS environment information, and other goodies in your shell. Finally, I'm using Tmux. I've tried a few different configuration tools but have opted to just roll my own. It's quite simple, and it's <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/tmux/.tmux.conf">here</a>.
-
-## LSPs
-
-Setting up language servers can be quite challenging, if you're new to the Neovim space. 
-
-The important thing to understand at the outset: Neovim *does not have debuggers, language servers, or formatters built in.* In order to use these tools, you have to install them separately and tell Neovim how to connect to them. This is a fundamentally different approach from other editors, like VSCode, where most of these things are installed and configured out of the box with the editor.
-
-Say you want to run a language server to give you autocomplete suggestions for a Golang codebase. Not only do you need to install the Golang language server (likely a separate binary, which will run as an independent process). You also need to set up Neovim so that it can communicate with that server, using the LSP, or Language Server Protocol.
-
-<p class="tip">The language server protocol was built to standardize the way that different language servers communicate diagnostic information, type definitions, and other language metatdata to clients (often editors). This standardization makes it easier to connect Neovim to a variety of different language servers that are all implementing the same protocol.
-
-Just a few years ago, the installation of these langauge servers was tedious, and you had to individually install them, keep them up-to-date, ensure they were in your path, and so forth. Fortunately, this is now much easier with <a href="https://github.com/williamboman/mason.nvim">Mason</a>, a plugin that lets you "easily install and manage LSP servers, DAP servers, linters, and formatters."
-
-## Debugging
-
 ## Theming
 
 Personally, I'm not into the whole "ricing" of Linux setups, although I do appreciate a clean configuration. For me, it's more about utility -- what colors, fonts, icons, and so forth will give me additional context or information, without being too distracting?
@@ -304,3 +282,113 @@ The color map is taken from Kanagawa's github page. To make your own overrides, 
 
 Changes are, if you're using Neovim as your primary development tool, you're also using other terminal tools. Beyond color schemes, it's also important to have a font that can support all sorts of symbols. I'm using Hack Nerd Font, but most <a href="https://github.com/ryanoasis/nerd-fonts">nerd fonts</a> will work. This is not a Neovim configuration but worth mentioning here (for me, I set these in my <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/alacritty/linux/.alacritty.yml">Alacritty</a> config).
 
+## Terminals
+
+Sometimes you need to leave Neovim. I've got two approaches to this. Primarily, I'm using tmux to keep open several windows, with Neovim open in one of them.
+
+Often, though, the terminal command that I need is very small (like an `ls` or `grep` or something like that). In those cases, I use <a href="https://github.com/numToStr/FTerm.nvim">FTerm.nvim</a>. It's a simple terminal toggle that you can switch open/closed when you need it. No frills, gets the job done.
+
+A terminal theming tool that I'd recommend is <a href="https://github.com/romkatv/powerlevel10k">powerlevel10k</a>, a ZSH theme that lets you get git status information, AWS environment information, and other goodies in your shell. Finally, I'm using Tmux. I've tried a few different configuration tools but have opted to just roll my own. It's quite simple, and it's <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/tmux/.tmux.conf">here</a>.
+
+## LSPs
+
+Setting up language servers can be quite challenging, if you're new to the Neovim space.
+
+The important thing to understand at the outset: Neovim *does not have debuggers, language servers, or formatters built in.* In order to use these tools, you have to install them separately and tell Neovim how to connect to them. This is a fundamentally different approach from other editors, like VSCode, where most of these things are installed and configured out of the box with the editor.
+
+The language server protocol was built to standardize the way that different language servers communicate diagnostic information, type definitions, and other language metatdata to clients (often editors). This standardization makes it easier to connect Neovim to a variety of different language servers that are all implementing the same protocol.
+
+Say you want to run a language server to give you autocomplete suggestions for a Golang codebase. Not only do you need to install the Golang language server (likely a separate binary, which will run as an independent process). You also need to set up Neovim so that it can communicate with that server, using the LSP, or Language Server Protocol.
+
+> If this is your first time setting up an LSP, please look elsewhere. This is not meant to be an exhaustive guide on how to set up an LSP.
+
+Just a few years ago, the installation of these language servers was tedious, and you had to individually install them, keep them up-to-date, ensure they were in your path, and so forth. Fortunately, this is now much easier with <a href="https://github.com/williamboman/mason.nvim">Mason</a>, a plugin that lets you "easily install and manage LSP servers, DAP servers, linters, and formatters."
+
+I'm taking advantage of Mason and <a href="https://github.com/williamboman/mason-lspconfig.nvim">mason-lspconfig.nvim</a>, a helper plugin, to automatically install the LSPs that I want and the debuggers that I want:
+
+```lua:title=~/.config/nvim/lua/lsp/init.lua
+local mason_status_ok, _ = pcall(require, "mason")
+local mason_lspconfig_ok, mason_lspconfig = pcall(require, "mason-lspconfig")
+
+if not (mason_status_ok and mason_lspconfig_ok and cmp_nvim_lsp_status_ok and lsp_format_ok) then
+  print("Mason, Mason LSP Config, Completion, or LSP Format not installed!")
+  return
+end
+
+local servers = {
+  "sumneko_lua",
+  "clojure_lsp",
+  "tailwindcss",
+  "tsserver",
+  "eslint",
+  "gopls",
+  "volar",
+}
+
+mason_lspconfig.setup({ ensure_installed = servers, automatic_installation = true })
+```
+
+When Neovim starts up, once you've installed Mason (using `:PackerSync` for instance) this code will automatically install the LSPs for these languages. Awesome! For each of those language servers, I want the ability to customize how they behave once Neovim (the client) has attached to them. 
+
+You can do this by providing an `on_attach` callback. I've written my `on_attach` callback, and for each of the servers specified above, I'm requiring another lua module located at `~/.config/nvim/lua/lsp/servers/x`, where `x` is the server name, and calling it's setup function, passing along the `on_attach` callback. 
+
+```lua
+local on_attach = function(client, bufnr)
+  local function buf_set_option(...)
+    vim.api.nvim_buf_set_option(bufnr, ...)
+  end
+
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
+  vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
+  vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {})
+  vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, {})
+  vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help)
+  vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, {})
+end
+
+local normal_capabilities = vim.lsp.protocol.make_client_capabilities()
+local capabilities = cmp_nvim_lsp.default_capabilities(normal_capabilities)
+
+for _, s in pairs(servers) do
+  local server_config_ok, mod = pcall(require, "lsp.servers." .. s)
+  if not server_config_ok then
+    require("notify")("The LSP '" .. s .. "' does not have a config.", "warn")
+  else
+    mod.setup(on_attach, capabilities)
+  end
+end
+```
+
+The module will then use that callback as appropriate by passing it to the specific language server's setup function. 
+
+```lua:title=~/.config/nvim/lua/lsp/servers/gopls.lua
+return {
+  setup = function(on_attach, capabilities)
+    require("lspconfig").gopls.setup({
+      on_attach = on_attach,
+      capabilities = capabilities,
+      settings = {
+        gopls = {
+          analyses = {
+            fillstruct = false
+          }
+        }
+      }
+    })
+  end,
+}
+```
+
+This approach let's me keep the LSP configurations nice and modular, while retaining some global settings that are applicable to all of my LSPs.
+
+## Debugging
+
+I've saved this section for last because it's in my opinion the hardest to set up. 
+
+Like the Language Server Protocol, there is a protocol for debuggers, called the Debugger Adapater Protocol, or DAP. However, there is not widespread adoption among debuggers yet, and some prominent debuggers notably stray from this standard.
+
+The best debugging package that I've found for Neovim is <a href="https://github.com/mfussenegger/nvim-dap">nvim-dap</a>, which is a DAP client implementation for Neovim. It lets you set breakpoints directly in your buffers and step through code. Another plugin called <a href="https://github.com/rcarriga/nvim-dap-ui">nvim-dap-ui</a> provides an elegant UI for nvim-dap, and is basically a requirement if you're going to be using it. Here's what it looks like on my machine to debug a JavaScript test.
+
+![Nvim-DAP](../images/inline_images/nvim-dap-ui.png "")
+
+If there's sufficient interest in it, I'll make a separate post about setting up a debugger, because it's quite complicated. But for now, I'll link again to my <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/dap/init.lua">dotfiles</a> in the hopes that it helps some people.
