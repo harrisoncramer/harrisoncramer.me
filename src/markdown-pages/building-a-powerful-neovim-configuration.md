@@ -9,15 +9,15 @@ tags: ["neovim"]
 draft: true
 ---
 
-I've been using Neovim as my primary editor for about three years. In that short time span, the editor and community surrounding the tool has undergone a dizzying amount of change. People moved onto Lua, the core team integrated LSPs directly into the editor, and the plugin ecosystem exploded. Much like the ever-changing frontend world, it can be hard to keep up. I hope this post gives a few signposts for folks building out their own editors.
+I've been using Neovim as my primary editor for about three years. In that span, the editor and community surrounding the tool has undergone a dizzying amount of change. People moved onto Lua, the core team integrated LSPs directly into the editor, and the plugin ecosystem exploded. Much like the ever-changing frontend world, it can be hard to keep up with the latest and greatest with Neovim core, let alone the plugin ecosystem. 
 
-My configuration that I'll reference throughout this post is <a href="https://www.github.com/harrisoncramer/neovim">here</a>.
+This post is by no means an exhaustive "how to" for setting up debuggers, LSPs, linters, or other tools. Rather, I hope this post gives inspiration to others building their configurations. The post is based on my own, which can be found <a href="https://www.github.com/harrisoncramer/nvim">here</a>.
 
-Of course, your mileage may vary -- things that work for me might not for you. The beauty of Neovim is that it's _so_ configurable, that there's always more than one way to do something. If you've got ideas on how I can improve my own workflow, or plugins I should try, please drop a comment below! 
+If you've got ideas on how I can improve my own workflow or ideas about what to cover next, please drop a comment below! 
 
 ## Lua Modules
  
-This isn't Neovim specific, but I think it's important to make sure we understand Lua modules before going any further, because they're at the heart of most Neovim configurations and modern plugins.
+This isn't Neovim specific, but I think it's important to make sure we understand Lua modules before going any further. They're at the heart of most Neovim configurations and modern plugins.
 
 When Neovim first loads it'll pick up your `init.lua` located in your standard path, for me `~/.config/nvim`. If you aren't sure where this is, run the following Ex-command:
 
@@ -25,7 +25,7 @@ When Neovim first loads it'll pick up your `init.lua` located in your standard p
 :lua print(vim.fn.stdpath('config'))
 ```
 
-I prefer to keep this initial file as simple as possible. Mine just loads another series of modules that contain different parts of my configuration:
+I prefer to keep this initial file as simple as possible. My `init.lua` just loads another series of modules that contain different parts of my configuration:
 
 ```lua
 -- Neovim Core Settings
@@ -47,7 +47,7 @@ require("plugins")
 require("mappings")
 ```
 
-When resolving these imports, Lua will automatically look for a `lua` directory in your config path, at `~/.config/nvim/lua`, and will look for a file that matches the given name. If it cannot find a file, it'll look for a directory with an `init.lua` inside it (if you're familiar with Javascript, this is equivalent to the way JS will resolve an `index.js` file inside of a directory).
+When resolving these imports, Lua will automatically look for a `lua` directory in your config path. If it cannot find a file, it'll look for a directory with an `init.lua` inside it (if you're familiar with JavaScript, this is equivalent to the an `index.js` resolution).
 
 For instance, my folder structure (basically) looks like this:
 
@@ -72,6 +72,8 @@ drwxr-xr-x   6 harrisoncramer  staff   192 Dec  3 12:16 lsp
 drwxr-xr-x  26 harrisoncramer  staff   832 Dec  6 22:34 plugins
 -rw-r--r--   1 harrisoncramer  staff  2118 Nov 19 21:18 settings.lua
 ```
+
+This isn't a full tour of Neovim, so I won't go into every folder and file here, but one common point of confusion worth clarifying: the `plugin` folder here is the output of my Packer plugin manager compiling all of my plugins into a single file. I'm not manually editing the `plugin/packer_compiled.lua` file (we'll get into plugins in a second).
 
 In some cases, I'm using folders to further break down a given module. For instance, the `lsp` folder contains an `init.lua` file that also imports other files, and so forth.
 
@@ -103,41 +105,47 @@ return {
 }
 ```
 
-Then in the callign code, we could access `foo.bar` as a variable. This is the basics of modules in Lua. There's a lot more to them than that, but if you understand the above, you'll be able to build up your own configuration without any problem.
+Then in the calling code, we could access `foo.bar` as a variable. You don't *have* to return a table out of a module, the code inside of the file will be called regardless of whether or not you return anything. For instance, my `mappings.lua` and `settings.lua` files do not return anything, they merely set editor configuration and key mappings.
 
 ## Plugin Installation
 
-I'm currently using <a href="https://github.com/wbthomason/packer.nvim">Packer</a> to manage my plugins. My `init.lua` loads in `~/.config/nvim/lua/plugins/init.lua` which holds the installation.
+I'm currently using <a href="https://github.com/wbthomason/packer.nvim">Packer</a> to manage my plugins. On startup, my `init.lua` loads in all of my plugins (and sets up packer) by sourcing a module at `~/.config/nvim/lua/plugins/init.lua`.
 
-The instructions for Packer are pretty straightforward, you basically just list the plugins you want installed and they're installed for you when you run `:PackerSync`.
-
-The only custom part of my configuration here is the following helper functions:
+The instructions for Packer are pretty straightforward, you basically just list the plugins you want installed and they're installed for you when you run `:PackerSync`. The only custom part of my configuration here is the following helper functions:
 
 ```lua:title=~/.config/nvim/lua/plugins/init.lua
-local setup = function(mod, remote)
-  if remote == nil then
-    require(mod)
-  else
+-- If the plugin is in lua, require it (otherwise I'll provide nil for the remote).
+-- After requiring the plugin, attempt to load my configuration for it.
+local custom = function(remote, config)
+  if remote == nil then -- The plugin does not need to be required.
+    local local_config_ok = pcall(require, config)
+    if not local_config_ok then
+      print(config .. " is not a configuration file.")
+      return
+    end
+  else -- Require both the plugin and my configuration
     local status = pcall(require, remote)
     if not status then
       print(remote .. " is not downloaded.")
       return
-    else
-      local local_config = require(mod)
-      if type(local_config) == "table" then
-        local_config.setup()
-      end
+    end
+    local local_config_ok = pcall(require, config)
+    if not local_config_ok then
+      print(remote .. " is not configured.")
     end
   end
 end
 
-local no_setup = function(mod)
+-- Simply requires the module and calls it's setup method, if it exists
+local default = function(mod)
   local status = pcall(require, mod)
   if not status then
     print(mod .. " is not downloaded.")
     return
   else
-    require(mod).setup({})
+    if type(mod.setup) == "function" then
+      mod.setup()
+    end
   end
 end
 ```
@@ -147,23 +155,30 @@ These are then passed to the setup in Packer, like this:
 ```lua:title=~/.config/nvim/lua/plugins/init.lua
 ...
 packer.startup(function(use)
-  use({
-    "quangnguyen30192/cmp-nvim-ultisnips",
-    config = setup("plugins.ultisnips"),
-  })
-  use({ "numToStr/Comment.nvim", config = no_setup("Comment") })
+  use({ "kevinhwang91/nvim-bqf", requires = "junegunn/fzf.vim", config = custom("bqf", "plugins.bqf") })
+  use({ "numToStr/Comment.nvim", config = default("Comment") })
 ...
 ```
 
-The `no_setup` function simply requires the given plugin (or shows a message) and then calls it's setup method, without any configuration. It's become a convention for Neovim plugins to have a `.setup()` method attached to the main module.
+Packer will automatically call the callback provided to the `config` key when it sets up the plugin. The `default` function simply requires the given plugin (or shows a message warning that it is missing) and then calls it's setup method, without any configuration if it exists. It's become a convention for Neovim plugins to have a `.setup()` method attached to the main module.
 
-The `setup` function requires the module, and then requires my own configuration for that plugin, which is stored in a separate file alongside `init.lua`. For instance, in this case, I have a file `ultisnips.lua` that is in the same folder. If the required module is a table (if it returns a table, like we talked about before) I then call the setup method on that table. Even if it's not a table all of the Lua inside of the file will still be run, including any mappings or other configuration for the plugin.
+The `custom` function requires the module, and then requires my own configuration for that plugin, which is stored in a separate file. For instance, I have a file at `~/.config/nvim/lua/plugins/bqf.lua` which contains all of my configuration for that plugin.
 
 These two functions let me easily keep all of my configuration or mappings for a specific plugin in a single file, and avoid repeitive boilerplate inside of the `plugins/init.lua` which is simply responsible for loading in the modules.
 
 ## Search
 
 For **project-wide**, intelligent fuzzy search, the best plugin in Neovim is <a href="https://github.com/nvim-telescope/telescope.nvim">Telescope</a>, hands-down. Not only does Telescope provide you with the ability to search for files and folders, it's API is extremely well designed and lets you build your own custom pickers, if you want to.
+
+Telescope is merely a browser of lists, and you can have it sort through anything you want. I use it for the following:
+
+- Search for files
+- Search for text
+- Search for text *in* a folder
+- Create, edit, and delete files and folders
+- Filter and search git stashes
+- Search through git history
+- Much more!
 
 For instance, I have the following user-defined `:Stash` ex-command that creates a stash for my current changes, named after the current branch:
 
@@ -226,7 +241,7 @@ The first and probably most essential Git plugin is <a href="https://github.com/
 
 ![Gstatus](../images/inline_images/fugitive.png "You can add files, change commit messages, and more from within the status window.")
 
-Fugitive also gives a variety of other super useful commands that let you interact with the history of your repository. The most useful for me are `:Gedit` and `:Gread` commands which, respectively, open up a file or read a file from a specific commit. These are super powerful when combined with Neovim's `%` symbol, which represents the current buffer. For instance, if you're in file `foo.js`, the command `:Gedit 30dks91:%` will open up `foo.js` in new buffer as it existed at the `30dks91` commit. You can easily restore an old version of a file like this or view an older version.
+Fugitive also gives a variety of other super useful commands that let you interact with the history of your repository. The most useful for me are `:Gedit` and `:Gread` commands which, respectively, open up the specified file (the `:Gedit develop:%` command opens a buffer of the current filename on the develop branch) or read a file (the `:Gread` command by itself restores the file to it's unmodified state on the current commit). These are super powerful when combined with Neovim's `%` symbol, which represents the current buffer. For instance, if you're in file `foo.js`, the command `:Gedit 30dks91:%` will open up `foo.js` in new buffer as it existed at the `30dks91` commit.
 
 Another helpful command is the `:Gvdiffsplit` command, which lets you see the difference between the current buffer and the same file at some point in the past. For instance, `:Gvdiffsplit HEAD~1:%` lets you see the difference between the current file and one commit back.
 
@@ -256,12 +271,11 @@ Setting up language servers can be quite challenging, if you're new to the Neovi
 
 The important thing to understand at the outset: Neovim *does not have debuggers, language servers, or formatters built in.* In order to use these tools, you have to install them separately and tell Neovim how to connect to them. This is a fundamentally different approach from other editors, like VSCode, where most of these things are installed and configured out of the box with the editor.
 
-Say you want to run a language server to give you autcomplete suggestions for a Golang codebase. Not only do you need to install the Golang language server (likely a separate binary, which will run as an independent process). You also need to set up Neovim so that it can communicate with that server, using the LSP, or Language Server Protocol.
+Say you want to run a language server to give you autocomplete suggestions for a Golang codebase. Not only do you need to install the Golang language server (likely a separate binary, which will run as an independent process). You also need to set up Neovim so that it can communicate with that server, using the LSP, or Language Server Protocol.
 
-The language server protocol is relatively new, and was built originally to standardize the way that different language servers communicated diagnostic and other information to clients (often editors) during a session. With this standard interface, it becomes much easier to connect Neovim to a variety of different language servers, so long as they all implement the protocol.
+<p class="tip">The language server protocol was built to standardize the way that different language servers communicate diagnostic information, type definitions, and other language metatdata to clients (often editors). This standardization makes it easier to connect Neovim to a variety of different language servers that are all implementing the same protocol.
 
-Just a few years ago, the installation of these langauge servers was tedious, and you had to individuall install them, keep them up-to-date, ensure they were in your path, and so forth. Fortunately, a lot of the pain of setting up these tools is easier with <a href="https://github.com/williamboman/mason.nvim">Mason</a>, a plugin that lets you "easily install and manage LSP servers, DAP servers, linters, and formatters." Why do you need a plugin to install other tools? 
-
+Just a few years ago, the installation of these langauge servers was tedious, and you had to individually install them, keep them up-to-date, ensure they were in your path, and so forth. Fortunately, this is now much easier with <a href="https://github.com/williamboman/mason.nvim">Mason</a>, a plugin that lets you "easily install and manage LSP servers, DAP servers, linters, and formatters."
 
 ## Debugging
 
