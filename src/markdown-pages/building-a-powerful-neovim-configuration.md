@@ -83,12 +83,10 @@ Due to the way Lua's require call works, **your Neovim configuration will error*
 Most of the time you want to handle these failed require calls gracefully. Fortunately, Lua provides us with a function that we can wrap around require calls, called `pcall`, in order to protect the rest of the code, like this:
 
 ```lua
-local cmp_nvim_lsp_status_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 local mason_status_ok, _ = pcall(require, "mason")
 local mason_lspconfig_ok, mason_lspconfig = pcall(require, "mason-lspconfig")
-local lsp_format_ok, lsp_format = pcall(require, "lsp-format")
 
-if not (mason_status_ok and mason_lspconfig_ok and cmp_nvim_lsp_status_ok and lsp_format_ok) then
+if not (mason_status_ok and mason_lspconfig_ok) then
   print("Mason, Mason LSP Config, Completion, or LSP Format not installed!")
   return
 end
@@ -279,7 +277,7 @@ vim.api.nvim_set_hl(0, "@tag.attribute", { fg = colorMap.sakuraPink })
 
 The color map is taken from Kanagawa's github page. To make your own overrides, you can run the ex-command `:TSHighlightCapturesUnderCursor` which will tell you which capture group you're currently hovering over. You can also install <a href="https://github.com/nvim-treesitter/playground">treesitter playground</a> to look at the AST for a given buffer.
 
-Changes are, if you're using Neovim as your primary development tool, you're also using other terminal tools. Beyond color schemes, it's also important to have a font that can support all sorts of symbols. I'm using Hack Nerd Font, but most <a href="https://github.com/ryanoasis/nerd-fonts">nerd fonts</a> will work. This is not a Neovim configuration but worth mentioning here (for me, I set these in my <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/alacritty/linux/.alacritty.yml">Alacritty</a> config).
+Chances are, if you're using Neovim as your primary development tool, you're also using other terminal tools. Beyond color schemes, it's also important to have a font that can support all sorts of symbols. I'm using Hack Nerd Font, but most <a href="https://github.com/ryanoasis/nerd-fonts">nerd fonts</a> will work. This is not a Neovim configuration but worth mentioning here (for me, I set these in my <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/alacritty/linux/.alacritty.yml">Alacritty</a> config).
 
 ## Terminals
 
@@ -309,7 +307,7 @@ I'm taking advantage of Mason and <a href="https://github.com/williamboman/mason
 local mason_status_ok, _ = pcall(require, "mason")
 local mason_lspconfig_ok, mason_lspconfig = pcall(require, "mason-lspconfig")
 
-if not (mason_status_ok and mason_lspconfig_ok and cmp_nvim_lsp_status_ok and lsp_format_ok) then
+if not (mason_status_ok and mason_lspconfig_ok) then
   print("Mason, Mason LSP Config, Completion, or LSP Format not installed!")
   return
 end
