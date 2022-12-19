@@ -5,8 +5,7 @@ path: /debugging-in-neovim/
 description: Don't context switch by debugging applications directly within Neovim with nvim-dap , a powerful Neovim client for the Debug Adapter Protocol, or DAP.
 imageDescription: Debugging client in Neovim.
 featuredImage: ../images/posts/bug.png
-tags: ["neovim"]
-draft: true
+tags: ["neovim", "debugging"]
 ---
 
 You'll probably spend more time debugging your next application than physically typing out the code required to run it.
@@ -113,7 +112,7 @@ if not (dap_ok) then
   return
 end
 
-require('dap').set_log_level('TRACE') -- Helps with configuring DAP
+require('dap').set_log_level('INFO') -- Helps with configuring DAP
 
 dap.configurations = {
     go = {
@@ -307,6 +306,8 @@ local go = {
 ## Next Steps
 
 We've now walked through the installation of the debugger, the debugger adapter, configuring the debugger, and adding a UI layer.
+
+If something goes wrong during your own setup, check Neovim's messages, and also DAP's logs with `:DapShowLog`.
 
 It's worth mentioning that you can achieve configuration of the debug adapter for Go specifically with <a href="https://github.com/leoluz/nvim-dap-go">nvim-dap-go</a>, which will effectively write the `dap.configurations.go` and `dap.adapters.go` sections of your DAP configuration for you. You'll still need to install the debugger (delve) in order to use it, and the UI. If you prefer a more out-of-the-box configuration for Golang specifically, this plugin is quite nice.
 
