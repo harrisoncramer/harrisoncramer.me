@@ -23,9 +23,10 @@ The Debug Adapter Protocol, or DAP, is a set of rules for how a debugger communi
 Translating this to a specific language like Golang, we need the following pieces:
 
 1. Our editor (Neovim)
-2. The DAP "client" which is the `nvim-dap` plugin
-3. The debugger which is `delve`
-4. The program to run (the Golang code)
+2. The DAP "client" (the `nvim-dap` plugin)
+3. The debugger-specific implementations, which we will write
+3. The debugger (`delve`)
+4. The program to run (go code)
 
 ## Installing the Debugger
 
@@ -133,7 +134,7 @@ dap.adapters.go = {
   type = "server",
   port = "${port}",
   executable = {
-    command = "dlv",
+    command = vim.fn.stdpath("data") .. '/mason/bin/dlv',
     args = { "dap", "-l", "127.0.0.1:${port}" },
   },
 }
@@ -297,11 +298,70 @@ local go = {
 }
 ```
 
+## Repeating this for NodeJS
+
+This pattern lets us easily set up debuggers for a variety of different languages and tools. For instance, let's set up a debugger for Node (server-side Javascript) now.
+
+First, let's add the debugger to our list of required debuggers (if you skipped this step earlier you can just install it manually with Mason):
+
+```lua{2}
+require("mason-nvim-dap").setup({
+    ensure_installed = { "delve", "node2" }
+})
+```
+
+Next we just need to add a configuration for JS files to our `dap.configurations` table:
+
+```lua{10-31}
+dap.configurations = {
+    go = {
+      {
+        type = "go", -- Which adapter to use
+        name = "Debug", -- Human readable name
+        request = "launch", -- Whether to "launch" or "attach" to program
+        program = "${file}", -- The buffer you are focused on when running nvim-dap
+      },
+    },
+    javascript = {
+      {
+        type = 'node2';
+        name = 'Launch',
+        request = 'launch';
+        program = '${file}';
+        cwd = vim.fn.getcwd();
+        sourceMaps = true;
+        protocol = 'inspector';
+        console = 'integratedTerminal';
+      },
+      {
+        type = 'node2';
+        name = 'Attach',
+        request = 'attach';
+        program = '${file}';
+        cwd = vim.fn.getcwd();
+        sourceMaps = true;
+        protocol = 'inspector';
+        console = 'integratedTerminal';
+      },
+    }
+}
+```
+
+And finally an entry to our `dap.adapters` table for the debugger that we just installed:
+
+```lua
+dap.adapters.node2 = {
+  type = 'executable';
+  command = 'node',
+  args = { vim.fn.stdpath("data") .. '/mason/packages/node-debug2-adapter/out/src/nodeDebug.js' };
+}
+```
+
+Now we can open up Javascript files and set breakpoints and inspect code the same way we did with Go! You can see now why DAP is a powerful framework that lets us easily abstract away langugage-specific debugger implementations!
+
 ## Next Steps
 
-We've now walked through the installation of the debugger, the debugger adapter, configuring the debugger, and adding a UI layer.
-
-If something goes wrong during your own setup, check Neovim's messages, and also DAP's logs with `:DapShowLog`.
+We've now walked through the installation of the debugger, the debugger adapter, configuring the debugger, and adding a UI layer. If something goes wrong during your own setup, check Neovim's messages, and also DAP's logs with `:DapShowLog`.
 
 It's worth mentioning that you can achieve configuration of the debug adapter for Go specifically with <a href="https://github.com/leoluz/nvim-dap-go">nvim-dap-go</a>, which will effectively write the `dap.configurations.go` and `dap.adapters.go` sections of your DAP configuration for you. You'll still need to install the debugger (delve) in order to use it, and the UI. If you prefer a more out-of-the-box configuration for Golang specifically, this plugin is quite nice.
 
