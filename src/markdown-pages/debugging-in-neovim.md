@@ -5,7 +5,7 @@ path: /debugging-in-neovim/
 description: Debug your applications directly within Neovim using the Debug Adapter Protocol, or DAP.
 imageDescription: Debugging client in Neovim.
 featuredImage: ../images/posts/bug.png
-tags: ["neovim", "debugging"]
+tags: ["neovim", "debugging", "golang", "javascript"]
 ---
 
 You'll probably spend more time debugging your next application than physically typing out the code required to run it. For a little while, the premier tool in the software industry for text manipulation, Neovim, was woefully behind IDEs like VSCode in it's debugger implementation. That's no longer the case. 

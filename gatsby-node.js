@@ -78,6 +78,7 @@ exports.createPages = async ({ actions, graphql }) => {
     "github",
     "neovim",
     "debugging",
+    "golang",
   ]
 
   // Create a new blog page for every n posts,
