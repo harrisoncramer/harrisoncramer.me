@@ -2,60 +2,54 @@
 title: Debugging in Neovim
 date: 2022-12-21
 path: /debugging-in-neovim/
-description: Don't context switch by debugging applications directly within Neovim with nvim-dap , a powerful Neovim client for the Debug Adapter Protocol, or DAP.
+description: Debug your applications directly within Neovim using the Debug Adapter Protocol, or DAP.
 imageDescription: Debugging client in Neovim.
 featuredImage: ../images/posts/bug.png
 tags: ["neovim", "debugging"]
 ---
 
-You'll probably spend more time debugging your next application than physically typing out the code required to run it.
+You'll probably spend more time debugging your next application than physically typing out the code required to run it. For a little while, the premier tool in the software industry for text manipulation, Neovim, was woefully behind IDEs like VSCode in it's debugger implementation. That's no longer the case. 
 
-It's always struck me as odd, then, that so many engineers in the Vim community are completely focused on optimizations for text manipulation. Text editing is important, of course, since editing at the speed of thought has benefits beyond just saving you a few keystrokes. But until relatively recently, the premier tool in text manipulation was woefully behind IDEs in terms of the tooling required to debug software.
+The <a href="https://microsoft.github.io/debug-adapter-protocol/specification">Debug Adapter Protocol (DAP)</a> lets Neovim serve as a fully-featured debugger client, letting you attach to a running instance of your code, set breakpoints, inspect variables, examine call stacks, among other helpful debugging techniques.
 
-That's no longer the case, thanks to the <a href="https://microsoft.github.io/debug-adapter-protocol/specification">Debug Adapter Protocol (DAP)</a> and the <a href="https://github.com/mfussenegger/nvim-dap">nvim-dap</a> plugin that turns Neovim into a debugger client. These technologies let Neovim communicate with debuggers that implement the protocol.
-
-This post is meant to serve as a basic guide for setting up a debugger in Neovim. Although this setup applies specifically to Golang, the principles are the same for setting up debuggers for other languages, so long as those debuggers implement the DAP protocol.
+This post is meant to serve as a basic guide for setting up a debugger in Neovim. Although it applies specifically to Golang, the principles are the same for debuggers for other languages, so long as they implement the Debug Adapter Protocol.
 
 ## What is DAP?
 
-The Debug Adapter Protocol, or DAP, is a set of rules for how a debugger communicates with a client (usually an editor). Microsoft's <a href="https://microsoft.github.io/debug-adapter-protocol/">summary</a> of the idea puts it well:
+The Debug Adapter Protocol, or DAP, is a set of rules for how a debugger communicates with a client (usually an editor). Microsoft's <a href="https://microsoft.github.io/debug-adapter-protocol/">summary</a> puts it succinctly:
 
-<p style="margin-left: 30px;">"The idea behind the Debug Adapter Protocol (DAP) is to abstract the way how the debugging support of development tools communicates with debuggers or runtimes into a protocol. Since it is unrealistic to assume that existing debuggers or runtimes adopt this protocol any time soon, we rather assume that an intermediary component - a so called Debug Adapter - adapts an existing debugger or runtime to the Debug Adapter Protocol.
-
-<p style="margin-left: 30px">The Debug Adapter Protocol makes it possible to implement a generic debugger for a development tool that can communicate with different debuggers via Debug Adapters. And Debug Adapters can be re-used across multiple development tools which significantly reduces the effort to support a new debugger in different tools."</p>
+<p style="margin-left: 30px;">"The idea behind the Debug Adapter Protocol (DAP) is to abstract the way how the debugging support of development tools communicates with debuggers or runtimes into a protocol .. The Debug Adapter Protocol makes it possible to implement a generic debugger for a development tool that can communicate with different debuggers via Debug Adapters. And Debug Adapters can be re-used across multiple development tools which significantly reduces the effort to support a new debugger in different tools."</p>
 
 Translating this to a specific language like Golang, we need the following pieces:
 
-1. The editor (Neovim)
+1. Our editor (Neovim)
 2. The DAP "client" which is the `nvim-dap` plugin
 3. The debugger which is `delve`
 4. The program to run (the Golang code)
 
-This diagram from nvim-dap's documentation is helpful:
-
-
-```
-DAP-Client ----- Debug Adapter ------- Debugger ------ Debugee
-(nvim-dap)  ^   (per language)  ^   (per language)    (your app)
-            |                   | 
-            |                   |
-            |        Implementation specific communication
-            |        Debug adapter and debugger could be the same process
-            |
-     Communication via the Debug Adapter Protocol
-```
-
 ## Installing the Debugger
 
-In order to debug a program you need a debugger. This is the application, completely outside of Neovim, that actually runs and attaches to the running program you are trying to debug.
+In order to debug a program you need a debugger. This is the tool, typically but not always a binary executable, that runs completely outside of Neovim and attaches to the running process you are trying to debug. To debug the application, I'm going to use the <a href="https://github.com/go-delve/delve">Delve</a> debugger. 
 
 The program that I'm going to "debug" is a simple TCP server implemented in Golang. You can get the same source code <a href="https://github.com/harrisoncramer/go-connect-tcp.git">here</a> or you can use your own program.
 
-To debug the application, I'm going to use the <a href="https://github.com/go-delve/delve">Delve</a> debugger. You can compile and run the TCP server by navigating to the root directory of this folder and running `go run .` which will compile and run the code. The equivalent command with Delve is `dlv debug .` which compiles the program with the correct debugger flags, and then attaches to it. You can then step through the code in a REPL-like environment.
+You can compile and run the TCP server by navigating to the root directory, and running: 
 
-You can install the Delve and other debuggers outside of Neovim. I prefer to keep my debugger installations baked into my Neovim configuration with <a href="https://github.com/williamboman/mason.nvim">Mason</a>, and optionally, <a href="https://github.com/jay-babu/mason-nvim-dap.nvim">mason-nvim-dap</a>.
+```bash
+$ go run main.go
+```
 
-After adding Mason to your Neovim configuration, you can use it to install and manage LSPs, DAPs, Linters, and other tools. To install Delve, open up Mason's UI with the `:Mason` command, and navigate to the DAP page:
+The equivalent command with Delve, which compiles the program with the correct debugger flags, and then starts that binary and attaches, is the following:
+
+```bash
+$ dlv debug main.go
+```
+
+With delve attached, you can then step through the code in a REPL-like environment. 
+
+You can install the Delve and other debuggers outside of Neovim, but I prefer to keep my debugger installations baked into my Neovim configuration with <a href="https://github.com/williamboman/mason.nvim">Mason</a>, and optionally, <a href="https://github.com/jay-babu/mason-nvim-dap.nvim">mason-nvim-dap</a>. This lets me automatically install them in a consistent path, even if my machine changes. Mason is the defacto Neovim standard for debugger installations, LSP installations, linters, and formatters.
+
+After adding Mason to your Neovim configuration (I'm using Packer to manage my plugins), open up Mason's UI with the `:Mason` command, and navigate to the DAP page:
 
 ![Mason](../images/inline_images/mason-dap.png "")
 
@@ -68,7 +62,7 @@ Version: 1.20.1
 Build: $Id: 96e65b6c615845d42e0e31d903f6475b0e4ece6e
 ```
 
-Great! We know now that `delve` is installed on our machine.
+Great! We know now that `delve` is installed on our machine at the specified path.
 
 > This next part is optional. Skip it if you'd like.
 
@@ -93,7 +87,7 @@ This is great, because it allows us to specify the automatic installation of deb
 
 Next, we need to install <a href="https://github.com/mfussenegger/nvim-dap">nvim-dap</a>, the plugin that will actually allow Neovim to communicate with Delve.
 
-Let's see nvim-dap "breaking" before we understand how to get it working. Install nvim-dap, and open up the `main.go` file in your project and run the following ex command: `:lua require("dap").continue()`
+Once you have it installed, let's see nvim-dap "breaking" before we understand how to get it working. Install nvim-dap, and open up the `main.go` file in your project and run the following ex command: `:lua require("dap").continue()`
 
 You should see the following message:
 
