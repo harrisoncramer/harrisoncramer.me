@@ -300,7 +300,9 @@ local go = {
 
 ## Repeating this for NodeJS
 
-This pattern lets us easily set up debuggers for a variety of different languages and tools. For instance, let's set up a debugger for Node (server-side Javascript) now.
+The above pattern lets us easily set up debuggers for a variety of different languages and tools. For a full list of the supported configurations you can go <a href="https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation#Javascript-chrome">here</a>.
+
+For instance, let's set up a debugger for Node (server-side Javascript) now.
 
 First, let's add the debugger to our list of required debuggers (if you skipped this step earlier you can just install it manually with Mason):
 
