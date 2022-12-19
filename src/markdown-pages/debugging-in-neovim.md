@@ -92,9 +92,9 @@ This is great, because it allows us to specify the automatic installation of deb
 
 ## Installing Nvim-DAP
 
-Next, we need the plugin that will actually allow Neovim to communicate with Delve when we try to debug our Golang program. Add this plugin: https://github.com/mfussenegger/nvim-dap
+Next, we need to install <a href="https://github.com/mfussenegger/nvim-dap">nvim-dap</a>, the plugin that will actually allow Neovim to communicate with Delve.
 
-Let's see nvim-dap "breaking" before we understand how to get it working. Open up the `main.go` file in your project and run the following ex command: `:lua require("dap").continue()`
+Let's see nvim-dap "breaking" before we understand how to get it working. Install nvim-dap, and open up the `main.go` file in your project and run the following ex command: `:lua require("dap").continue()`
 
 You should see the following message:
 
@@ -104,12 +104,12 @@ No configuration found for `go`. You need to add configs to `dap.configurations.
 
 What's going on here? We've installed the debugger, and the debugger adapter for Neovim, but we haven't told nvim-dap what do to for Golang files yet. As the documentation states: "Neovim needs to instruct the debug adapter .. how to launch and connect to the debugee. The debugee is the application you want to debug."
 
-We need to tell nvim-dap which debug adapter to use, and whether to `attach` to the program that we want to debug or `launch` it. Add the following to your configuration:
+Add the following to your configuration:
 
 ```lua
 local dap_ok, dap = pcall(require, "dap")
 if not (dap_ok) then
-  require("notify")("nvim-dap not installed!", "warning") -- nvim-notify is a separate plugin, I recommend it too!
+  print("nvim-dap not installed!")
   return
 end
 
@@ -148,7 +148,7 @@ dap.adapters.go = {
 
 We should finally be set up and ready to run the debugger for real. Hover over a line in the `main.go` file and set a breakpoint with `:lua require("dap").toggle_breakpoint()` then re-run the above command to start the debugger.
 
-After a moment, you should see the debugger pause on the line you set. You shouldn't see any errors, and if you grep for a running delve process, you should see it running on your system:
+After a moment, you should see the debugger pause on the line you set. You shouldn't see any errors, and if you grep for a running delve process, you should see it:
 
 ```
 $ top | grep dlv
@@ -159,56 +159,11 @@ $ top | grep dlv
 96326  dlv              0.0  00:00.09 16     0   37     17M    0B    0B    96326 96166 sleeping *0[1]      0.00000 0.00000    501 2160     443   40        15        6102       112       2585       0       12       0.0   0         0         harrisoncramer         N/A    N/A   N/A   N/A   N/A   N/A
 ```
 
-Nice! This shows that we've successfully set up delve to launch via Neovim. Finally, close and terminate the debugger with `:lua require("dap").terminate()`
+Nice! This shows that we've successfully set up delve to launch via Neovim. Finally, close and terminate the debugger with `:lua require("dap").terminate()` which will close the delve process and terminate the connection.
 
 ## Configuring Dap-UI
 
-Next we want to install <a href=" https://github.com/rcarriga/nvim-dap-ui">nvim-dap-ui</a> which will let us view more metadata about the debugger and give us a nicer experience with the debugger.
-
-Once you've installed this plugin, we need to configure keybindings to run nvim-dap commands and nvim-dap-ui commands more easily. These are the keybindings that I'm using to step through code and set breakpoints, but feel free to customize them as you see fit:
-
-```lua
-local dap_ok, dap = pcall(require, "dap")
-local dap_ui_ok, ui = pcall(require, "dapui")
-
-if not (dap_ok and dap_ui_ok) then
-  require("notify")("nvim-dap or dap-ui not installed!", "warning") -- nvim-notify is a separate plugin, I recommend it too!
-  return
-end
-
-vim.fn.sign_define('DapBreakpoint', { text = '🐞' })
-
--- Start debugging session
-vim.keymap.set("n", "<localleader>ds", function()
-  dap.continue()
-  ui.toggle({})
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-w>=", false, true, true), "n", false) -- Spaces buffers evenly
-end)
-
--- Set breakpoints, get variable values, step into/out of functions, etc.
-vim.keymap.set("n", "<localleader>dl", require("dap.ui.widgets").hover)
-vim.keymap.set("n", "<localleader>dc", dap.continue)
-vim.keymap.set("n", "<localleader>db", dap.toggle_breakpoint)
-vim.keymap.set("n", "<localleader>dn", dap.step_over)
-vim.keymap.set("n", "<localleader>di", dap.step_into)
-vim.keymap.set("n", "<localleader>do", dap.step_out)
-vim.keymap.set("n", "<localleader>dC", function()
-  dap.clear_breakpoints()
-  require("notify")("Breakpoints cleared", "warn")
-end)
-
--- Close debugger and clear breakpoints
-vim.keymap.set("n", "<localleader>de", function()
-  dap.clear_breakpoints()
-  ui.toggle({})
-  dap.terminate()
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-w>=", false, true, true), "n", false)
-  require("notify")("Debugger session ended", "warn")
-end)
-```
-
-We also need to set up the UI itself. This is the configuration that I like:
-
+The default experience with DAP is pretty rough without a better UI and keybindings to start and stop the debugger, set breakpoints in the code, and so forth. Luckily, this is very easy to configure with <a href=" https://github.com/rcarriga/nvim-dap-ui">nvim-dap-ui</a>. This is the configuration that I like.
 
 ```lua
 local dap_ui_ok, ui = pcall(require, "dapui")
@@ -259,15 +214,56 @@ ui.setup({
 })
 ```
 
-This should provide us with a nice interface that lets us step through the code, view breakpoints, and so forth. Here's what the full setup looks like on my machine:
+I also have the following keybindings set up to call functions in both plugins:
+
+```lua
+local dap_ok, dap = pcall(require, "dap")
+local dap_ui_ok, ui = pcall(require, "dapui")
+
+if not (dap_ok and dap_ui_ok) then
+  require("notify")("nvim-dap or dap-ui not installed!", "warning") -- nvim-notify is a separate plugin, I recommend it too!
+  return
+end
+
+vim.fn.sign_define('DapBreakpoint', { text = '🐞' })
+
+-- Start debugging session
+vim.keymap.set("n", "<localleader>ds", function()
+  dap.continue()
+  ui.toggle({})
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-w>=", false, true, true), "n", false) -- Spaces buffers evenly
+end)
+
+-- Set breakpoints, get variable values, step into/out of functions, etc.
+vim.keymap.set("n", "<localleader>dl", require("dap.ui.widgets").hover)
+vim.keymap.set("n", "<localleader>dc", dap.continue)
+vim.keymap.set("n", "<localleader>db", dap.toggle_breakpoint)
+vim.keymap.set("n", "<localleader>dn", dap.step_over)
+vim.keymap.set("n", "<localleader>di", dap.step_into)
+vim.keymap.set("n", "<localleader>do", dap.step_out)
+vim.keymap.set("n", "<localleader>dC", function()
+  dap.clear_breakpoints()
+  require("notify")("Breakpoints cleared", "warn")
+end)
+
+-- Close debugger and clear breakpoints
+vim.keymap.set("n", "<localleader>de", function()
+  dap.clear_breakpoints()
+  ui.toggle({})
+  dap.terminate()
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-w>=", false, true, true), "n", false)
+  require("notify")("Debugger session ended", "warn")
+end)
+```
+
+
+We now have a nice interface that lets us step through the code, view breakpoints, and so forth. Here's what the full setup looks like on my machine:
 
 ![Nvim-DAP](../images/inline_images/nvim-dap-ui-go.png "")
 
 ## Multiple Configurations
 
-This works fine if you want to run the equivalent of `dlv debug .` locally. But what if you want to have multiple different debug configurations for different scenarios? You can simply add another table to your `dap.configurations.go` table!
-
-I've got separate configurations for:
+This works fine if you want to run the equivalent of `dlv debug .` locally. But what if you want to have multiple different debug configurations for different scenarios? You can simply add another table to your `dap.configurations.go` table! I've got separate configurations for:
 
 1. Compiling and running the program with delve right away (what we just configured)
 2. Debugging a test file
@@ -312,7 +308,7 @@ local go = {
 
 We've now walked through the installation of the debugger, the debugger adapter, configuring the debugger, and adding a UI layer.
 
-It's worth mentioning that you can achieve configuration of the debug adapter for Go specifically with <a href="https://github.com/leoluz/nvim-dap-go">nvim-dap-go</a>, which will effectively write the `dap.configurations.go` and `dap.adapters.go` sections of your DAP configuration for you. You'll still need to install the debugger (delve) in order to use it, and you'll still need to have the UI installed. If you prefer a more out-of-the-box experience with Golang debugging this plugin is nice.
+It's worth mentioning that you can achieve configuration of the debug adapter for Go specifically with <a href="https://github.com/leoluz/nvim-dap-go">nvim-dap-go</a>, which will effectively write the `dap.configurations.go` and `dap.adapters.go` sections of your DAP configuration for you. You'll still need to install the debugger (delve) in order to use it, and the UI. If you prefer a more out-of-the-box configuration for Golang specifically, this plugin is quite nice.
 
 Finally, you can find my personal dotfiles <a href="github.com/harrisoncramer/nvim">here</a> and specifically my debugger configuration <a href="https://github.com/harrisoncramer/nvim/tree/main/lua/plugins/dap">here</a>.
 
