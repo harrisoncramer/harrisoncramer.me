@@ -106,7 +106,7 @@ if not (dap_ok) then
   return
 end
 
-require('dap').set_log_level('INFO') -- Helps with configuring DAP
+require('dap').set_log_level('INFO') -- Helps when configuring DAP, see logs with :DapShowLog
 
 dap.configurations = {
     go = {
@@ -152,11 +152,11 @@ $ top | grep dlv
 96326  dlv              0.0  00:00.09 16     0   37     17M    0B    0B    96326 96166 sleeping *0[1]      0.00000 0.00000    501 2160     443   40        15        6102       112       2585       0       12       0.0   0         0         harrisoncramer         N/A    N/A   N/A   N/A   N/A   N/A
 ```
 
-Nice! This shows that we've successfully set up delve to launch via Neovim. Finally, close and terminate the debugger with `:lua require("dap").terminate()` which will close the delve process and terminate the connection.
+Nice! This shows that we've successfully set up delve to launch via Neovim. This is the first step! Finally, close and terminate the debugger with `:lua require("dap").terminate()` which will close the delve process and terminate the connection.
 
 ## Configuring Dap-UI
 
-The default experience with DAP is pretty rough without a better UI and keybindings to start and stop the debugger, set breakpoints in the code, and so forth. Luckily, this is very easy to configure with <a href=" https://github.com/rcarriga/nvim-dap-ui">nvim-dap-ui</a>. This is the configuration that I like.
+The default experience with DAP is pretty rough without a better interface, and keybindings to start and stop the debugger, set breakpoints in the code, and so forth. Luckily, this is very easy to configure with <a href=" https://github.com/rcarriga/nvim-dap-ui">nvim-dap-ui</a>. This is the configuration that I like.
 
 ```lua
 local dap_ui_ok, ui = pcall(require, "dapui")
