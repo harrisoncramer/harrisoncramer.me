@@ -300,7 +300,7 @@ local go = {
 
 ## Repeating this for NodeJS
 
-The above pattern lets us easily set up debuggers for a variety of different languages and tools. For a full list of the supported configurations you can go <a href="https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation#Javascript-chrome">here</a>.
+The above pattern lets us easily set up debuggers for a variety of different languages and tools. For a full list of the supported configurations you can go <a href="https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation">here</a>.
 
 For instance, let's set up a debugger for Node (server-side Javascript) now.
 

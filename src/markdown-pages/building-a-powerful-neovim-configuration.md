@@ -108,6 +108,8 @@ Then in the calling code, we could access `foo.bar` as a variable. You don't *ha
 
 I'm currently using <a href="https://github.com/wbthomason/packer.nvim">Packer</a> to manage my plugins. On startup, my `init.lua` loads in all of my plugins (and sets up packer) by sourcing a module at `~/.config/nvim/lua/plugins/init.lua`.
 
+> I've recently switched to <a href="https://github.com/folke/lazy.nvim">nvim.lazy</a> for plugin management and no longer use the below functions.
+
 The instructions for Packer are pretty straightforward, you basically just list the plugins you want installed and they're installed for you when you run `:PackerSync`. The only custom part of my configuration here is the following helper functions:
 
 ```lua:title=~/.config/nvim/lua/plugins/init.lua
