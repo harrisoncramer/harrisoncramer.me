@@ -2,7 +2,7 @@
 title: Migrating From Gastby to Astro
 date: 2023-01-30
 path: /migrating-from-gatsby-to-astro/
-description: I recently migrated a simple blog site from Gatsby to Astro, and was glad I did. Here are my takewaways.
+description: I recently migrated a simple blog site from Gatsby to Astro, and was glad I did. Here are my takeaways.
 imageDescription: An image of an astronaut floating through space
 featuredImage: ../images/posts/astronaut.jpg
 tags: ["astro", "javascript", "typescript"]
@@ -18,9 +18,9 @@ That's why recently, when my partner expressed interest in revamping her cooking
 
 The first and most obvious benefit was that the production bundle was significantly smaller with Astro. 
 
-All told, the site compiled down to about 250KB with Astro, and Gatsby was about 1.7MB. That's roughly 7x smaller.
+All told, the site compiled down to about 250KB with Astro. With Gatsby it was about 1.7MB. That's roughly 7x smaller.
 
-The main reason for that is because with Gatsby, I was shipping React to the client (and several React libraries). I found Astro's templating syntax easy enough to use that I didn't need React at all, since using React just to render HTML is overkill. When I did need interactivity, I used custom elements, which Astro encourages. For instance, here's what I did for a toggle component:
+The main reason for the difference is that I was using React to render the pages with Gatsby, and several React libraries, which I just replaced with vanilla Javascript with Astro. Using React is overkill when there are only a handful of elements that require client-side Javascript. With Astro, I needed interactivity only a handful of times, and I used custom elements, which Astro encourages. For instance, here's what I did for a toggle component:
 
 ```html:title=Toggle.astro
 <wrapper-element>
@@ -49,7 +49,7 @@ The main reason for that is because with Gatsby, I was shipping React to the cli
 </script>
 ```
 
-As you can see, Astro encourages you to make use of browser-native APIs if all you need is a tiny bit of interactivity. You _can_ use React, Vue, or whatever language you want to write up your components, but you don't have to.
+As you can see, Astro encourages you to make use of browser-native APIs if all you need is a tiny bit of interactivity. You _can_ use React, Vue, or whatever language you want to write up your components, but you don't have to, and they'll be compiled down to HTML by default on the client anyway. Astro doesn't ship any Javascript to the client by default, which is awesome.
 
 Here's another example, this time taking advantage of a fuller array of Astro APIs:
 
@@ -129,9 +129,9 @@ src
 tsconfig.json
 ```
 
-Astro has an excellent CLI utility, too. When I wanted to add Tailwind to my project, all I had to do was run a single terminal command: `npx astro add tailwind` which sets up the CSS imports and installs the dependencies for me.
+Astro has an excellent CLI utility, too. When I wanted to add Tailwind to my project, all I had to do was run a single terminal command: `npx astro add tailwind` which set up the CSS imports and installed the dependencies for me.
 
-I've also found Astro is _faster_ to reload and rebuild locally in development than Gatsby is. It's built on top of Vite, which is my bundler of choice, and which is nice because the APIs are very familiar. The total configuration for Astro is just 15 lines of pure, relatively readable Typescript:
+I've also found Astro is _faster_ to rebuild locally than Gatsby is. It's built on top of Vite, which is my preferred bundler. This is also nice because the APIs are very familiar. The total configuration for Astro is just 15 lines of pure, readable Typescript:
 
 ```typescript
 import { defineConfig } from 'astro/config';
@@ -152,18 +152,18 @@ export default defineConfig({
 });
 ```
 
-Compare this with Gatsby, which requires you to interface with a GraphQL API in order to fetch your content during build time. The APIs are just _cleaner_ in Astro and the abstractions simpler.
+Compare this with Gatsby, which requires you to interface with a GraphQL API in order to fetch your content during build time. This always felt clunky, when all you wanted to do was render static content. The APIs are just _cleaner_ in Astro and the abstractions simpler.
 
 ## Rough Edges
 
 Astro is still a relatively young project compared to Gatsby and some other static site tools, so some of the tooling is not quite there yet. For me, working in Neovim, it took a minute to set up the LSP and syntax highlighting. From that perspective, I'm not sure that I love the idea of having three separate syntax blocks in a single file, plus JSX (even if I can understand the logic of colocating all these different parts).
 
-The tool also doesn't quite have the plugin ecosystem that Gastby has at this point. I'm not about to migrate my own blog because I rely too heavily on certain plugins that aren't there yet for Astro. But in time, I'm sure it'll catch up.
+The tool also doesn't quite have the plugin ecosystem that Gastby has at this point. I'm not going to migrate this blog immediately because I rely too heavily on certain plugins that aren't there yet for Astro. But in time, I'm sure it'll catch up.
 
 ## Closing Thoughts
 
-Astro feels like a tool that was purpose built for a specific purpose: building content-driven sites. It feels designed to get you what you need, and then get out of yoru way. It also seems to encourage browser native APIs and deliberately push you away from heavier frameworks like React or Vue, which you probably don't need.
+Astro was purpose built for building content-driven sites, and you can tell. It's designed to get you what you need, and then get out of yoru way. It also seems to encourage browser native APIs and deliberately push you away from heavier frameworks like React or Vue, which you probably don't need.
 
-This is a pretty sharp contrast to Gatsby, which feels a bit forced -- really, I'm not convinced that most people really need a GraphQL API to pull in data from markdown pages, or even data from a headless CMS like Contentful. In my experience it's just not the right abstraction.
+This is a pretty sharp contrast to Gatsby, which feels like it's forcing you to use tools (GraphQL) which weren't really designed with this use-case in mind. -- which weren't really designed with this use-case in mind. I'm not convinced that most people really need a GraphQL API to pull in data for markdown pages, or even data from a headless CMS like Contentful. In my experience it's just not the right abstraction.
 
 This is of course just scratching the surface of Astro, the whole tool seems really promising and I'm excited to see where it goes.
