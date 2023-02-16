@@ -20,7 +20,11 @@ const IndexPage = (): JSX.Element => {
         <p>
           My name is Harrison Cramer, and I'm a full-stack developer living in
           Brooklyn. Prior to my career in software, I was a reporter in
-          Washington, where I covered foreign policy and the military.
+          Washington, where I covered foreign policy and the military. My resume
+          can be found{" "}
+          <a href="https://hjc-public.s3.amazonaws.com/cramer_resume.pdf">
+            here.
+          </a>
         </p>
         <h2>What is this site?</h2>
         <p>
@@ -56,20 +60,5 @@ export const query = graphql`
     }
   }
 `
-
-// const CenterImage = styled.div`
-//   .profileImage {
-//     max-height: 800px;
-//   }
-// `
-// <CenterImage>
-//   {image && (
-//     <GatsbyImage
-//       className="profileImage"
-//       image={image}
-//       alt={"A profile shot of this site's author, Harrison Cramer."}
-//     />
-//   )}
-// </CenterImage>
 
 export default IndexPage
