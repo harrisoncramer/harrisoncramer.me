@@ -18,9 +18,11 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   }, [isDark])
 
   return (
-    <main className={`${isDark ? 'main-dark' : 'main-light'}`}>
+    <main className={`main ${isDark ? 'main-dark' : 'main-light'}`}>
       <Header setIsDark={setIsDark} isDark={isDark} />
-      <section>{children}</section>
+      <div className="content-wrapper">
+        <section>{children}</section>
+      </div>
     </main>
   )
 }
