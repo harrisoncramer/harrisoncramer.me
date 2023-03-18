@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+  <h1>Contact</h1>
+  <div>
+    <p>
+      Twitter:{" "}
+      <a href="https://twitter.com/harrisoncramer">@harrisoncramer</a>
+    </p>
+  </div>
+  <div>
+    <p>
+      Github: <a href="https://github.com/harrisoncramer">harrisoncramer</a>
+    </p>
+  </div>
+  <div>
+    <p data-tip data-for="signal-tip">Signal: 510-698-1166</p>
+  </div>
+  <!-- Add tooltip -->
+  <div id="signal-tip">Signal is a secure messenging application.</div>
+  <br />
+  <div>
+    <p>
+      I'm always looking for cool projects to work on, particularly in the open
+      source community. If you think I could be a good fit for your team, please
+      don't hesitate to reach out.
+    </p>
+  </div>
+</Layout>
+<style>
+  p {
+    margin: 0.25em;
+    display: inline-block;
+  }
+</style>

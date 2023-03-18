@@ -1,0 +1,75 @@
+---
+// import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import Layout from "../components/Layout";
+import "normalize.css";
+const { title } = Astro.props;
+---
+
+<div>
+  <head>
+    <title>{title}</title>
+  </head>
+  <Layout client:load>
+    <slot />
+  </Layout>
+</div>
+
+<style is:global>
+  .main {
+    min-height: 100%;
+  }
+
+  .main h1,
+  h2,
+  h3,
+  h4,
+  form {
+    font-family: "Playfair Display";
+    font-weight: 500;
+  }
+
+  /* Increase title size on computers */
+  @media only screen and (min-width: 875px) {
+    .main h1 {
+      font-size: 2.75em;
+    }
+  }
+
+  .main h2 {
+    font-size: 1.75em;
+  }
+
+  .main p,
+  li {
+    font-size: 1.2em;
+    font-family: "Lora";
+  }
+
+  /* Light mode! */
+  .main-light {
+    color: #222;
+    background: #f9f9f9;
+  }
+
+  .main-light a {
+    color: #0366fc;
+  }
+
+  /* Dark mode! */
+  .main-dark {
+    color: #eee;
+    background: #141414;
+  }
+
+  .main-dark a {
+    color: #9ec4ff;
+  }
+
+  .content-wrapper {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+</style>
