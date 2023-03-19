@@ -4,7 +4,7 @@ import "@fontsource/lora";
 import "@fontsource/playfair-display";
 import "@fontsource/raleway";
 
-import Layout from "../components/Layout";
+import Header from "../components/Header";
 import "normalize.css";
 const { title } = Astro.props;
 ---
@@ -13,21 +13,20 @@ const { title } = Astro.props;
   <head>
     <title>{title}</title>
   </head>
-  <Layout client:load>
+  <Header client:load />
+  <div class="content-wrapper">
     <slot />
-  </Layout>
+  </div>
 </div>
 
 <style is:global>
   html,
   body {
+    @apply bg-app-background-dark text-app-white;
     height: 100%;
   }
-  .main {
-    min-height: 100%;
-  }
 
-  .main h1,
+  h1,
   h2,
   h3,
   h4,
@@ -38,38 +37,22 @@ const { title } = Astro.props;
 
   /* Increase title size on computers */
   @media only screen and (min-width: 875px) {
-    .main h1 {
+    h1 {
       font-size: 2.75em;
     }
   }
 
-  .main h2 {
+  h2 {
     font-size: 1.75em;
   }
 
-  .main p,
+  p,
   li {
     font-size: 1.2em;
     font-family: "Lora";
   }
 
-  /* Light mode! */
-  .main-light {
-    color: #222;
-    background: #f9f9f9;
-  }
-
-  .main-light a {
-    color: #0366fc;
-  }
-
-  /* Dark mode! */
-  .main-dark {
-    color: #eee;
-    background: #141414;
-  }
-
-  .main-dark a {
+  a {
     color: #9ec4ff;
   }
 
