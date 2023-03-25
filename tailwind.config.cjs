@@ -30,7 +30,7 @@ module.exports = {
     },
     colors: {
       'app-white': '#ffffff',
-      'app-black': '#000000',
+      'app-black': '#0d0d0d',
       'app-header': '#f8b591',
       'app-background-dark': '#141414',
       'app-background-light': '#242424',

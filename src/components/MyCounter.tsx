@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface CounterProps {
-  initialCount?: number;
+  initialCount: number;
 }
 
 const Counter: React.FC<CounterProps> = ({ initialCount = 0 }) => {
