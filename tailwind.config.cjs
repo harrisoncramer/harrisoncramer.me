@@ -6,6 +6,7 @@ module.exports = {
       sans: ['Helvetica'],
       serif: [],
       display: ['Nugelo'],
+      playfair: 'Playfair',
     },
     fontSize: {
       xs: '.75rem',

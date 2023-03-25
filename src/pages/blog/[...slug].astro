@@ -16,9 +16,9 @@ const post = Astro.props;
 const { Content } = await post.render();
 ---
 
+<meta charset="utf-8" />
 <Layout>
   <BlogPost {...post.data}>
-    <h1>{post.data.title}</h1>
     <Content />
   </BlogPost>
 </Layout>
