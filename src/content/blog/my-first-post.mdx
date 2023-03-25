@@ -4,6 +4,7 @@ pubDate: 2020-06-22
 description: This is a template post that shows what's possible with my blog.
 heroImage: /placeholder-hero.jpg
 ---
+import MyCounter from "../../components/MyCounter.tsx"
 
 Welcome to the blog section of my personal website!
 
@@ -36,4 +37,12 @@ c = a + b;
 document.getElementById('demo1').innerHTML = c;
 ```
 
-If anything is confusing or looks off, please let me know!
+Finally, because Astro supports embedding Javascript into markdown via MDX, we can even embed components, like this:
+
+<MyCounter client:load />
+
+The above counter is a React component that I've embedded into the Markdown on this page!
+
+## Final Thoughts
+
+I've recently migrated this entire site from Gatsby (booo, hiss) to Astro. There are likely to be weird quirks or UI bugs. If anything is confusing or looks off, please let me know!
