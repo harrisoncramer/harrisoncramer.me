@@ -32,9 +32,9 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
       <article>
         <h1 class="title">{title}</h1>
         <p class="text-lg mb-8">{description}</p>
-        <div class="flex items-center gap-2 hover:underline mb-1">
+        <div class="flex items-center gap-2 mb-1">
           <date class="flex-1 font-playfair">{formattedPublishDate}</date>
-          <p class="text-right text-sm">
+          <p class="text-right text-sm hover:underline">
             <a class="text-app-white" href="https://www.google.com"
               >Edit this page on Github
               <div class="w-4">

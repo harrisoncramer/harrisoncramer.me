@@ -6,27 +6,17 @@ heroImage: /placeholder-hero.jpg
 ---
 import MyCounter from "../../components/MyCounter.tsx"
 
-Welcome to the blog section of my personal website!
+Welcome to the blog section of my personal website! This is where I'll share what I'm learning about in the software world, both at work and in my personal capacity.
 
-This is where I'll share what I'm learning about the various technologies at <a href="https://www.codesmith.io">Codesmith</a> during the June cohort, and beyond. 
+## What will you be writing about?
 
-## What is this site?
-
-I'm a former national security reporter, who recently left my job on Capitol Hill for the world of software development. I've wanted to build a site to post about what I'm learning in the world of software development for the past few years and finally got around to it.
-
-Previously, I'd done all of my personal journaling in an offline application, but wasn't the best for sharing my own learnings with others. This site is an an attempt to share what I'm learning with other aspiring software developers who may be figuring out some of the same technologies.
-
-## What are you going to write about?
-
-I'll be focused mostly on Javascript and Typescript for the next few months, but will likely occasionally upload posts relating to Docker, Kubernetes, and other CI/CD technologies. I'm also learning Golang and will probably post about that occasionally. I'm also a vim user, and will ocassionally post about some of the things I'm learning about the editor—whether it's new plugins that speed up productivity, or built-in features that I'm learning to master, like the quickfix list.
+I'll be focused mostly on Typescript and Golang, but will also upload posts relating to Docker, Kubernetes, and other technologies I'm interested in. I'm also an avid Neovim user, and will ocassionally post about some of the things I'm learning about the editor—whether it's new plugins that speed up productivity, or built-in features that I'm learning to master.
 
 Most of the posts will be for my own reference and will therefore be explanatory or otherwise instructional.
 
 ## What's the technology stack of this site?
 
-Unlike pre-baked blogging platforms like Medium, this site is built entirely from the ground up. That lets me easily share my content with others and migrate to another system more easily, should I choose to move away from a static site generator. The application is built on <a href="https://www.astro.build">Astro</a> with a CI/CD pipeline using Github Actions. It is hosted on AWS using <a href="https://www.terraform.io/">Terraform</a>. The source code is <a href="https://github.com/harrisoncramer/harrisoncramer.me">here</a>.
-
-The posts in this section are originally written in markdown and converted to HTML. I'll style code snippets like this:
+This site is built on <a href="https://www.astro.build">Astro</a> with a CI/CD pipeline using Github Actions. It is hosted on AWS using <a href="https://www.terraform.io/">Terraform</a>. The source code is <a href="https://github.com/harrisoncramer/harrisoncramer.me">here</a>. The posts in this section are originally written in markdown and converted to HTML. I'll style code snippets like this:
 
 
 ```javascript
@@ -42,7 +32,5 @@ Finally, because Astro supports embedding Javascript into markdown via MDX, we c
 <MyCounter client:load />
 
 The above counter is a React component that I've embedded into the Markdown on this page!
-
-## Final Thoughts
 
 I've recently migrated this entire site from Gatsby (booo, hiss) to Astro. There are likely to be weird quirks or UI bugs. If anything is confusing or looks off, please let me know!
