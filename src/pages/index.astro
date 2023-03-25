@@ -1,35 +1,25 @@
 ---
 import Layout from "../layouts/Layout.astro";
+// import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf()
+);
 ---
 
-<Layout title="harrisoncramer.me">
-  <div>
-    <h1>Welcome!</h1>
-    <p>
-      You're probably looking for the <a href="/blog">software blog</a>.
-    </p>
-    <h2>What is this site?</h2>
-    <p>
-      This blog is intended to serve as a resource for other developers using
-      Kubernetes, Vue, GraphQL, Golang, and much more. It's built with Gatsby,
-      CircleCI for CI/CD, and Terraform.
-    </p>
-    <p>
-      Please make a pull request if you want to fix a bug or suggest a feature.
-      The{" "}
-      <a href="https://github.com/harrisoncramer/harrisoncramer.me">
-        repository
-      </a>{" "}
-      is on Github.
-    </p>
-  </div>
+<Layout>
+  <main>
+    <section>
+      <ul>
+        {
+          posts.map((post) => (
+            <li>
+              <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
 </Layout>
-
-<style>
-  h2 {
-    @apply my-4;
-  }
-  p {
-    @apply my-2;
-  }
-</style>
