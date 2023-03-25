@@ -21,6 +21,9 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
       .last-updated-on {
         font-style: italic;
       }
+      .blog-post-content {
+        @apply flex flex-col gap-6 mt-8 mb-24;
+      }
     </style>
   </head>
 
@@ -62,7 +65,9 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
             />
           )
         }
-        <slot />
+        <div class="blog-post-content">
+          <slot />
+        </div>
       </article>
     </main>
   </body>

@@ -23,11 +23,10 @@ Most of the posts will be for my own reference and will therefore be explanatory
 
 ## What's the technology stack of this site?
 
-Unlike pre-baked blogging platforms like Medium, this site is built entirely from the ground up. That lets me easily share my content with others and migrate to another system more easily, should I choose to move away from a static site generator. The application is built on <a href="https://www.gatsby.io">Gatsby</a> with a CI/CD pipeline using <a href="http://circleci.com/">CircleCI</a>, and is hosted on AWS using <a href="https://www.terraform.io/">Terraform</a>. The source code is <a href="https://github.com/harrisoncramer/harrisoncramer.me">here</a>.
+Unlike pre-baked blogging platforms like Medium, this site is built entirely from the ground up. That lets me easily share my content with others and migrate to another system more easily, should I choose to move away from a static site generator. The application is built on <a href="https://www.astro.build">Astro</a> with a CI/CD pipeline using Github Actions. It is hosted on AWS using <a href="https://www.terraform.io/">Terraform</a>. The source code is <a href="https://github.com/harrisoncramer/harrisoncramer.me">here</a>.
 
 The posts in this section are originally written in markdown and converted to HTML. I'll style code snippets like this:
 
-Thanks to a number of plugins available through Gatsby, namely `gatsby-transformer-remark` + `gatsby-remark-prismjs`, we can include styled code:
 
 ```javascript
 var a, b, c;
@@ -37,6 +36,4 @@ c = a + b;
 document.getElementById('demo1').innerHTML = c;
 ```
 
-We can also include images thanks to the `gatsby-remark-images` plugin:
-
-![I'm some alternate text for this image](/example-image.png "These are some of the styles used in this site.")
+If anything is confusing or looks off, please let me know!
