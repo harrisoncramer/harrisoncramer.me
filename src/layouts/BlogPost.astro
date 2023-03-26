@@ -3,7 +3,8 @@ import { Image } from "@astrojs/image/components";
 import type { CollectionEntry } from "astro:content";
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, heroImage, imageDescription } =
+  Astro.props;
 const dateOptions: object = {
   year: "numeric",
   month: "long",
@@ -62,11 +63,14 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
         {
           heroImage && (
             <Image
+              format="avif"
               width={900}
-              height={400}
+              aspectRatio={16 / 9}
               src={import(`../assets/posts/${heroImage}.png`)}
-              alt=""
+              alt={imageDescription}
               class="mb-4"
+              fit="cover"
+              background="white"
             />
           )
         }
