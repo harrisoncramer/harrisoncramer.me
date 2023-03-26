@@ -1,11 +1,11 @@
 ---
 import { Icon } from "astro-icon";
-const { filename } = Astro.props;
+const { title } = Astro.props;
 ---
 
 <div class="code-block">
   <div class="title-info">
-    <div class="bg-app-black">{filename}</div>
+    <div class="bg-app-black">{title}</div>
     <div class="w-4">
       <Icon class="content-copy" pack="mdi" name="content-copy" />
     </div>
@@ -19,18 +19,15 @@ const { filename } = Astro.props;
   .code-block {
     @apply pt-2 bg-app-black;
   }
+
+  pre.astro-code {
+    @apply bg-app-black text-lg;
+  }
   .code-block .title-info {
     @apply flex items-center justify-end gap-2 mr-4 text-right text-app-gray font-sans;
   }
-  .content-copy {
-    @apply cursor-pointer;
+
+  .code-block .title-info:hover {
+    @apply text-app-white cursor-pointer;
   }
 </style>
-
-<script is:inline>
-  const copier = document.querySelector(".content-copy");
-  copier.addEventListener("click", () => {
-    const content = document.querySelector(".content-slot").innerText;
-    navigator.clipboard.writeText(content);
-  });
-</script>

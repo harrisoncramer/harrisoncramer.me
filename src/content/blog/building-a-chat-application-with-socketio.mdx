@@ -3,6 +3,7 @@ title: Building a chat application with SocketIO
 pubDate: 2021-08-07
 description: Websockets are a great way to breathe life into an otherwise stale application. Implement them easily with SocketIO, the defacto standard for NodeJS applications.
 heroImage: /posts/heros/socket.jpeg
+imageDescription: Socket
 ---
 import Code from "../../components/Code.astro"
 
@@ -15,7 +16,7 @@ The completed project can be downloaded <a href="https://s3.amazonaws.com/harris
 ## The project structure
 
 Our project is going to have only a few files. Here's what the entirety of our structure will be once we're done:
-```text
+```plaintext
 node_modules/
 package.json
 index.html
@@ -27,7 +28,7 @@ client.js
 
 Let's install our packages first, all we'll need is `socket.io` (note the period) and `express` to run our server. We're going to install `nodemon` as well so that our server restarts with every change.
 
-```text
+```plaintext
 $ npm init -y
 $ npm i express socket.io
 $ npm i -D nodemon
@@ -35,7 +36,7 @@ $ npm i -D nodemon
 
 Then we'll create our `index.html` file that we'll be serving. We'll require `socket.io` in a script tag at the top of this file, and we'll also request the client-side javascript.
 
-<Code filename={'index.html'} >
+<Code title={'index.html'} >
 ```html
 <!DOCTYPE html>
 <html>
@@ -70,13 +71,14 @@ The user will also be able to disconnect from our server entirely by clicking th
 
 Let's create a dummy javascript file for the client, for now. This is the file that is required by the script tag at the bottom of our index page:
 
-```javascript:title=client.js
+```javascript
 console.log("Hello!")
 ```
 
 Finally, we'll set our express server next to serve these files.
 
-```javascript:title=server.js
+<Code title={"server.js"}>
+```javascript
 const express = require("express");
 const app = express();
 app.get("/", (req, res) => {
@@ -91,10 +93,11 @@ app.listen(3000, () => {
   console.log("listening on *:3000");
 });
 ```
+</Code>
 
 Let's start our application. I'm going to be using nodemon.
 
-```text
+```plaintext
 $ nodemon server.js
 ```
 
@@ -106,7 +109,8 @@ When we use websockets, we need to configure a bare HTTP server. That's because 
 
 That requires us to rewrite our server file slightly. Here's the edited version. Notice that we're <a href="https://stackoverflow.com/questions/17696801/express-js-app-listen-vs-server-listen">creating our own HTTP server</a> now; we're not relying on Express to create the HTTP server for us.
 
-```javascript{3-11,21}:title=server.js
+<Code title={"server.js"}>
+```javascript
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -131,6 +135,7 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 ```
+</Code>
 
 The last thing that we need to do is actually open a websockets connection from our frontend. Remember, because of the order of the script tags in our index file, the socketio library is available as a global variable. If you were using React, you'd have to import this library yourself.
 
@@ -140,10 +145,12 @@ Let's add the following line to our client file. We pass in as an argument to th
 
 This will make that request for an upgrade to our backend to a WebSockets connection.
 
-```javascript:title=client.js
+<Code title={"client.js"}>
+```javascript
 console.log("Hello!")
 const socket = io("ws://localhost:3000");
 ```
+</Code>
 
 Now when we visit our page, we should see "A user connected" in our terminal.
 
@@ -151,17 +158,20 @@ Now when we visit our page, we should see "A user connected" in our terminal.
 
 Now that we've got a client connected to our SocketIO server, we can send and recieve data. This is done in SocketIO with the "emit" method. Let's write a simple emit from the client that will send back a message to the server.
 
-```javascript{3}:title=client.js
+<Code title={"client.js"}>
+```javascript
 console.log("Hello!")
 const socket = io();
 socket.emit("Hello from the client.");
 ```
+</Code>
 
 Now, inside of the server file, we need to listen for events. Let's use the `onAny` method, which listens for all events. That accepts a callback, which takes the event data as arguments. If we passed multiple strings, they would be picked up in sequence.
 
 The function should be put inside the connection callback, because each `socket` variable refers to a client's connection to the server.
 
-```javascript{11-13}:title=server.js
+<Code title={"server.js"}>
+```javascript
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -189,6 +199,7 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 ```
+</Code>
 
 If we make a new connection to this server, we should now see "Hello from the client!" appear in our terminal. That's because our client "emitted" that data, and our server picked it up.
 
@@ -202,15 +213,18 @@ Since we're creating a "chat" application, it makes sense to create a chat names
 
 Next, let's emit a "message" event. On the server, we can now listen for the "message" event and respond accordingly, rather than responding to any event. Our code is now a bit more semantic.
 
-```javascript{2}:title=client.js
+<Code title={"client.js"}>
+```javascript
 console.log("Hello!")
 const socket = io("ws://localhost:3000/chat");
 socket.emit("message", "Hello from the client.");
 ```
+</Code>
 
 Rather than responding to *all* events in our "chat" namespace, let's only handle "message" events for now.
 
-```javascript{11-13}:title=server.js
+<Code title={"server.js"}>
+```javascript
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -238,6 +252,7 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 ```
+</Code>
 
 We should now still see the chat coming from the client. The difference here is that our client emitted a "message" event specically to the "chat" namespace.
 
@@ -245,7 +260,8 @@ We should now still see the chat coming from the client. The difference here is 
 
 Let's wire up the rest of our frontend. We'll scrap the code we just wrote (it was only for explanation purposes). Instead, we'll be emitting various events to our backend, depending on what action occurs. Those events will ocur on button clicks and form submissions. 
 
-```javascript:title=client.js
+<Code title={"client.js"}>
+```javascript
 const socket = io('ws://localhost:3000/chat');
 
 const form = document.getElementById('form');
@@ -268,12 +284,14 @@ socket.on('chat', (data) => {
   console.log(data);
 });
 ```
+</Code>
 
 When the form is submitted, the user (who is connected to the "chat" namespace) will emit a "message" that will contain the form's contents. We'll then clear the form.
 
 On the backend, we can listen for the "message" event and respond by re-emitting the message out to anyone inside of the "chat" namespace. The `socket.broadcast.emit()` method lets us send the message out to everyone *except* for the user who initially sent it.
 
-```javascript{11-13}:title=server.js
+<Code title={"server.js"}>
+```javascript
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -301,6 +319,7 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 ```
+</Code>
 
 If we open up two browsers to our application, we should be able to send messages back and forth between them. Those messages will get displayed in the console.
 
@@ -320,7 +339,8 @@ Let's make a "special" room on our server, so that only people who are in the sp
 
 First, let's add a button to the frontend that will emit a "join" event to the backend, and pass it the name of the room we want to join. We can also wire up another button to leave the room.
 
-```javascript{23-32}:title=client.js
+<Code client title={"client.js"}>
+```javascript
 const socket = io('ws://localhost:3000/chat');
 
 const form = document.getElementById('form');
@@ -354,10 +374,12 @@ leaveSpecial.addEventListener('click', () => {
   socket.emit('leave', 'special');
 });
 ```
+</Code>
 
 Now, we can handle the "join" and "leave" events on the backend. Let's add that now.
 
-```javascript{15-23}:title=server.js
+<Code server title={"server.js"}>
+```javascript
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -396,12 +418,14 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 ```
+</Code>
 
 This code will join the user to the room that is specified in the event. Now, on the frontend, users can emit a "join" and pass it the name they want to join. 
 
 If you look at our `index.html` file, you'll notice that we have a form for the special room. Let's wire up the frontend so that the form submits a `special-message` to the backend.
 
-```javascript{32-41}:title=client.js
+<Code client title={"client.js"}>
+```javascript
 const socket = io('ws://localhost:3000/chat');
 
 const form = document.getElementById('form');
@@ -444,10 +468,12 @@ specialForm.addEventListener('submit', function (e) {
   }
 });
 ```
+</Code>
 
 Now, on the backend, we will listen for the `special-message` and we will re-emit the data to anyone who has joined the special room.
 
-```javascript{25-27}:title=server.js
+<Code server title={"server.js"}>
+```javascript
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -490,6 +516,7 @@ server.listen(3000, () => {
   console.log("listening on *:3000");
 });
 ```
+</Code>
 
 Notice the syntax here: The `socket.to()` method accepts the room name as it's sole argument, and then emits a "chat" message to that room. It passes back in the message from the original sender. Any of the users who have joined the special room will then recieve that message.
 
