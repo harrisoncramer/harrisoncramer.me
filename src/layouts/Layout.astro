@@ -68,6 +68,20 @@ const { title, description } = Astro.props;
     .astro-code code {
       @apply px-6 py-4 flex flex-col gap-1 bg-app-black;
     }
+
+    /* Loading image */
+    .skeleton {
+      animation: skeleton-loading 0.5s linear infinite alternate;
+    }
+
+    @keyframes skeleton-loading {
+      0% {
+        @apply bg-app-background-medium;
+      }
+      100% {
+        @apply bg-app-background-medium-dark;
+      }
+    }
   </style>
 
 

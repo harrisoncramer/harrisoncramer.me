@@ -33,6 +33,8 @@ module.exports = {
       'app-black': '#0d0d0d',
       'app-header': '#f8b591',
       'app-background-dark': '#141414',
+      'app-background-medium-dark': '#1e1e1e',
+      'app-background-medium': '#2e2e2e',
       'app-background-light': '#242424',
       'app-gray': '#C9D1D9',
       'app-gray-light': '#f8f8ff',
