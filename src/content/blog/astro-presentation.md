@@ -2,7 +2,7 @@
 title: What is Astro?
 pubDate: 2023-03-26
 description: This explains the use-case for Astro and it's strengths as a framework.
-heroImage: /posts/heros/astronaut.jpg
+heroImage: astronaut
 imageDescription: An image of an astronaut
 ---
 
