@@ -2,17 +2,24 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout>
+<Layout
+  title={"Contact page"}
+  description={"The best way to contact me, Harrison Cramer"}
+>
   <h1>Contact</h1>
   <div>
     <p>
       Twitter:{" "}
-      <a href="https://twitter.com/harrisoncramer">@harrisoncramer</a>
+      <a aria-label="Twitter" href="https://twitter.com/harrisoncramer"
+        >@harrisoncramer</a
+      >
     </p>
   </div>
   <div>
     <p>
-      Github: <a href="https://github.com/harrisoncramer">harrisoncramer</a>
+      Github: <a aria-label="Github" href="https://github.com/harrisoncramer"
+        >harrisoncramer</a
+      >
     </p>
   </div>
   <div>

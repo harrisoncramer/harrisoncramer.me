@@ -7,16 +7,16 @@ imageDescription: Socket
 ---
 import Code from "../../components/Code.astro"
 
-Adding real-time chat functionality can be a great way of spicing up an otherwise vanilla application. Although the underlying technology—websockets—is far from simple, implementing it with <a href="https://socket.io/">SocketIO</a> is surprisingly simple.
+Adding real-time chat functionality can be a great way of spicing up an otherwise vanilla application. Although the underlying technology—websockets—is far from simple, implementing it with <a aria-label="socket IO's website" href="https://socket.io/">SocketIO</a> is surprisingly simple.
 
 This post will walk through the basics of setting up a SocketIO server. We'll keep the rest of the application very simple—using vanilla Javascript, with no CSS styling. The same principles would apply here for a production-grade application using Webpack and React, however.
 
-The completed project can be downloaded <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/socketio.tar.gz">here</a>.
+The <a aria-label="s3 bucket for project files" href="https://s3.amazonaws.com/harrisoncramer.me.assets/socketio.tar.gz">completed project</a> is available for download.
 
 ## The project structure
 
 Our project is going to have only a few files. Here's what the entirety of our structure will be once we're done:
-```plaintext
+```
 node_modules/
 package.json
 index.html
@@ -28,7 +28,7 @@ client.js
 
 Let's install our packages first, all we'll need is `socket.io` (note the period) and `express` to run our server. We're going to install `nodemon` as well so that our server restarts with every change.
 
-```plaintext
+```
 $ npm init -y
 $ npm i express socket.io
 $ npm i -D nodemon
@@ -97,7 +97,7 @@ app.listen(3000, () => {
 
 Let's start our application. I'm going to be using nodemon.
 
-```plaintext
+```
 $ nodemon server.js
 ```
 
@@ -107,7 +107,7 @@ Visiting `http://localhost:3000` should now server our files, and "Hello!" shoul
 
 When we use websockets, we need to configure a bare HTTP server. That's because websockets actually upgrades the user's connection from the HTTP protocol to the WSS protocol. The WebSocket client will initially send an HTTP request asking for a WebSocket connection, then the server will respond with an HTTP 101 response, to switch protocols. The client can then start to send and receive data in binary format.
 
-That requires us to rewrite our server file slightly. Here's the edited version. Notice that we're <a href="https://stackoverflow.com/questions/17696801/express-js-app-listen-vs-server-listen">creating our own HTTP server</a> now; we're not relying on Express to create the HTTP server for us.
+That requires us to rewrite our server file slightly. Here's the edited version. Notice that we're <a aria-label="stackoverflow" href="https://stackoverflow.com/questions/17696801/express-js-app-listen-vs-server-listen">creating our own HTTP server</a> now; we're not relying on Express to create the HTTP server for us.
 
 <Code title={"server.js"}>
 ```javascript

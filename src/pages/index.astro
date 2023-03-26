@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-// import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("blog")).sort(
@@ -8,14 +8,16 @@ const posts = (await getCollection("blog")).sort(
 );
 ---
 
-<Layout>
+<Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <main>
     <section>
       <ul>
         {
           posts.map((post) => (
             <li>
-              <a href={`/${post.slug}`}>{post.data.title}</a>
+              <a aria-label={post.data.title} href={`/${post.slug}`}>
+                {post.data.title}
+              </a>
             </li>
           ))
         }

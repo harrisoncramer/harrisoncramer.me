@@ -6,66 +6,69 @@ import "@fontsource/raleway";
 
 import Header from "../components/Header";
 import "normalize.css";
-const { title } = Astro.props;
+const { title, description } = Astro.props;
 ---
 
-<div>
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
     <title>{title}</title>
   </head>
   <Header client:load />
   <div class="content-wrapper">
     <slot />
   </div>
-</div>
-
-<style is:global>
-  html,
-  body {
-    @apply bg-app-background-dark text-app-white;
-    height: 100%;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  form {
-    font-family: "Playfair Display";
-    font-weight: 500;
-  }
-
-  /* Increase title size on computers */
-  @media only screen and (min-width: 875px) {
-    h1 {
-      font-size: 2.75em;
+  <style is:global>
+    html,
+    body {
+      @apply bg-app-background-dark text-app-white;
+      height: 100%;
     }
-  }
 
-  h2 {
-    font-size: 1.75em;
-  }
+    h1,
+    h2,
+    h3,
+    h4,
+    form {
+      font-family: "Playfair Display";
+      font-weight: 500;
+    }
 
-  p,
-  li {
-    font-size: 1.2em;
-    font-family: "Lora";
-  }
+    /* Increase title size on computers */
+    @media only screen and (min-width: 875px) {
+      h1 {
+        font-size: 2.75em;
+      }
+    }
 
-  a {
-    color: #9ec4ff;
-  }
+    h2 {
+      font-size: 1.75em;
+    }
 
-  .content-wrapper {
-    padding: 1em;
-    display: flex;
-    flex-direction: column;
-    max-width: 900px;
-    margin: 0 auto;
-  }
+    p,
+    li {
+      font-size: 1.2em;
+      font-family: "Lora";
+    }
 
-  .astro-code code {
-    @apply px-6 py-4 flex flex-col gap-1 bg-app-black;
-  }
-</style>
+    a {
+      color: #9ec4ff;
+    }
+
+    .content-wrapper {
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .astro-code code {
+      @apply px-6 py-4 flex flex-col gap-1 bg-app-black;
+    }
+  </style>
+
+
+</html>

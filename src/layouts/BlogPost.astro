@@ -17,6 +17,7 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
 
 <html lang="en">
   <head>
+    <title>{title}</title>
     <style>
       .last-updated-on {
         font-style: italic;
@@ -34,10 +35,14 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
         <div class="flex items-center gap-2 mb-1">
           <date class="flex-1 font-playfair">{formattedPublishDate}</date>
           <p class="text-right text-sm hover:underline">
-            <a class="text-app-white" href="https://www.google.com"
+            <a
+              class="text-app-white"
+              href="https://www.google.com"
+              aria-label="edit this page on Github"
               >Edit this page on Github
               <div class="w-4">
-                <svg viewBox="0 0 128 128">
+                <svg role="img" viewBox="0 0 128 128">
+                  <title>Github icon</title>
                   <g fill="white">
                     <path
                       fill-ule="evenodd"
@@ -53,7 +58,11 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
             </a>
           </p>
         </div>
-        {heroImage && <img src={heroImage} alt="" class="mb-4" />}
+        {
+          heroImage && (
+            <img width="900" height="400" src={heroImage} alt="" class="mb-4" />
+          )
+        }
         <div class="blog-post-content">
           <slot />
         </div>
