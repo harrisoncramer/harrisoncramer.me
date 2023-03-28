@@ -1,0 +1,36 @@
+---
+import { Image } from "@astrojs/image/components";
+import type { CollectionEntry } from "astro:content";
+interface Props {
+  post: CollectionEntry<"blog">;
+  featured?: boolean;
+}
+
+const dateOptions: object = {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+};
+const { post, featured } = Astro.props;
+---
+
+<li class={`${featured ? "mb-12" : ""}`}>
+  <a class="text-app-white" aria-label={post.data.title} href={`/${post.slug}`}>
+    <Image
+      format="avif"
+      width={featured ? 900 : 450}
+      aspectRatio={16 / 9}
+      src={import(`../assets/posts/${post.data.heroImage}.png`)}
+      alt={post.data.imageDescription}
+      class="skeleton"
+      fit="cover"
+    />
+    <h2 class="mt-2">
+      {post.data.title}
+    </h2>
+    <date class="flex-1 font-playfair text-sm block mt-2 mb-4"
+      >{new Date(post.data.pubDate).toLocaleDateString("en-US", dateOptions)}
+    </date>
+    <p class="text-lg">{post.data.description}</p>
+  </a>
+</li>
