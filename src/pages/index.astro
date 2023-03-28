@@ -16,7 +16,7 @@ const posts = (await getCollection("blog")).sort(
         post={posts.at(0) as CollectionEntry<"blog">}
         featured={true}
       />
-      <ul class="grid grid-cols-2 gap-6">
+      <ul class={"all-posts"}>
         {
           posts
             .slice(1, posts.length)
@@ -26,3 +26,22 @@ const posts = (await getCollection("blog")).sort(
     </section>
   </main>
 </Layout>
+
+<style is:global>
+  .all-posts .post {
+    @apply mb-16;
+  }
+  @media only screen and (min-width: 800px) {
+    .all-posts {
+      @apply grid grid-cols-2 gap-6;
+    }
+
+    .all-posts img {
+      @apply w-full;
+    }
+
+    .all-posts .post {
+      @apply mb-8;
+    }
+  }
+</style>
