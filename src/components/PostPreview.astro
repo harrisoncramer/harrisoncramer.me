@@ -14,7 +14,7 @@ const dateOptions: object = {
 const { post, featured } = Astro.props;
 ---
 
-<li class={`${featured ? "mb-12" : ""}`}>
+<li class={`${featured ? "mb-12 list-none" : ""}`}>
   <a class="text-app-white" aria-label={post.data.title} href={`/${post.slug}`}>
     <Image
       format="avif"
