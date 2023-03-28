@@ -1,0 +1,37 @@
+<ul class="share-buttons" data-source="simplesharingbuttons.com">
+  <li>
+    <a
+      href="https://twitter.com/intent/tweet?source=http%3A%2F%2Fharrisoncramer.me&text=:%20http%3A%2F%2Fharrisoncramer.me"
+      target="_blank"
+      title="Tweet"
+      onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(document.title) + ':%20'  + encodeURIComponent(document.URL)); return false;"
+    >
+      <img class="bg-app-black" alt="Tweet" src="twitter.svg" />
+    </a>
+  </li>
+  <li>
+    <a
+      href="http://www.reddit.com/submit?url=http%3A%2F%2Fharrisoncramer.me&title="
+      target="_blank"
+      title="Submit to Reddit"
+      onclick="window.open('http://www.reddit.com/submit?url=' + encodeURIComponent(document.URL) + '&title=' +  encodeURIComponent(document.title)); return false;"
+    >
+      <img class="bg-app-white invert" src="reddit.svg" alt="reddit" />
+    </a>
+  </li>
+</ul>
+
+<style>
+  ul.share-buttons {
+    @apply flex flex-row justify-end;
+    list-style: none;
+  }
+
+  ul.share-buttons img {
+    @apply w-8;
+  }
+
+  ul.share-buttons li:hover {
+    @apply opacity-90;
+  }
+</style>

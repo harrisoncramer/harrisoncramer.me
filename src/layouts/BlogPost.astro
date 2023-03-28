@@ -1,4 +1,5 @@
 ---
+import Social from "../components/Social.astro";
 import { Image } from "@astrojs/image/components";
 import type { CollectionEntry } from "astro:content";
 type Props = CollectionEntry<"blog">["data"];
@@ -62,15 +63,18 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
         </div>
         {
           heroImage && (
-            <Image
-              format="avif"
-              width={900}
-              aspectRatio={16 / 9}
-              src={import(`../assets/posts/${heroImage}.png`)}
-              alt={imageDescription}
-              class="mb-4 skeleton"
-              fit="cover"
-            />
+            <>
+              <Image
+                format="avif"
+                width={900}
+                aspectRatio={16 / 9}
+                src={import(`../assets/posts/${heroImage}.png`)}
+                alt={imageDescription}
+                class="skeleton"
+                fit="cover"
+              />
+              <Social />
+            </>
           )
         }
         <div class="blog-post-content">
