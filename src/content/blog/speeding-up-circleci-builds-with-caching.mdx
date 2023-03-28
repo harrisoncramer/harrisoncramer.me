@@ -6,8 +6,10 @@ imageDescription: An image of a child staring at steps.
 heroImage: sharing
 tags: ["circleci", "ci/cd"]
 ---
+import Code from "../../components/Code.astro"
 
 ## Why do we need faster deployments?
+
 When building out a deployment pipeline for an application, it's important to get feedback about the build quickly. Ultimately, a quicker pipeline leads to code reaching a production environment more frequently and in smaller chunks. This ensures rapid iteration for developers, who won't be waiting around for a massive build before continuing on to the next feature.
 
 The faster deployment cycle also facilitates better debugging and rollback. It's much easier to debug code you've written three minutes ago, versus a half hour ago. And rolling back each small feature is effortless, compared to rolling back a massive, jumbled commit.
@@ -16,7 +18,8 @@ The faster deployment cycle also facilitates better debugging and rollback. It's
 
 Let's say our simple NodeJS application relies on a few packages to function. It's a simple Express application that reaches out to another API and provides JSON data back at a specific endpoint. This is the entire application:
 
-```javascript:title=index.js
+<Code title={'index.js'}>
+```javascript
 const express = require("express");
 const axios = require("axios");
 
@@ -38,8 +41,8 @@ app.get("/", async (req, res) => {
 app.listen(port, () => {
   console.log("Application running on port " + port);
 });
-
 ```
+</Code>
 
 Let's say we're trying to build a basic continuous integration setup for this project (we'll leave deployment aside for the moment) in order to ensure that our code passes checks before merging it into master. We might want to do a two things:
 1. Lint the code. 
@@ -47,7 +50,9 @@ Let's say we're trying to build a basic continuous integration setup for this pr
 
 Let's build a pipeline that does each of those jobs by running scripts inside our package.json file:
 
-```yaml{14,23}:title=.circleci/config.yml
+14/23
+<Code title={".circleci/config.yml"}>
+```yaml
 version: 2.1
 executors:
   app-executor:
@@ -80,6 +85,7 @@ workflows:
           requires:
             - lint
 ```
+</Code>
 
 Both jobs run `npm install` in order to download our dependencies. This isn't ideal, because the dependencies aren't actually changing and our pipeline is doing extra work. These installs will also take more time as the project grows in size, both because our dependency list will grow, and because we will have more jobs re-fetching the dependencies.
 
@@ -89,7 +95,9 @@ The simplest way to boost the speed of our pipeline is to implement CircleCI's c
 
 Let's set up the cache. We specify the creation of a cache as a separate `save_cache` step within the job that installs our dependencies. The step requires two fields: the `paths` and `key` fields. 
 
-```yaml{16-19,24-27,31}:title=.circleci/config.yml
+{16-19,24-27,31}
+<Code title=".circleci/config.yml">
+```yaml
 version: 2.1
 executors:
   app-executor:
@@ -114,6 +122,7 @@ workflows:
     jobs:
       - lint
 ```
+</Code>
 
 The `paths` key tells the cache what folders and files to save. In our case, we're only caching our dependencies.
 
@@ -125,7 +134,9 @@ Now, let's use that cache in another step.
 
 We can use the `restore_cache` step in our later jobs to fetch those dependencies, since our `package.json` doesn't change and the checksum will be the same.
 
-```yaml{24-27}:title=.circleci/config.yml
+{24-27}
+<Code title={".circleci/config.yml"}>
+```yaml
 version: 2.1
 executors:
   app-executor:
@@ -165,13 +176,15 @@ workflows:
           requires:
             - lint
 ```
+</Code>
+
 We pass an array of `keys` to the step, and it looks sequentially for hashes that match. When it finds one, it'll load those depedencies. 
 
 The second value in the array is known as a "fallback" and will allow CircleCI to load _part_ of our cache. For instance, if our package.json has changed slightly, we won't have to redownload everything.
 
 You'll see a message like this inside your workflow when the cache is created:
 
-```shell{3}
+```
 Creating cache archive...
 Uploading cache archive...
 Stored Cache to app-yircCA87nBHtoilUaSxwuZsPVx4OSrUcmpAoE45tPlo=
@@ -180,7 +193,7 @@ Stored Cache to app-yircCA87nBHtoilUaSxwuZsPVx4OSrUcmpAoE45tPlo=
 
 And a message like this when the cache is restored:
 
-```shell{1}
+```
 Found a cache from build 7 at app-yircCA87nBHtoilUaSxwuZsPVx4OSrUcmpAoE45tPlo=
 Size: 5.0 MiB
 Cached paths:
@@ -191,6 +204,7 @@ Validating cache...
 
 Unarchiving cache...
 ```
+
 Notice how the hashes of the cache matches. Now, every time you want to add another step to your workflow, you can just reference the cache created earlier and you'll only have to download the dependencies once. 
 
 ## Using orbs
@@ -201,7 +215,9 @@ Orbs are basically blocks of configuration that give us a shortcut to writing ou
 
 Here's the same functionality re-written with Orbs:
 
-```yaml{2-3,6,9}:title=.circleci/config.yml
+{2-3,6,9}:title=
+<Code title={".circleci/config.yml"}>
+```yaml
 version: 2.1
 orbs:
   node: circleci/node@4.5.1
@@ -218,6 +234,7 @@ workflows:
     jobs:
       - start
 ```
+</Code>
 
 Notice that we specify we want to use the orb on lines 2 and 3, and we pass in the `node/default` as our executor. Then, inside of the steps, we have access to a special step provided by that orb: the `node/install-packages` step. This step will take care of all of our caching for us.
 
