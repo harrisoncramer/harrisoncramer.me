@@ -1,12 +1,22 @@
 ---
 import type { CollectionEntry } from "astro:content";
+
+/* The getStaticPaths function returns an array of page routes, and all of the pages at those routes will use the same template defined in the file. */
 export async function getStaticPaths() {
   const tags = ["astro", "javascript", "typescript"].map((tag) => ({
     params: { tag },
   }));
   const allPosts = await Astro.glob("../../content/blog/*.md");
+
+  /* Create a page for each tag, passing in the tag as a parameter.
+  Pass in the tag as a parameter (which will replace [tag] in the file) 
+  and pass in the matching posts as props */
+
   return tags.map((value) => ({
     ...value,
+    params: {
+      tag: value.params.tag,
+    },
     props: {
       posts: allPosts.filter((post) =>
         post.frontmatter.tags?.includes(value.params.tag)
