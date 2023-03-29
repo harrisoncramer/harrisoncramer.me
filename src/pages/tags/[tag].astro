@@ -1,6 +1,8 @@
 ---
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 import { getCollection } from "astro:content";
 import PostPreview from "../../components/PostPreview.astro";
+import Layout from "../../layouts/Layout.astro";
 
 /* The getStaticPaths function returns an array of page routes, and all of the pages at those routes will use the same template defined in the file. */
 export async function getStaticPaths() {
@@ -29,13 +31,9 @@ const { tag } = Astro.params;
 const { posts } = Astro.props;
 ---
 
-<ul>
-  {
-    posts.map((post: any) => (
-      <>
-        <PostPreview post={post} featured={true} />
-      </>
-    ))
-  }
-</ul>
-<p>Posts tagged with {tag}</p>
+<Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <h2 class="mb-4">{tag[0].toUpperCase() + tag.slice(1)} posts</h2>
+  <ul class="all-posts">
+    {posts.map((post: any) => <PostPreview post={post} featured={true} />)}
+  </ul>
+</Layout>
