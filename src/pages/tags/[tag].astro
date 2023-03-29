@@ -1,25 +1,25 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import PostPreview from "../../components/PostPreview.astro";
 
 /* The getStaticPaths function returns an array of page routes, and all of the pages at those routes will use the same template defined in the file. */
 export async function getStaticPaths() {
   const tags = ["astro", "javascript", "typescript"].map((tag) => ({
     params: { tag },
   }));
-  const allPosts = await Astro.glob("../../content/blog/*.md");
 
+  const postsWithSlugs = await getCollection("blog");
   /* Create a page for each tag, passing in the tag as a parameter.
   Pass in the tag as a parameter (which will replace [tag] in the file) 
   and pass in the matching posts as props */
-
   return tags.map((value) => ({
     ...value,
     params: {
       tag: value.params.tag,
     },
     props: {
-      posts: allPosts.filter((post) =>
-        post.frontmatter.tags?.includes(value.params.tag)
+      posts: postsWithSlugs.filter((post) =>
+        post.data.tags?.includes(value.params.tag)
       ),
     },
   }));
@@ -27,17 +27,14 @@ export async function getStaticPaths() {
 
 const { tag } = Astro.params;
 const { posts } = Astro.props;
-type Post = {
-  frontmatter: CollectionEntry<"blog">["data"];
-};
 ---
 
 <ul>
   {
-    posts.map((post: Post) => (
-      <li>
-        <div>{post.frontmatter.title}</div>
-      </li>
+    posts.map((post: any) => (
+      <>
+        <PostPreview post={post} featured={true} />
+      </>
     ))
   }
 </ul>
