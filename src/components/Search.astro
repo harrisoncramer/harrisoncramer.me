@@ -1,11 +1,12 @@
-<input placeholder="Search" class="main-app-search" />
+---
+import { getCollection } from "astro:content";
+const posts = await getCollection("blog");
+const postData = JSON.stringify(posts);
+---
 
-<script>
-  const search = document.querySelector(".main-app-search");
-  search?.addEventListener("input", (e) => {
-    console.log(e.target.value);
-  });
-</script>
+<astro-search data-posts={postData}>
+  <input placeholder="Search" class="main-app-search" />
+</astro-search>
 
 <style>
   .main-app-search {
@@ -14,3 +15,28 @@
     font-family: Lora;
   }
 </style>
+
+<script>
+  class Search extends HTMLElement {
+    constructor() {
+      super();
+
+      // Read the message from the data attribute.
+      const posts = this.dataset.posts;
+      const input = this.querySelector("input");
+      input?.addEventListener("input", (e) => {
+        const query = e.target.value;
+        const data = JSON.parse(posts);
+        const results = data.filter((post) => {
+          if (post.data.title.includes(query)) return true;
+          if (post.data.description.includes(query)) return true;
+          if (post.slug.includes(query)) return true;
+        });
+
+        console.log(results);
+      });
+    }
+  }
+
+  customElements.define("astro-search", Search);
+</script>
