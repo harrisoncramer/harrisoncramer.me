@@ -1,42 +1,81 @@
 ---
-import { getCollection } from "astro:content";
+import { CollectionEntry, getCollection } from "astro:content";
 const posts = await getCollection("blog");
 const postData = JSON.stringify(posts);
 ---
 
 <astro-search data-posts={postData}>
   <input placeholder="Search" class="main-app-search" />
-</astro-search>
+  <div
+    class="absolute bg-app-background-dark pt-2 flex flex-col hidden cursor-pointer rounded-4"
+    id="search-results"
+  >
+  </div>
 
-<style>
-  .main-app-search {
-    @apply py-2 pl-2 border-b text-app-white bg-app-black outline-none;
-    border-bottom-color: rgb(40, 40, 40);
-    font-family: Lora;
-  }
-</style>
+  <style>
+    .main-app-search {
+      @apply py-2 pl-2 border-b text-app-white bg-app-black outline-none;
+      border-bottom-color: rgb(40, 40, 40);
+      font-family: Lora;
+    }
+  </style>
 
-<script>
-  class Search extends HTMLElement {
-    constructor() {
-      super();
+  <script>
+    class Search extends HTMLElement {
+      constructor() {
+        super();
 
-      // Read the message from the data attribute.
-      const posts = this.dataset.posts;
-      const input = this.querySelector("input");
-      input?.addEventListener("input", (e) => {
-        const query = e.target.value;
-        const data = JSON.parse(posts);
-        const results = data.filter((post) => {
-          if (post.data.title.includes(query)) return true;
-          if (post.data.description.includes(query)) return true;
-          if (post.slug.includes(query)) return true;
+        // Read the message from the data attribute.
+        const posts = this.dataset.posts;
+        const input = this.querySelector("input") as HTMLInputElement;
+
+        function removeResults() {
+          const searchResultsNode = document.querySelector(
+            "#search-results"
+          ) as HTMLElement;
+
+          while (searchResultsNode?.firstChild) {
+            searchResultsNode.removeChild(searchResultsNode.firstChild);
+          }
+        }
+
+        input?.addEventListener("input", (event: Event) => {
+          removeResults(event);
+
+          const searchResultsNode = document.querySelector(
+            "#search-results"
+          ) as HTMLElement;
+
+          const query = (event.target as HTMLInputElement).value;
+
+          searchResultsNode.classList.add("hidden");
+          if (query.length === 0) return;
+          searchResultsNode.classList.remove("hidden");
+
+          const results = JSON.parse(posts).filter((post) => {
+            if (post.data.title.includes(query)) return true;
+            if (post.data.description.includes(query)) return true;
+            if (post.slug.includes(query)) return true;
+          });
+
+          results.slice(0, 5).forEach((post) => {
+            const node = document.createElement("div");
+            node.addEventListener("mousedown", () => {
+              window.location.href = `/${post.slug}`;
+            });
+            node.classList.add("hover:bg-app-blue");
+            node.classList.add("hover:text-app-black");
+            node.classList.add("py-2");
+            node.classList.add("px-4");
+            node.textContent = post.data.title;
+            searchResultsNode?.appendChild(node);
+          });
         });
 
-        console.log(results);
-      });
+        input.addEventListener("blur", removeResults);
+      }
     }
-  }
 
-  customElements.define("astro-search", Search);
-</script>
+    customElements.define("astro-search", Search);
+  </script>
+</astro-search>
