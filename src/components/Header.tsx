@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react"
 import NavigationDropdown from "./NavigationDropdown"
+import type React from "react"
 
-const Search = (): JSX.Element => {
-  return (
-    <input placeholder="Search" className={'border-b border-solid border-app-gray text-app-white bg-app-black'} />
-  )
-}
+type HeaderProps = { children: React.ReactChild | React.ReactChild[] }
 
-const Header = (): JSX.Element => {
+const Header = ({ children }: HeaderProps): JSX.Element => {
 
   const [scrolling, setScrolling] = useState(false)
   const [scrollTop, setScrollTop] = useState(0)
@@ -29,11 +26,15 @@ const Header = (): JSX.Element => {
     return () => window.removeEventListener("scroll", onScroll)
   }, [scrollTop])
 
+  function handleChange(e: any) {
+    const search = e.target.value
+    console.log(search)
+  }
 
   return (
-      <nav className={`shadow z-10 p-4 gap-12 top-0 sticky flex items-center transition-opacity bg-app-black text-app-white ${scrolling ? 'opacity-0' : 'opacity-100'}`}>
+      <nav className={`shadow z-10 p-4 gap-4 top-0 sticky flex items-center transition-opacity bg-app-black text-app-white ${scrolling ? 'opacity-0' : 'opacity-100'}`}>
         <NavigationDropdown />
-        <Search />
+        { children }
       </nav>
   )
 }

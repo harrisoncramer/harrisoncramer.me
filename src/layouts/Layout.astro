@@ -5,6 +5,7 @@ import "@fontsource/playfair-display";
 import "@fontsource/raleway";
 
 import Header from "../components/Header";
+import Search from "../components/Search.astro";
 import "normalize.css";
 const { title, description } = Astro.props;
 ---
@@ -16,7 +17,9 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
     <title>{title}</title>
   </head>
-  <Header client:load />
+  <Header client:load>
+    <Search />
+  </Header>
   <div class="content-wrapper">
     <slot />
   </div>

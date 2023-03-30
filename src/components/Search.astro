@@ -1,0 +1,16 @@
+<input placeholder="Search" class="main-app-search" />
+
+<script>
+  const search = document.querySelector(".main-app-search");
+  search?.addEventListener("input", (e) => {
+    console.log(e.target.value);
+  });
+</script>
+
+<style>
+  .main-app-search {
+    @apply py-2 pl-2 border-b text-app-white bg-app-black outline-none;
+    border-bottom-color: rgb(40, 40, 40);
+    font-family: Lora;
+  }
+</style>
