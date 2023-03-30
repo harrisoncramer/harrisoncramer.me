@@ -17,7 +17,14 @@ const { tags } = post.data;
 
 <li class={`post ${featured ? "mb-12 list-none" : ""}`}>
   <div class="post-tags">
-    {tags && tags?.map((tag) => <a class="tag">{tag}</a>)}
+    {
+      tags &&
+        tags?.map((tag) => (
+          <a class="tag" href={`/tags/${tag}`}>
+            {tag}
+          </a>
+        ))
+    }
   </div>
   <a class="text-app-white" aria-label={post.data.title} href={`/${post.slug}`}>
     <Image
