@@ -306,7 +306,7 @@ For instance, let's set up a debugger for Node (server-side Javascript) now.
 
 First, let's add the debugger to our list of required debuggers (if you skipped this step earlier you can just install it manually with Mason):
 
-```lua{2}
+```lua {2}
 require("mason-nvim-dap").setup({
     ensure_installed = { "delve", "node2" }
 })
@@ -314,7 +314,7 @@ require("mason-nvim-dap").setup({
 
 Next we just need to add a configuration for JS files to our `dap.configurations` table:
 
-```lua{10-31}
+```lua {10-31}
 dap.configurations = {
     go = {
       {

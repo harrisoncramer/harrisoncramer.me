@@ -74,8 +74,29 @@ const { title, description } = Astro.props;
       margin: 0 auto;
     }
 
-    .astro-code code {
-      @apply px-6 py-4 flex flex-col gap-1 bg-app-black;
+    div[data-rehype-pretty-code-fragment] {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      max-width: 850px;
+      overflow: auto;
+      background-color: #212126;
+    }
+
+    pre > code > span {
+      background-color: #212126;
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    pre > code {
+      display: grid;
+      background-color: rgba(200, 200, 255, 0.09);
+    }
+    .highlighted {
+      background-color: rgba(200, 200, 255, 0.1);
+      border-left-color: #9ec4ff;
+      border-left-width: 3px;
+      border-left-style: solid;
     }
 
     /* Loading image */
