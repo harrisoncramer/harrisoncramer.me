@@ -18,7 +18,7 @@ The working files for this tutorial are online <a href="https://s3.amazonaws.com
 
 Before we start writing our code, let's review our what our directory structure should eventually look like:
 
-```shell:title=directory
+```bash:title=directory
 my_scraper/
   src/
     setupPuppeteer.ts
@@ -34,7 +34,7 @@ my_scraper/
 
 To begin creating our directory, let's create a `src` folder and create our `index.ts` file inside of it. We'll also run `npm init -y` inside our root folder, to initalize an npm directory, and `tsc init` which will create our `tsconfig.json` file. Next, let's install Puppeteer. I'm installing a specific version. We'll also need to install Typescript in order to compile our code, and `ts-node` to run our code in development:
 
-```shell
+```bash
 $ mkdir src
 $ touch src/index.ts
 $ npm init -y
@@ -44,7 +44,7 @@ $ npm install ts-node -D
 
 Great, now our directory should look like this:
 
-```shell:title=directory
+```bash:title=directory
 my_scraper/
   src/
     index.ts
@@ -149,7 +149,7 @@ execute();
 
 Let's try running our project locally first. Run our development script:
 
-```shell
+```bash
 $ npm run start
 ```
 
@@ -220,7 +220,7 @@ This is the basic structure of our scraper! We can easily now navigate to differ
 
 Let's build our project and run it to make sure that everything is working:
 
-```shell
+```bash
 $ npm run build
 $ node build/index.js
 
@@ -279,7 +279,7 @@ This lets us install Chromium using `apt-get` which is the package manager provi
 
 Now we can see the second change we'll have to make to our `setupPuppeteer.ts` file: We're installing Chromium inside of our Dockerfile, but we're not using it yet, because we're relying on the version that gets installed with puppeteer by default. We only need one of these installations. Let's change puppeteer to puppeteer-core, which does not install Chromium by itself.
 
-```shell
+```bash
 $ npm uninstall puppteer
 $ npm install puppeteer-core
 ```
@@ -376,7 +376,7 @@ At this point, we've got a container that will:
 
 We should now be able to build our image. Let's do that now, inside the root of our project.
 
-```shell
+```bash
 $ docker build -t docker-puppeteer .
 $ docker images
 REPOSITORY                       TAG       IMAGE ID       CREATED         SIZE
@@ -385,7 +385,7 @@ docker-puppeteer                 latest    eab61f8ff354   8 seconds ago   1.27GB
 
 In order to see that our scraper is running correctly, we can run it. This should pipe the output of our Docker container directly to our console, which will log the result to the screen, and then exit. That's it!
 
-```shell
+```bash
 $ docker run docker-puppeteer
 Configured puppeteer.
 Browser was disconnected.

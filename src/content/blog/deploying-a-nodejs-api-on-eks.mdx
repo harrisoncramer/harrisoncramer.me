@@ -51,7 +51,7 @@ Let's create a new user inside of the Identity Access Management (IAM) console i
 
 The screen will show you the credentials for the new user, which we're going to save: the `aws_access_key_id` and the `aws_secret_access_key`. We're putting both of these inside of the `~/.aws/credentials` file on our computer, user a new user. This is the file that the AWS CLI picks up when running commands.
 
-```text:title=~/.aws/credentials
+```text title="~/.aws/credentials"
 [eksctl]
 aws_access_key_id=AKIAQHIT7YWF2VDNJRHL
 aws_secret_access_key=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
@@ -59,13 +59,13 @@ aws_secret_access_key=cLz3BRObITWlkLtNUPSLhsJYwgpVx19BNsDigqqX
 
 Next, let's install the <a href="https://aws.amazon.com/cli/">AWS CLI</a> and ensure that it's working. I'll leave the installation of this CLI up to you.
 
-```text
+```bash
 $ aws --version 
 ```
 
 Now, we can switch to the specific AWS user we want. This will apply to the current shell. Let's check that we're using the right user with the `aws iam get-user` command:
 
-```text
+```bash
 $ export AWS_PROFILE=eksctl
 $ aws iam get-user
 {
@@ -84,14 +84,14 @@ If we try to create our resources without providing this authentication step, we
 
 Now that we have a user set up, let's create our AWS infrastructure. First, we're going to install the `eksctl` command line tool. I'm on a Mac, so I'll use brew:
 
-```text
+```bash
 $ brew tap weaveworks/tap
 $ brew install weaveworks/tap/eksctl
 ```
 
 The `eksctl` CLI takes a number of commands, but the one we're interested in is the `eksctl create cluster`. Let's see the various options available to us with the `--help` command.
 
-```text
+```bash
 $ eksctl create cluster --help
 ```
 
@@ -103,7 +103,7 @@ For reference, this is the <a href="https://eksctl.io/usage/schema/">documentati
 
 Let's create an `infrastructure` folder and place our file inside of it:
 
-```yaml:title=infrastructure/eksctl.yaml
+```yaml title="infrastructure/eksctl.yaml"
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -123,13 +123,13 @@ Our worker node group is going to have three of these nodes, and we're enabling 
 
 We can finally now tell `eksctl` to create our cluster. Let's do a dry run first to see what it would create. Notice that we did not set many of these fields, they were applied automatically by default.
 
-```text
+```bash
 $ eksctl create cluster --config-file infrastructure/cluster.yaml --dry-run
 ```
 
 Once we're happy with the output, lets create the cluster.
 
-```text
+```bash
 $ eksctl create cluster --config-file infrastructure/cluster.yaml
 ```
 
@@ -137,7 +137,7 @@ Thie command will take a while. Behind the scenes, it's going to create all the 
 
 We can also get a list of the nodegroups from our command line interface.
 
-```text
+```bash
 $ eksctl get nodegroup --cluster TestCluster
 ```
 
@@ -148,7 +148,7 @@ Still don't believe me? You can actually log into the EC2 instances that make up
 
 And because we enabled SSH access earlier, you can log into any of them with the ssh key:
 
-```text
+```bash
 $ ssh -i ~/.ssh/id_rsa ec2-user@your_node_ip_here
 ```
 
@@ -159,14 +159,14 @@ Great! Our cluster is up and running, and ready to start running our containers.
 
 Let's create a simple API to deploy to our EKS cluster. We're going to create a basic Express server that dishes up some random information at the `/api` route. Let's initialize our npm repository and install a few dependencies:
 
-```text
+```bash
 $ npm init -y
 $ npm install express faker
 ```
 
 The API is pretty simple, we're using the `faker` package to generate some dummy data every time that request is made to our server and we're dishing up that JSON content at the `/api` route:
 
-```javascript:title=index.js
+```javascript title="index.js"
 const express = require("express");
 const faker = require("faker");
 const app = express();
@@ -208,7 +208,7 @@ The Dockerfile is also going to be pretty bare bones. We're building off of the 
 
 In our Dockerfile, we're setting a work directory inside the container, copying over and installing our dependencies, and copying over our code. The only thing to note here is that the EXPOSE keyword <a href="https://docs.docker.com/engine/reference/builder/#expose">does not actually</a> expose that port, we need to do it when we run the container.
 
-```docker:title=Dockerfile
+```dockerfile title="Dockerfile"
 FROM node:14-alpine
 RUN apk --no-cache add curl
 
@@ -224,13 +224,13 @@ CMD ["node", "index.js"]
 
 Let's build the container. If you haven't signed up for an account on Docker Hub, make sure you do that now. Then, make sure you prefix the image with your username so that you can publish it to Docker Hub.
 
-```text
+```bash
 $ docker build -t kingofcramers/random-data .
 ```
 
 Let's test it out now locally. The `-dit` flags tell the container to run in detatched mode and accept text input (in case we want to ssh into it) and the `-p` flag maps the port to our local machine. If you curl the endpoint, you should get the dummy data in return.
 
-```text
+```bash
 $ docker run -dit -p 3005:3005 kingofcramers/random-data
 9dd0475c3fe9bba5119594cbf676ee582fbce4163dc93ad05846cf4c385b0e0b
 $ curl localhost:3005/api
@@ -239,7 +239,7 @@ $ curl localhost:3005/api
 
 With our POST request, we should also see the user's headers logged within the container. Let's try making a POST request to the `/api` route.
 
-```text
+```bash
 $ curl -d '{ "hello": "there" }' -H 'Content-Type: application/json' http://localhost:3005/api
 {"hello":"there"} 
 $ docker logs 9dd04
@@ -255,7 +255,7 @@ POST Request recieved, headers are:  {
 
 Finally, we want to push our Docker image up to Docker hub:
 
-```text
+```bash
 $ docker push kingofcramers/random-data
 ```
 
@@ -273,7 +273,7 @@ Some of the commands that we'll run from here on out will be one-liners, but the
 
 Quick note: when we do apply our configuration files, `kubectl` will create the resources inside of the "context" in which it's operating. If the context is not your EKS cluster, then switch it:
 
-```text
+```bash
 $ k config use-context eksctl@TestCluster.us-east-1.eksctl.io
 ```
 
@@ -286,7 +286,7 @@ Now when we send commands through `kubectl` we will send them to the correct clu
 
 Let's create the configuration file for our pod. Notice that it specifies the API version that we're using, and describes the `kind` of resource we want to create (in this case, a pod). The `spec` field provides details about the pod, like the containers, volumes, and other data. In this case specifically, it details a single `containers` field that gives a list of the containers we want and where to find their images.
 
-```yaml:title=infrastructure/pods.yaml
+```yaml title="infrastructure/pods.yaml"
 apiVersion: v1
 kind: Pod
 metadata:
@@ -304,14 +304,14 @@ One thing to note here: Like the `PORT` command inside our Dockerfile, the `port
 
 Let's now create this pod inside of our cluster.
 
-```text
+```bash
 $ k create -f infrastructure/pods.yaml
 ```
 
 After running this command, you can check to see the pod has been created. You may also see that the pod is still creating. Give it a moment, because your cluster has to pull down this image from Docker Hub.
 
 
-```text
+```bash
 $ k get pods
 NAME       READY   STATUS    RESTARTS   AGE
 test-pod   1/1     Running   0          60s
@@ -319,7 +319,7 @@ test-pod   1/1     Running   0          60s
 
 Congratulations, you've deployed your first container to your Kubernetes cluster! We can also see the logs of our pod (more precisely, our container). In our case, it's the console from our Javascript file. Container logs are rotated daily and whenever the log file reaches 10MB; this command will show the latest version.
 
-```text
+```bash
 $ k logs test-pod
 Listening on port 3005!
 ```
@@ -330,7 +330,7 @@ This is great, but it's not actually how you'll deploy pods to your cluster. One
 
 Let's delete the pod. We can either specify it by name, or we can apply delete and pass in the filename, which will delete all resources in a file.
 
-```text
+```bash
 $ k destroy pod test-pod # Or k delete -f infrastructure/pods.yaml
 $ k get pods
 No resources in default namespace
@@ -340,7 +340,7 @@ The pod was *not recreated* after it was deleted.
 
 In order to have our containers be recreated in case of failure, we need to use Replica Sets. These are another Kubernetes resource that manage pods on our behalf. We declare how many pods we want, and the Replica Set ensures that the "state" of our application always matches. Let's take a look at a new configuration file.
 
-```yaml:title=resources/rs.yaml
+```yaml title="resources/rs.yaml"
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
@@ -366,14 +366,14 @@ Replica Sets work by defining a "selector" on both the Replica Set and within th
 
 When you apply this configuration file, Kubernetes will create three new pods that match the specification provided. It will restart any pods that die!
 
-```text
+```bash
 $ k create -f infrastructure/rs.yaml
 replicationcontroller/test-rs created
 ```
 
 Now let's try deleting one of our pods (this command may take a moment). Notice that the Replica Set has already spun up a new pod in order to match the three specified in our configuration.
 
-```text{12,15}
+```bash {12,15}
 $ k get pods
 NAME            READY   STATUS    RESTARTS   AGE
 test-rs-6phnq   1/1     Running   0          3m53s
@@ -404,7 +404,7 @@ Here's a simplified example of what that looks like.
 
 In this example, we'll forward the pod's port (3005) to our local machine's port (3010). We can now curl that address on our local machine and we'll hit the container running inside the pod.
 
-```text
+```bash
 $ k port-forward test-rs-6phnq 3010:3005
 Forwarding from 127.0.0.1:3005 -> 3005
 Forwarding from [::1]:3005 -> 3005
@@ -425,7 +425,7 @@ Services are Kubernetes resources that give us a single, persistent point of ent
 
 Let's create a NodePort service, which will let us to curl our API *from within the cluster*.
 
-```yaml:title=infrastructure/np.yaml
+```yaml title="infrastructure/np.yaml"
 apiVersion: v1
 kind: Service
 metadata:
@@ -440,13 +440,14 @@ spec:
 ```
 
 Create the resource.
-```text
+
+```bash
 $ k create -f infrastructure/np.yaml
 ```
 
 Let's confirm that the service was created.
 
-```text
+```bash
 $ k get svc
 NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
 kubernetes       ClusterIP   10.100.0.1      <none>        443/TCP        28h
@@ -459,7 +460,7 @@ The CLUSTER-IP field indicates that our service is now waiting for connections a
 
 Let's try it out by using the `exec` command to run curl inside of one of our pods, and curl that IP address.
 
-```text
+```bash
 $ k get pods
 NAME            READY   STATUS    RESTARTS   AGE
 test-rs-6phnq   1/1     Running   0          3m53s
@@ -482,14 +483,14 @@ This service will create a different resource depending on where you're deployin
 
 Let's first delete our old NodePort service; we don't need that anymore.
 
-```text
+```bash
 $ k delete -f infrastructure/np.yaml
 <img src="" alt="" />
 ```
 
 Create the configuration file for our load balancer. It'll look very similar to our NodePort service.
 
-```yaml:title=infrastructure/load-balancer.yaml
+```yaml title="infrastructure/load-balancer.yaml"
 apiVersion: v1
 kind: Service
 metadata:
@@ -505,7 +506,7 @@ spec:
 
 Let's create it, and get our services. You'll now see a valid public IP address.
 
-```text
+```bash
 $ k create infrastructure/load-balancer.yaml 
 service/test-load-balancer created
 $ k get svc 
@@ -516,7 +517,7 @@ test-load-balancer   LoadBalancer   10.100.40.213   a1da4187b5e3e4552b8490fe77dc
 
 We can now curl the IP address listed at our endpoint, and we'll hit our server! Let's try doing it a few times.
 
-```text
+```bash
 $ curl -d '{ "hey": "hi" }' -H 'Content-Type: application/json' a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com/api 
 { "hey": "hi" }
 $ curl -d '{ "some new data": "wow!" }' -H 'Content-Type: application/json' a1da4187b5e3e4552b8490fe77dc59f0-1220017641.us-east-1.elb.amazonaws.com/api 
@@ -527,7 +528,7 @@ $ curl -d '{ "key one": "678" }' -H 'Content-Type: application/json' a1da4187b5e
 
 We can verify that our load balancer service is routing traffic to our various different pods by getting their log data. You'll notice that the requests were load balanced across all of our pods, and that one did not recieve all of the requests.
 
-```text
+```bash
 $ k get pods
 NAME            READY   STATUS    RESTARTS   AGE
 test-rs-6phnq   1/1     Running   0          3m53s

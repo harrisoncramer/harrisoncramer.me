@@ -74,12 +74,18 @@ const { title, description } = Astro.props;
       margin: 0 auto;
     }
 
+    /* Blog post content */
     div[data-rehype-pretty-code-fragment] {
       padding-top: 12px;
       padding-bottom: 12px;
       max-width: 850px;
       overflow: auto;
       background-color: #212126;
+    }
+
+    div[data-rehype-pretty-code-title] {
+      padding-right: 12px;
+      text-align: right;
     }
 
     pre > code > span {
@@ -92,6 +98,7 @@ const { title, description } = Astro.props;
       display: grid;
       background-color: rgba(200, 200, 255, 0.09);
     }
+
     .highlighted {
       background-color: rgba(200, 200, 255, 0.1);
       border-left-color: #9ec4ff;

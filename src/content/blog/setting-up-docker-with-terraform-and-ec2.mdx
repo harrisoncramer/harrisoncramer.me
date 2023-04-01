@@ -38,7 +38,7 @@ Think of the provider as the software that communicates with an outside party, i
 
 To do this, you'll need to save your AWS user's credentials to your local computer. Your configuration might look something like this:
 
-```text:title=~/.aws/credentials
+```text title="~/.aws/credentials"
 [terraform]
 aws_access_key_id=KLUHSUIDFB8972D989FSD92
 aws_secret_access_key=fj9f&SDKsdfbsdlahsdf
@@ -50,7 +50,7 @@ aws_secret_access_key=ksdfjn9sf91nfuwof
 
 You can then load those credentials into your provider:
 
-```hcl:title=infrastructure/main.tf
+```hcl title="infrastructure/main.tf"
 provider "aws" {
   region = "us-east-1"
   shared_credentials_file = "~/.aws/credentials"
@@ -66,7 +66,7 @@ There are certain parts of this configuration that can be easily pulled into var
 
 Create a file to declare all of your variables. 
 
-```hcl:title=infrastructure/variables.tf
+```hcl title="infrastructure/variables.tf"
 variable "availability_zone" {
   description = "Availability zone of resources"
   type        = string
@@ -90,7 +90,7 @@ variable "ssh_public_key" {
 
 Then create a separate file (which you will _not_ commit to source code) that contains your values for each of these variables. This file is called `terraform.tfvars` and Terraform will pick it up automatically and initialize the variables inside of it.
 
-```hcl:title=infrastructure/terraform.tfvars
+```hcl title="infrastructure/terraform.tfvars"
 availability_zone = "us-east-1a"
 instance_ami = "ami-09e67e426f25ce0d7"
 instance_type = "t2.micro"
@@ -108,7 +108,7 @@ When we setup ssh for our EC2 server later, the `ssh_public_key` will match with
 
 Our EC2 servers will need to live inside of a network. In AWS parlance, this is the VPC, or virtual private cloud. Let's create it:
 
-```hcl:title=infrastructure/network.tf
+```hcl title="infrastructure/network.tf"
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -123,7 +123,7 @@ The full list of options for the VPC is <a href="https://registry.terraform.io/p
 
 Next, create our Elastic IP resource. The IP address is a static address that _will not change_, and we can map to our EC2 instance. In the future, if the EC2 instance goes down or is re-created, the public-facing URL will remain accessible at the same place.
 
-```hcl{10-14}:title=infrastructure/network.tf
+```hcl {10-14} title="infrastructure/network.tf"
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -143,7 +143,7 @@ You'll notice that we're referencing the `aws_instance` which is our EC2 server.
 
 Next, we'll create a subnet within the range that we defined for our VPC. The `cidrsubnet` function <a href="https://www.terraform.io/docs/language/functions/cidrsubnet.html">calculates</a> a subnet address within the given VPC's CIDR block:
 
-```hcl:title=infrastructure/subnet.tf
+```hcl title="infrastructure/subnet.tf"
 resource "aws_subnet" "my_app" {
   cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 3, 1)
   vpc_id            = aws_vpc.main.id
@@ -153,7 +153,7 @@ resource "aws_subnet" "my_app" {
 
 Let's also create the route table. This will allow traffic from our internet gateway (which we haven't created yet) to reach our VPC.
 
-```hcl{7-18}:title=infrastructure/subnet.tf
+```hcl {7-18} title="infrastructure/subnet.tf"
 resource "aws_subnet" "my_app" {
   cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 3, 1)
   vpc_id            = aws_vpc.main.id
@@ -176,7 +176,7 @@ resource "aws_route_table" "my_app" {
 
 We also need to associate this route table with our subnet. Strangely, this is actually a different resource in AWS than the subnet and the route table:
 
-```hcl{20-23}:title=infrastructure/subnet.tf
+```hcl {20-23} title="infrastructure/subnet.tf"
 resource "aws_subnet" "my_app" {
   cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 3, 1)
   vpc_id            = aws_vpc.main.id
@@ -204,7 +204,7 @@ resource "aws_route_table_association" "subnet-association" {
 
 The last resource that we'll need to create is our internet gateway. This is the resource that actually opens up our VPC to the rest of the internet:
 
-```hcl:title=infrastructure/gateway.tf
+```hcl title="infrastructure/gateway.tf"
 resource "aws_internet_gateway" "my_app" {
   vpc_id = aws_vpc.main.id
   tags = {
@@ -220,7 +220,7 @@ Whew! We're done with the network. Let's move on to the server itself.
 
 Start by creating a new `aws_key_pair` resource that we'll include in our EC2 instance. This will give us shell access. If we need to manually connect to the server at some point in the future, we'll use the private key on our local machine that corresponds with this credential.
 
-```hcl:title=infrastructure/ec2.tf
+```hcl title="infrastructure/ec2.tf"
 resource "aws_key_pair" "ssh-key" {
   key_name   = "ssh-key"
   public_key = var.ssh_public_key
@@ -229,7 +229,7 @@ resource "aws_key_pair" "ssh-key" {
 
 Next create the EC2 instance. We're referencing many of the variables that we already set up, for the type, the size, and the availablity zone. We're also creating it within the subnet we created earlier, and we're passing it a security group, which we'll create in a moment, which will control access.
 
-```hcl{6-27}:title=infrastructure/ec2.tf
+```hcl {6-27} title="infrastructure/ec2.tf"
 resource "aws_key_pair" "ssh-key" {
   key_name   = "ssh-key"
   public_key = var.ssh_public_key
@@ -275,7 +275,7 @@ The last resource we need to configure is the security group, which defines acce
 
 Let's create the security group that will open up the ports required for our application to function. First, we'll allow SSH access on Port 22 from any IP. We could narrow this down if we only want a smaller group of computers to be able to access our resource for security reasons.
 
-```hcl:title=infrastructure/security_group.tf
+```hcl title="infrastructure/security_group.tf"
 resource "aws_security_group" "my_app" {
   name   = "SSH + Port 3005 for API"
   vpc_id = aws_vpc.main.id
@@ -293,7 +293,7 @@ resource "aws_security_group" "my_app" {
 
 Now let's allow traffic on port 80 to reach port 80 on our machine. We do that through the use of another ingress rule
 
-```hcl{14-21}:title=infrastructure/security_group.tf
+```hcl {14-21} title="infrastructure/security_group.tf"
 resource "aws_security_group" "my_app" {
   name   = "SSH + Port 3005 for API"
   vpc_id = aws_vpc.main.id
@@ -320,7 +320,7 @@ resource "aws_security_group" "my_app" {
 
 Next, we'll allow all outgoing traffic with an egress rule.
 
-```hcl{23-28}:title=infrastructure/security_group.tf
+```hcl {23-28} title="infrastructure/security_group.tf"
 resource "aws_security_group" "my_app" {
   name   = "SSH + Port 3005 for API"
   vpc_id = aws_vpc.main.id
@@ -355,7 +355,7 @@ resource "aws_security_group" "my_app" {
 
 For convenience (and so we don't have to use the AWS GUI at all) we can create an output file, that'll log out information about our network after a deploy. For simplicity's sake, we're only interested in the IP address of our EC2 server.
 
-```hcl:title=infrastructure/outputs.tf
+```hcl title="infrastructure/outputs.tf"
 output "ec2_ip_address" {
   value = aws_instance.my_app.public_ip
 }
@@ -366,7 +366,7 @@ output "ec2_ip_address" {
 
 At this point, we should have a list of terraform files that can setup an EC2 instance with Docker. Let's get a view of our folder.
 
-```shell
+```bash
 $ ls infrastructure
 ec2.tf
 gateway.tf
@@ -380,7 +380,7 @@ variables.tf
 
 We should be able to now plan and apply our infrastucture with Terraform, using the `terraform plan` and `terraform apply` commands inside of the infrastructure folder.
 
-```shell
+```bash
 $ cd infrastucture
 $ terraform init 
 $ terraform plan 
@@ -395,18 +395,18 @@ Once your resources are created, you should get an output (from our output.tf fi
 
 We can then connect to that IP address (you may be using a different root user):
 
-```shell
+```bash
 $ ssh ubuntu@your_ip_here
 ```
 
 Note that in order to run the docker commands as the ubuntu user we'll need our groups to be refreshed. No big deal, just lot out and log back in:
-```shell
+```bash
 $ exit
 $ ssh ubutnu@your_ip_here
 ```
 Now that we're back in the container, let's run a simple webserver and bind it to port 80 of the machine (which is exposed to the internet):
 
-```shell
+```bash
 $ docker run -dit -p 80:80 nginxdemos/hello
 ```
 

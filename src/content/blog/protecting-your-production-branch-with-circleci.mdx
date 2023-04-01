@@ -22,7 +22,7 @@ The files that we're going to build, test, and lint will be very simple. We're m
 
 <p class="tip">I'm using the Github CLI for this tutorial. I'd recommend installing it, it makes the process of repository management very easy if you like working in the text.</p>
 
-```text
+```bash
 $ mkdir joke && cd joke
 $ npm init -y
 $ git init
@@ -31,14 +31,14 @@ $ gh repo create
 
 We're going to use ESLint as our linter, and we're going to compile our project with Babel. Let's install those dependencies now.
 
-```text
+```bash
 $ npm install -D @babel/cli @babel/node @babel/preset-env
 $ npm install -D eslint
 ```
 
 And let's set up our eslint file. We're not going to use React or Typescript, for the purposes of this tutorial it'll be very simple.
 
-```json:title=.eslintrc.js
+```javascript title=".eslintrc.js"
 module.exports = {
   env: {
     es2021: true,
@@ -55,7 +55,7 @@ module.exports = {
 
 Next, let's add a build script, a lint script, and a start script.
 
-```json{7-9}:title=package.json
+```json {7-9} title="package.json"
 {
   "name": "circleci",
   "version": "1.0.0",
@@ -81,7 +81,7 @@ Next, let's add a build script, a lint script, and a start script.
 
 As you can see, Babel expects to find our source files in a directory called `src`. Let's create that now and add the simplest Javascript file imaginable, but written using ESM, so that it'll be compiled.
 
-```javascript:title=src/index.js
+```javascript title="src/index.js"
 export const add = (a, b) => {
   const result = a + b;
   console.log(`The result is ${result}`);
@@ -90,7 +90,7 @@ export const add = (a, b) => {
 
 We'll now create our configuration file for Babel, so that the compiler will translate our ESM back into CommonJS modules; This way our script can be run with vanilla NodeJS.
 
-```json:title=babel.config.json
+```json title="babel.config.json"
 {
   "presets": [
     [
@@ -108,7 +108,7 @@ We'll now create our configuration file for Babel, so that the compiler will tra
 Let's test our code. We should now be able to build our project and run it using our scripts.
 
 
-```text
+```bash
 $ npm run lint
 $ npm run build
 $ npm run start
@@ -118,7 +118,7 @@ The result is 3
 The linter should also complain if we write some non-valid Javascript. Let's try to create a paragraph tag on the DOM. This ought to fail, because we're referencing the document object, which in NodeJS, we don't have access to in the global scope.
 
 
-```javascript{8-12}:title=src/index.js
+```javascript {8-12} title="src/index.js"
 export const add = (a, b) => {
   const result = a + b;
   console.log(`The result is ${result}`);
@@ -135,7 +135,7 @@ makePTag();
 
 And run the linter, and notice the error message.
 
-```text
+```bash
 $ npm run lint
 > circleci@1.0.0 lint
 > eslint src/**.js
@@ -162,7 +162,7 @@ circleci-tutorial
 
 Let's quickly create a `.gitignore` file to ignore our node modules, and commit everything and push it up to our repository.
 
-```text
+```bash
 $ echo "node_modules">.gitignore
 $ git add .
 $ git commit -m 'initial commit'
@@ -175,7 +175,7 @@ Finally, the good stuff. The CI/CD tool that we'll be using is called CircleCI. 
 
 When we commit our code, CircleCI will recognize that we have a configuration file in our project, and will read it. Behind the scenes, it's going to spin up a Docker container that will run all of the steps outlined in the file. The application requires that configuration file to be located at `.circleci/config.yaml` in your project. Let's create it now.
 
-```yaml:title=.circleci/config.yaml
+```yaml title=".circleci/config.yaml"
 version: 2.1
 orbs:
   node: circleci/node@4.5.1
@@ -231,13 +231,13 @@ Now that we have these branch protection rules set up, we can deliberately cause
 
 First, let's create a new branch. 
 
-```text
+```bash
 $ git checkout -b new-branch
 ```
 
 Then, we can try adding a change to our code. In this case, let's just throw an error inside of our code.
 
-```javascript{7}:title=src/index.js
+```javascript {7} title="src/index.js"
 export const add = (a, b) => {
   const result = a + b;
   console.log(`The result is ${result}`);
@@ -249,7 +249,7 @@ throw new Error("I threw this intentionally.");
 
 Let's commit our changes and push them up to the new branch.
 
-```text
+```bash
 $ git add .
 $ git commit -m 'commit that should throw an error'
 $ git push --set-upstream origin new-branch

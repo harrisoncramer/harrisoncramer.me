@@ -20,7 +20,7 @@ The end result will look like <a href="../images/gifs/jokes.gif">this.</a>
 
 Let's initialize the repository, using an empty folder.
 
-```text
+```bash
 $ mkdir joke && cd joke
 $ npm init -y
 ```
@@ -28,7 +28,7 @@ Next, we'll need to tell `npm` that our project includes an executable. We do th
 
 This `shim.js` file will be the starting point of our entire command line program. We want to make a small tweak and set the `main` field in our `package.json` to reflect that.
 
-```json{5,9-11}:title=package.json
+```json {5,9-11} title="package.json"
 {
   "name": "joke",
   "version": "1.0.0",
@@ -50,14 +50,14 @@ Next, let's create the two folders that our project will rely on: the `src` fold
 
 The `build` folder will eventually contain our compiled code. This is what we're going to publish to NPM (a package respository) so that others can *use* our tool. We won't publish the `build` directory to version control.
 
-```text
+```bash
 $ mkdir src
 $ mkdir build
 ```
 
 Finally, we'll create the `shim.js` file, which will run the code inside of our build folder.
 
-```text
+```bash
 $ touch shim.js
 ```
 
@@ -77,14 +77,14 @@ Why do we need this file? Since we're creating a CLI, our end user is going to s
 
 That's where the `shim.js` file comes into play. We can include a "shebang" at the top of that file that tells our shell to execute the code using the user's locally installed version of NodeJS. This <a href="https://stackoverflow.com/questions/33509816/what-exactly-does-usr-bin-env-node-do-at-the-beginning-of-node-files">post</a> has a good overview of the concept.
 
-```javascript:title=shim.js
+```javascript title="shim.js"
 #!/usr/bin/env node
 require("./build/index.js")
 ```
 
 We also need to make this file executable.
 
-```text
+```bash
 $ chmod 700 shim.js
 ```
 
@@ -94,7 +94,7 @@ At the moment, we don't have anything inside of our build folder. In fact, we wo
 
 We're going to use <a href="https://babeljs.io/">Babel</a> to compile our code, to ensure that we can write newer Javascript features (like ESM) but remain compatible with older versions of NodeJS. It's an `npm` dependency, so we'll install it. We're also going to install a few helper packages along with it.
 
-```text
+```bash
 $ npm install --save-dev @babel/core @babel/cli @babel/preset-env @babel/node
 ```
 
@@ -107,7 +107,7 @@ Here's what each of the packages do:
 
 In order to run Babel, we're going to put a build script in our `package.json` file. The `build` command will grab our source files from the `src` directory, compile them, and place the result into the `build` directory.
 
-```json{7,17-20}:title=package.json
+```json {7,17-20} title="package.json"
 {
   "name": "joke",
   "version": "1.0.0",
@@ -135,7 +135,7 @@ In order to run Babel, we're going to put a build script in our `package.json` f
 
 We also need to make a configuration file for Babel in the root of our project. This is where we're taking advantage of the `@babel/preset-env` package that we installed earlier. We're also telling Babel that we intend to use ESM.
  
-```json:title=babel.config.json
+```json title="babel.config.json"
 {
   "presets": [
     [
@@ -153,19 +153,19 @@ We also need to make a configuration file for Babel in the root of our project. 
 
 Let's test what we have so far. Let's create a simple `index.js` file inside of our `src` folder.
 
-```javascript:title=src/index.js
+```javascript title="src/index.js"
 console.log('Hello, world!')
 ```
 
 Next, we can run our build script. This will compile the `index.js` file and place the compiled version inside of the build folder.
 
-```text
+```bash
 $ npm run build
 ```
 
 Finally, we can test our executable directly. This will run the compiled version of our code. 
 
-```text
+```bash
 $ ./shim.js
 Hello, world!
 ```
@@ -174,7 +174,7 @@ Hello, world!
 
 It would be extremely time consuming to have to manually build our script every time we want to run it in development. Let's setup a script so that every time we make changes, the CLI will get rebuilt. To do this, we're going to rely on <a href="https://www.npmjs.com/package/nodemon">nodemon</a>. This package let's us re-run Javascript files every time a change is made. 
 
-```text
+```bash
 $ npm install -D nodemon
 ```
 
@@ -182,7 +182,7 @@ We're going to combine `nodemon` with Babel. To do that, we need to use another 
 
 Let's add a script to our `package.json` file that will run our `src/index.js` file directly. The `-I` flag lets us pass keystrokes into the CLI, which will make it interactive. The `--exec` flag tells Nodemon that rather than running the following code with node, run it with `babel-node` instead. This is what lets us run code that uses ESM.
 
-```json{8}:title=package.json
+```json {8} title="package.json"
 {
   "name": "joke",
   "version": "1.0.0",
@@ -215,7 +215,7 @@ Phew! We've got everything set up, and we can now run `npm start` to run our scr
 
 Next, we'll write the actual logic of the CLI. There are a few libraries out there that are useful for building CLI tools, but the one we'll use for this tutorial is called <a href="https://www.npmjs.com/package/inquirer">Inquirer</a> to create some questions for our CLI. We'll also use <a href="https://www.npmjs.com/package/ora">ora</a> to show a loading spinner when we make calls to our API.
 
-```text
+```bash
 $ npm install inquirer ora
 ```
 
@@ -223,7 +223,7 @@ Let's import our packages and prompt the user with an initial question: Would yo
 
 First, let's write a helper function that will get our joke from an external API that serves up JSON content. We'll save it in another helper file.
 
-```javascript:title=src/api_call.js
+```javascript title="src/api_call.js"
 import ora from "ora";
 import https from "https";
 
@@ -267,7 +267,7 @@ Let's break this down. We declare a helper function called `getJoke` that return
 
 Next, we use our inquirer package:
 
-```javascript:title=src/index.js
+```javascript title="src/index.js"
 import inquirer from "inquirer";
 import { getJoke } from "./api_call"
 
@@ -319,7 +319,7 @@ Once you've created an account on npm, we'll initialize our project with git. Th
 
 I highly recommend installing Github's relatively new <a href="https://cli.github.com/">CLI tool</a>, which lets you create repositories without bothering with a web browser. It's what I'll use in the code below (the CLI's alias is "gh").
 
-```text
+```bash
 $ git init
 $ echo "node_modules\nbuild" > .gitignore
 $ git add .
@@ -330,7 +330,7 @@ $ git push --set-upstream origin main
 
 We also want to add an `.npmignore` file to our folder. Without it, npm will ignore files listed in `.gitignore` which we don't want! Recall that we want to ignore the `src` folder when we publish to Github so that other developers can edit our code, but we want to publish our `build` folder to npm, because that's what's used in our production code. Create the new file:
 
-```text:title=.npmignore
+```bash title=".npmignore"
 node_modules
 src
 ```
@@ -344,7 +344,7 @@ We also want to "namespace" our project. This means that we prefix our project n
 We're also adding a new script: the `prePublishOnly` script. This will automatically run before we publish our package. Inside of it, we want to run our build script—ensuring that the latest build directory is pushed up with each publication of our CLI.
 
 
-```json{2,4,10,15-21}:title=package.json
+```json {2,4,10,15-21} title="package.json"
 {
   "name": "@harrisoncramer/joke",
   "version": "1.0.0",
@@ -386,14 +386,14 @@ We're also adding a new script: the `prePublishOnly` script. This will automatic
 
 Now let's publish our CLI. The publish step will automatically build our application using the `prepublishOnly` script.
 
-```text
+```bash
 $ npm login # Only run this if you aren't logged in.
 $ npm publish
 ```
 
 If you go to your account you should now see that you have a package published. We can now test to see that it works on our local machine by installing it globally.
 
-```text
+```bash
 $ npm install -g @harrisoncramer/joke
 $ joke
 ? What type of joke do you want to hear? Dad Joke

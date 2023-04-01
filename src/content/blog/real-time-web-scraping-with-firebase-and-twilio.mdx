@@ -22,20 +22,20 @@ This blog will show you how to build a web scraper that trawls a URL and checks 
 
 You'll first need to install the Firebase CLI tools, which can be added via NPM.
 
-```
+```bash
 $ npm i -g firebase-tools
 ```
 
 Create a firebase account online, and then connect the CLI.
 
 
-```
+```bash
 $ firebase login
 ```
 
 Once this is done, we can initialize a new project. Create a new folder, and initialize it as a git repository,  and then run the `firebase init` command.
 
-```
+```bash
 $ mkdir my-dummy-scrapers
 $ cd my-dummy-scrapers
 $ git init
@@ -50,7 +50,7 @@ It will then ask whether you'd like to initialize a realtime database to go alon
 
 Once that's done, you'll be asked to configure a number of other features (Typescript vs. Javascript, ESLint, etc) which are not crucial. I'm picking Typescript and installing all my dependencies with NPM. At the end of this process, you'll have a folder which contains all of your code for the project, like this:
 
-```
+```bash
 $ ls -l
 .firebaserc
 .git
@@ -71,7 +71,7 @@ Switch into the firebase folder and open up the `src/index.ts` file. This is whe
 
 The deployment process for this is super simple: Just write a function, and export it as as constant like you would with any other ES module. 
 
-```typescript:title=index.ts
+```typescript title="index.ts"
 import * as functions from "firebase-functions";
 
 export const helloWorld = functions.https.onRequest((request, response) => {
@@ -82,7 +82,7 @@ export const helloWorld = functions.https.onRequest((request, response) => {
 
 We can now deploy this function to firebase from the shell. Switch back into the root directory of the project, and run the deploy command:
 
-```
+```bash
 $ cd ../
 $ firebase deploy --only functions
 === Deploying to 'my-dummy-scraper'...
@@ -132,7 +132,7 @@ Normally, you'd use the pubsub function to run some arbitrary code whenever a ce
 
 Let's create a new function.
 
-```typescript:title=index.ts
+```typescript title="index.ts"
 import * as functions from "firebase-functions";
 export const helloEveryFiveMinutes = functions.pubsub
     .schedule("every 5 minutes")
@@ -156,7 +156,7 @@ These logs are visible in the firebase console. Log into your project, and head 
 
 First, use <a href="https://www.npmjs.com/package/dotenv">dotenv</a> to pull in any variables we need from our environment files (I've got a .env in the root of my project). Then we're initializing our Firebase app. This connects our application to Firebase in the cloud.
 
-```typescript:title=index.ts
+```typescript title="index.ts"
 import { config } from "dotenv";
 import { initializeApp } from "firebase/app";
 
@@ -180,7 +180,7 @@ Next, I'm initializing the function to run every five minutes, logging the start
 
 Notice that I'm using axios and have to destructure the data off of the response.
 
-```typescript{1,2,20-29}:title=index.ts
+```typescript {1,2,20-29} title="index.ts"
 import * as functions from "firebase-functions";
 import axios from "axios";
 import { config } from "dotenv";
@@ -212,7 +212,7 @@ export const getPosts = functions.pubsub
 
 Next, we have to connect to Firebase's real-time database. Just import the `getDatabase` function and call it. We'll also make a function for storing our link in the DB.
 
-```typescript{2,29,31-40}:title=index.ts
+```typescript {2,29,31-40} title="index.ts"
 import * as functions from "firebase-functions";
 import { getDatabase, ref, set } from "firebase/database";
 import axios from "axios";
@@ -259,7 +259,7 @@ export const getPosts = functions.pubsub
 
 This function will require an "ID" for each link, because I generally prefer to use random strings to store items in a DB. Here's the hashing function I'm using to turn those links into IDs.
 
-```typescript{5,22-23}:title=index.ts
+```typescript {5,22-23} title="index.ts"
 import * as functions from "firebase-functions";
 import { getDatabase, ref, set } from "firebase/database";
 import axios from "axios";
@@ -310,7 +310,7 @@ Finally, we'll use Cheerio to load our data and parse it. Cheerio returns an "ar
 
 This is a bit of a contrived example, because I'm only grabbing all the h2 elements. Normally, Cheerio's benefit comes in when working with a more complex website. For instance, with <a href="https://github.com/harrisoncramer/streetsleazy/blob/main/functions/src/index.ts#L114">this code</a> from a Street Easy real estate listings scraper.
 
-```typescript{4,47-48}:title=index.ts
+```typescript {4,47-48} title="index.ts"
 import * as functions from "firebase-functions";
 import { getDatabase, ref, set } from "firebase/database";
 import axios from "axios";
@@ -366,7 +366,7 @@ Finally, we'll iterate over our values and save them to the Database. The DB wil
 
 The whole function looks like this:
 
-```typescript:title=index.ts
+```typescript title="index.ts"
 import * as functions from "firebase-functions";
 import axios from "axios";
 import cheerio from "cheerio";
@@ -441,7 +441,7 @@ First, create a new function to export. The "ref" in this case is the method tha
 
 Finally, we're using the `snapshot.val()` function, which will return to us the value of the given ref from the DB. This is an object, so we can destructure the link property that we set earlier.
 
-```typescript:title=index.ts
+```typescript title="index.ts"
 export const onCreatedPost = functions.database
   .ref("/post/{id}")
   .onCreate(async (snapshot, context) => {
@@ -465,7 +465,7 @@ This is the simplest part of the application. Sign up for a Twilio account, and 
 
 We're pulling the variables required to connect to Twilio from our `.env` file.
 
-```typescript{10-26}:title=index.ts
+```typescript {10-26} title="index.ts"
 export const onCreatedPost = functions.database
 .ref("/posts/{id}")
 .onCreate(async (snapshot, context) => {

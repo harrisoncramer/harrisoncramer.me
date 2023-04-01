@@ -64,7 +64,7 @@ This works fine, but if we're building a microservices application we probably w
 
 Create your project folder, and add a `docker-compose.yml` file inside of it.
 
-```yaml:title=docker-compose.yml
+```yaml title="docker-compose.yml"
 version: '3'
 services:
   rabbit:
@@ -96,14 +96,14 @@ $ cd producer
 
 Inside of the producer folder, initialize the npm repository, and install your dependencies.
 
-```
+```bash
 $ npm init -y
 $ npm install express amqplib
 ```
 
 Next, we'll create our server file. It's a simple express server that sends back "Hello world!" on the home route.
 
-```javascript:title=producer/index.js
+```javascript title="producer/index.js"
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -121,7 +121,7 @@ app.listen(PORT, () => {
 
 Finally, we want a script to start up our application. 
 
-```json{7}:title=package.json
+```json{7} title="package.json"
 {
   "name": "teachingrabbitmq",
   "version": "1.0.0",
@@ -158,7 +158,7 @@ CMD ["npm", "run", "dev:start"]
 
 Let's add our producer microservice to our docker-compose file now.
 
-```yaml{13-19}:title=docker-compose.yml
+```yaml {13-19} title="docker-compose.yml"
 version: '3'
 services:
   rabbit:
@@ -186,13 +186,13 @@ You'll notice a problem if you try to start our microservices like this: Our pro
 
 First, install it as a development dependency to your producer microservice.
 
-```
+```bash
 $ npm i wait-port
 ```
 
 Next, modify the startup script so that it'll only run after RabbitMQ is ready.
 
-```json{7,15}:title=producer/package.json
+```json {7,15} title="producer/package.json"
 {
   "name": "teachingrabbitmq",
   "version": "1.0.0",
@@ -216,7 +216,7 @@ The producer microservice will now startup immediately, but the node process its
 
 Import the `amqplib` library and connect to the message broker. We pass in the URI of our message broker in the docker-compose file.
 
-```javascript{8-11,13,21}:title=producer/index.js
+```javascript {8-11,13,21} title="producer/index.js"
 const express = require('express');
 const path = require('path');
 const amqplib = require("amqplib")
@@ -244,7 +244,7 @@ Since we're using docker-compose to start up both of these containers, they are 
 
 We also need to provide the default username and password, and the port where the service is exposed (in this case, it's 5672, not 15672, which is the management console).
 
-```yaml{20-21}:title=docker-compose.yml
+```yaml {20-21} title="docker-compose.yml"
 version: '3'
 services:
   rabbit:
@@ -272,7 +272,7 @@ We can run the updated container with `docker-compose up --build`, which will fo
 
 Now that we've connected to RabbitMQ, we need to actually publish a message. Let's refactor our code slightly, so that we can use the more modern `async/await` syntax. We'll wrap our code in immediately invoked function expression, or IIFE, to make this possible. Future versions of Node.js will support top-level await, but for now, we have to wrap our code this way to use await.
 
-```javascript{14-24}:title=producer/index.js
+```javascript {14-24} title="producer/index.js"
 const express = require('express');
 const path = require('path');
 const amqplib = require("amqplib")
@@ -315,7 +315,7 @@ Finally, we need to publish a message to the exchange whenever someone visits th
 
 Notice that we also need to send our data as a buffer, because RabbitMQ expects that.
 
-```javascript{25-26}:title=producer/index.js
+```javascript {25-26} title="producer/index.js"
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -364,7 +364,7 @@ Now that we're publishing messages to the message broker, we need to create a mi
 
 This tutorial is focused on RabbitMQ, but <a href="https://harrisoncramer.me/building-a-chat-application-with-socketio/">this</a> is a more in-depth tutorial of how to use the `socket.io` library.
 
-```
+```bash
 $ mkdir consumer
 $ cd consumer
 $ npm init -y
@@ -377,7 +377,7 @@ Next, let's create the express server. This server is going to connect to our Ra
 
 Before we get to using websockets, let's consume the messages. Instead of publishing to the exchange like we did in the producer microservice, we are consuming from the "log" queue. We're also changing the port.
 
-```javascript{6,19}:title=consumer/index.js
+```javascript {6,19} title="consumer/index.js"
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -410,7 +410,7 @@ if (!RABBIT_URI) {
 
 This callback function will process messages from our queue. Let's write that callback now. We need to acknowledge that we've processed the message, in order for it to be taken out of the queue. This is an important design pattern for RabbitMQ, because it ensures that we don't have any data loss when we process messages in the queue. The message will only leave the queue once we have successfully processed it.
 
-```javascript{13-22,31}:title=consumer/index.js
+```javascript {13-22,31} title="consumer/index.js"
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -460,7 +460,7 @@ You're almost done. You still need to do three things:
 
 The completed `docker-compose` file looks like this:
 
-```yaml:title=docker-compose.yml
+```yaml title="docker-compose.yml"
 version: '3'
 services:
   rabbit:
@@ -493,7 +493,7 @@ services:
 
 The moment of truth! Start up your application.
 
-```
+```bash
 $ docker-compose up --build
 ```
 
@@ -507,14 +507,14 @@ One of the biggest advantages of using a message broker is their speed. We're go
 
 The library that we'll use to accomplish this is `socket.io`, install it now.
 
-```
+```bash
 $ cd consumer
 $ npm i socket.io
 ```
 
 Create another folder inside of the consumer, and add an `index.html` and `client.js` file.
 
-```
+```bash
 $ mkdir client
 $ touch client/index.html client/client.js
 ```
@@ -523,7 +523,7 @@ Here's the boilerplate HTML that will pull in our script. Notice that we're also
 
 We also import the socket.io library within the head of the file.
 
-```html:title=consumer/client/index.html
+```html title="consumer/client/index.html"
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -541,7 +541,7 @@ We also import the socket.io library within the head of the file.
 
 Next, let's write the logic to process messages on the frontend. Whenever the client recieves a 'log' message, we append a paragraph tag to the root element on the page.
 
-```javascript:title=consumer/client/script.js
+```javascript title="consumer/client/script.js"
 let socket = io();
 socket.on('log', (msg) => {
   const log = document.createElement('p');
@@ -553,7 +553,7 @@ socket.on('log', (msg) => {
 
 In order to send the message to the client, we'll need to modify our existing server code. Here's the full file. Again, if you're curious about what's going on here with socket.io, check out <a href="https://harrisoncramer.me/building-a-chat-application-with-socketio/">this</a> blog post.
 
-```javascript:title=consumer/index.js
+```javascript title="consumer/index.js"
 const express = require('express');
 const path = require('path');
 const amqplib = require('amqplib');

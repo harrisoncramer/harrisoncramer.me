@@ -22,7 +22,7 @@ For this project, we have multiple webpack configuration files. Our `webpack.pro
 
 We used `webpack-merge` to merge these configuration files together. Let's take a look at our common webpack file first. The file is split up here for readability.
 
-```javascript:title=webpack.common.js
+```javascript title="webpack.common.js"
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -45,7 +45,7 @@ module.exports = {
 
 We're setting our entry files and output files. The `[name]` syntax will let webpack split our bundle up into chunks, rather than stuff all of our code into a single bundle file. Let's continue.
 
-```javascript:title=webpack.common.js
+```javascript title="webpack.common.js"
   ...
 
   module: {
@@ -77,7 +77,7 @@ We're setting our entry files and output files. The `[name]` syntax will let web
 
 Here, we're running all of our javascript files through babel in order to compile them down to vanilla javascript. We're also sending our static files—images, videos, and so forth—through the url-loader, which creates URLs that we can use in our code.
 
-```javascript:title=webpack.common.js
+```javascript title="webpack.common.js"
   ...
   
   plugins: [
@@ -100,7 +100,7 @@ Finally, we're using a few plugins here. One will grab environment variables fro
 Let's take a look at our production file now.
 
 
-```javascript:title=webpack.prod.js
+```javascript title="webpack.prod.js"
 const { merge } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -135,7 +135,7 @@ module.exports = merge(common, {
 
 This file is shorter because it's additive—we run these optimizations when we are building a production version of our site. To accomplish this, we are calling the `merge` function and exporting the result. In order to pick up this configuration, we point the webpack CLI at the production file using the `--config` flag.
 
-```json{10}:title=package.json
+```json {10} title="package.json
 {
   "name": "loql.land",
   "version": "1.0.0",
@@ -160,7 +160,7 @@ Great, now that we actually understand how these files are getting merged and ru
 
 This one may seem obvious, but it's easy to miss. Make sure that Webpack is in production mode. This enables a some important defaults, including the <a href="https://webpack.js.org/plugins/terser-webpack-plugin/">Terser</a> plugin, which helps minify and uglify your code.
 
-```javascript{8}:title=webpack.prod.js
+```javascript {8} title="webpack.prod.js"
 const { merge } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -199,7 +199,7 @@ In previous versions of webpack, you had to manually configure this functionalit
 
 This is another one that's easy to miss. Source maps are <a href="https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map">a valuable debugging tool</a> when running in development. We're using them in our development configuration.
 
-```javascript{5}:title=webpack.dev.js
+```javascript {5} title="webpack.dev.js"
 import { merge } from 'webpack-merge';
 import common from './webpack.common.js';
 
@@ -234,7 +234,7 @@ We _also_ want to minify and uglify our stylesheets. To do this, we installed <a
 
 <p class="tip">When it compiles your code, webpack will normally pack all of your styles alongside your Javascript code. The css is then pulled out when your code is run. That's why you <em>could</em> have just one output file, like a <code>bundle.js</code> file. We want to pull the CSS out of that bundle so that we can minify and uglify it.</p>
 
-```javascript{14,19,24,29}:title=webpack.prod.js
+```javascript {14,19,24,29} title="webpack.prod.js"
 const { merge, unique } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -279,7 +279,7 @@ Tweaking the webpack configuration is only going to get you so far if the code i
 
 The easiest way to do this is to install the <a href="https://www.npmjs.com/package/webpack-bundle-analyzer">webpack bundle analyzer</a>, which shows you which libraries are taking up the most space in your bundle. We wrote a separate script to use our bundle analyzer with our production configuration file. To do this, we're passing the `ANALYZE` environment variable and using that variable to load the plugin after our build is complete.
 
-```json{12}:title=package.json
+```json {12} title="package.json"
 {
   "name": "loql.land",
   "version": "1.0.0",
@@ -303,7 +303,7 @@ The easiest way to do this is to install the <a href="https://www.npmjs.com/pack
 This variable is picked up inside of our configuration file and is used to add the plugin.
 
 
-```javascript{3}:title=webpack.prod.js
+```javascript {3} title="webpack.prod.js"
   plugins: [
     new MiniCssExtractPlugin(),
     ...(process.env.ANALYZE ? [new BundleAnalyzerPlugin()] : []),
@@ -335,7 +335,7 @@ import myObject from "my-dependency/lib/myObject";
 This can dramatically reduce your bundle size, especially with big libraries like Bootstrap. Notice in our project, for instance, that we're importing all of our bootstrap components like this. For instance, in the footer component.
 
 
-```javascript{3-5}:title=Footer.js
+```javascript {3-5} title="Footer.js"
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
@@ -358,7 +358,7 @@ Lazy loading lets users download your application in pieces. Rather than downloa
 
 In loQL, we lazy load according to specific routes in our router. Let's take a look at our `app.jsx` file, which contains our routing.
 
-```javascript{11-14,5}:title=app.jsx
+```javascript {11-14,5} title="app.jsx"
 import '@fontsource/roboto';
 import '@fontsource/poppins';
 import '@fontsource/ibm-plex-sans';
@@ -380,7 +380,7 @@ const DocsContainer = lazy(() => import('./containers/DocsContainer'));
 
 To make the `lazy` function work, we also need to wrap the routes in the `Suspense` component, also supplied by React, and provide a fallback to render when the fetch is occuring. In our case, we render a loading component.
 
-```jsx:title=app.jsx
+```jsx title="app.jsx"
 ...
 
 const App = () => {
@@ -424,7 +424,7 @@ Across the board, make sure that you're optimizing the media you serve to your c
 
 You also should really avoid using GIFs, which can be absolutely massive in size. Instead, convert the GIFs to MP4 files (I use an awesome free tool called <a href="https://formulae.brew.sh/formula/ffmpeg">ffmpeg</a> that is quick and easy) which are much smaller. You can then autoplay those videos.
 
-```jsx{26-28}:title=MainContainer.jsx
+```jsx {26-28} title="MainContainer.jsx"
 import React, { Component, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
@@ -469,7 +469,7 @@ Modern browsers will ask for a compressed version of every file by default first
 
 Our React application is sitting behind Nginx. Here's part of our reverse proxy configuration.
 
-```nginx{25-32}:title=nginx.conf
+```nginx {25-32} title="nginx.conf"
 user www-data;
 worker_processes auto;
 pid /run/nginx.pid;

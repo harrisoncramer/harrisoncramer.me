@@ -50,7 +50,7 @@ When resolving these imports, Lua will automatically look for a `lua` directory 
 
 For instance, my folder structure (basically) looks like this:
 
-```terminal
+```bash
 $ pwd 
 ~/.config/nvim
 $ ls
@@ -96,7 +96,7 @@ Here, I'm just printing and returning from a module if the required dependencies
 
 In order to return something _out_ of a module, like variables or methods, you can just return a Lua table. For instance, we could require a file `foo.lua` which just returns a table with the `bar` value defined inside of it:
 
-```lua:title=foo.lua
+```lua title="foo.lua"
 return {
     bar = "Hello, World"
 }
@@ -112,7 +112,7 @@ I'm currently using <a href="https://github.com/wbthomason/packer.nvim">Packer</
 
 The instructions for Packer are pretty straightforward, you basically just list the plugins you want installed and they're installed for you when you run `:PackerSync`. The only custom part of my configuration here is the following helper functions:
 
-```lua:title=~/.config/nvim/lua/plugins/init.lua
+```lua title="~/.config/nvim/lua/plugins/init.lua"
 -- If the plugin is in lua, require it (otherwise I'll provide nil for the remote).
 -- After requiring the plugin, attempt to load my configuration for it.
 local custom = function(remote, config)
@@ -151,7 +151,7 @@ end
 
 These are then passed to the setup in Packer, like this:
 
-```lua:title=~/.config/nvim/lua/plugins/init.lua
+```lua title="~/.config/nvim/lua/plugins/init.lua"
 ...
 packer.startup(function(use)
   use({ "kevinhwang91/nvim-bqf", requires = "junegunn/fzf.vim", config = custom("bqf", "plugins.bqf") })
@@ -192,7 +192,7 @@ end, { nargs = "?" })
 
 Then within Telescope, I can easily scroll through branch-specific stashes for the current branch and <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/telescope/pickers.lua">apply them</a>. Here's what the function looks like:
 
-```lua:title=~/.config/nvim/lua/plugins/telescope/pickers.lua
+```lua title="~/.config/nvim/lua/plugins/telescope/pickers.lua"
 local actions = require("telescope.actions")
 local finders = require("telescope.finders")
 local conf = require("telescope.config").values
@@ -267,7 +267,7 @@ To that end, I've unified the colorscheme across my entire development environme
 
 Like most good colorshemes, Kanagawa integrates directly with <a href="https://github.com/nvim-treesitter/nvim-treesitter">Treesitter</a>, an absolute **must** for any Neovim configuration. Back in the bad old days, Vim and Neovim used to rely on complicated regular expressions to parse buffers and apply syntax highlighting. That's no longer necessary thanks to tools like Treesitter, which parse the file into an abstract syntax tree and apply highlighting from there. This also gives you fine-grained control over which colors to use. For instance, I work a lot in VueJS, and have defined a few different highlight groups to work with Treesitter tags:
 
-```lua:title=~/.config/nvim/lua/colorscheme.lua
+```lua title="~/.config/nvim/lua/colorscheme.lua"
 local colorMap = {
   sumiInk3      = "#363646",
   sumiInk4      = "#54546D",
@@ -308,7 +308,7 @@ Just a few years ago, the installation of these language servers was tedious, an
 
 I'm taking advantage of Mason and <a href="https://github.com/williamboman/mason-lspconfig.nvim">mason-lspconfig.nvim</a>, a helper plugin, to automatically install the LSPs that I want and the debuggers that I want:
 
-```lua:title=~/.config/nvim/lua/lsp/init.lua
+```lua title="~/.config/nvim/lua/lsp/init.lua"
 local mason_status_ok, _ = pcall(require, "mason")
 local mason_lspconfig_ok, mason_lspconfig = pcall(require, "mason-lspconfig")
 
@@ -363,7 +363,7 @@ end
 
 The module will then use that callback as appropriate by passing it to the specific language server's setup function. 
 
-```lua:title=~/.config/nvim/lua/lsp/servers/gopls.lua
+```lua title="~/.config/nvim/lua/lsp/servers/gopls.lua"
 return {
   setup = function(on_attach, capabilities)
     require("lspconfig").gopls.setup({

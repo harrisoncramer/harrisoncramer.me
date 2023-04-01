@@ -1,5 +1,5 @@
 ---
-const posts = await Astro.glob("../content/blog/*.md"); // returns an array of posts that live at ./src/pages/post/*.md
+const posts = await Astro.glob("../content/blog/*.{md,mdx}");
 const postData = JSON.stringify(posts);
 ---
 

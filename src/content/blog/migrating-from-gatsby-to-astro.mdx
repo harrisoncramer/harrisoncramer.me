@@ -22,7 +22,7 @@ All told, the site compiled down to about 250KB with Astro. With Gatsby it was a
 
 The main reason for the difference is that I was using React to render the pages with Gatsby, and several React libraries, which I just replaced with vanilla Javascript with Astro. Using React is overkill when there are only a handful of elements that require client-side Javascript. With Astro, I needed interactivity only a handful of times, and I used custom elements, which Astro encourages. For instance, here's what I did for a toggle component:
 
-```html:title=Toggle.astro
+```html title="Toggle.astro"
 <wrapper-element>
   <slot name="trigger" />
 </wrapper-element>
@@ -53,7 +53,7 @@ As you can see, Astro encourages you to make use of browser-native APIs if all y
 
 Here's another example, this time taking advantage of a fuller array of Astro APIs:
 
-```html:title=HeaderLink.astro
+```astro title="HeaderLink.astro"
 ---
 interface Props {
   displayName: string;
@@ -98,7 +98,7 @@ Astro has a better developer experience, and it's not close.
 
 For starters, the amount of configuration required is minimal. Here's what my project root looked like with Gastby. All of the configuration files are highlighted:
 
-```bash{2,5-7,10-11,14}
+```bash {2,5-7,10-11,14}
 $ ls -la
 .babelrc
 .env
@@ -117,7 +117,7 @@ static.json
 
 I'm not even using Typescript with this Gatsby setup, but you can already start to see that there is more configuration than I'd like. This is Astro, which has Typescript already configured for me:
 
-```bash{2,3,6-7,9}
+```bash {2,3,6-7,9}
 .eslintrc.js
 astro.config.mjs
 infrastructure
@@ -133,7 +133,7 @@ Astro has an excellent CLI utility, too. When I wanted to add Tailwind to my pro
 
 I've also found Astro is _faster_ to rebuild locally than Gatsby is. It's built on top of Vite, which is my preferred bundler. This is also nice because the APIs are very familiar. The total configuration for Astro is just 15 lines of pure, readable Typescript:
 
-```typescript
+```typescript title="astro.config.mjs"
 import { defineConfig } from 'astro/config';
 import image from '@astrojs/image';
 import sitemap from '@astrojs/sitemap';
