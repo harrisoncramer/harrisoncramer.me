@@ -58,12 +58,14 @@ $ dive nginxdemos/hello
 
 The output of running this command is an interactive CLI, that shows us what files were added to the filesystem with each layer.
 
-![You can use the dive tool to inspect the layers of an image more closely](../images/inline_images/dive_layers.png "You can use the dive tool to inspect the layers of an image more closely.")
+<img src="/inline_images/dive_layers.png" alt="Dive image analyzer layers" />
+<p>You can use the dive tool to inspect the layers of an image more closely.</p>
 
 As you can see in the above image, the Dockerfile ran `ADD hello.conf /etc/nginx/conf.d/`, which created a single file inside the `/etc/nginx/conf.d` directory. The resulting layer was just 373 bytes in size, which is quite small. The base OS for this image is 5.6MB, which is 5.6 million bytes!
 
 ## Layers in production
 
+<img src="" alt="" />
 What does this all mean for production? We want to ensure that the production version of our docker image is as small as possible, so that we aren't copying over lots of data needlessly every time. That means both minimizing the number of layers, and minimizing their size.
 
 We'll write a simple application below to demonstrate a few of those principles. First, we'll write it without optimizing at all. Then, we'll rewrite the application to shrink down our image as much as possible.
@@ -187,7 +189,7 @@ Check out the difference, our new image is only 117MB. That's a huuuuugue differ
 
 What happens if we need to use a utility that's not installed? For instance, if we start up our container and attach to it, we'll see that the curl utility is not working.
 
-<p class="tip">The <b>exec</b> command let's us attach to a running container, and can be paired with a shell (in this case the <b>/bin/sh</b> shell) to let us run commands from inside the running container. Make sure you allow interactivity with the container by passing the <b>-dit</b> flags at startup.
+<p class="tip">The <b>exec</b> command let's us attach to a running container, and can be paired with a shell (in this case the <b>/bin/sh</b> shell) to let us run commands from inside the running container. Make sure you allow interactivity with the container by passing the <b>-dit</b> flags at startup.</p>
 
 ```
 $ docker run -dit --rm docker_tutorial
@@ -335,7 +337,8 @@ CMD ["node", "index.js"]
 
 The size of the image, if we rebuild it, is now only 49.4MB! And diving into the layers themselves, we'll see that the bulk of that is coming from NodeJS itself.
 
-![This container is under 50MB and the bulk of that is coming from NodeJS itself.](../images/inline_images/dockersmall.png)
+<img src="/inline_images/dockersmall.png" alt="Docker image compressed" />
+<p>This container is under 50MB and the bulk of that is coming from NodeJS itself.</p>
 
 This is pretty much as small as your NodeJS container is going to get, unless you start picking apart the NodeJS runtime itself. 
 

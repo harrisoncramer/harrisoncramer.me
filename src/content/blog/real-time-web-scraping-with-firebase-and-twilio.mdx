@@ -143,13 +143,14 @@ export const helloEveryFiveMinutes = functions.pubsub
 
 Redeploy the functions with `firebase deploy --only functions` from the root of your project. When this deploy runs, Firebase will automatically detect the old "hello world" function is no longer in our code, and will delete it, in addition to deploying our new function. In this way, you can think of Firebase functions a bit like other "stateful" approaches to infrastructure as code: Whatever is defined in your files will also be reflected in your production environment, and nothing more. In the future, changes to these functions will be applied to our cloud environment.
 
-<p class="tip">Firebase will update outdated functions whenever you change the code and redeploy. It can't do that in our case, however, because we wrote an HTTP function the first time and a schedule function the second time. 
+<p class="tip">Firebase will update outdated functions whenever you change the code and redeploy. It can't do that in our case, however, because we wrote an HTTP function the first time and a schedule function the second time.</p>
 
 We've written "every five minutes" for simplicity here, but the `schedule` callback actually supports CRON syntax, which is a simple way to write timers. I'd recommend playing around with <a href="https://crontab.guru/">this</a> tool if you need to run functions on certain days or times.
 
 These logs are visible in the firebase console. Log into your project, and head to the functions page, and to the logs tab. My logs look like this:
 
-![The console logs inside of your function will show up here.](../images/inline_images/firebase-logs.png "The console logs inside of your function will show up here.")
+<img src="/inline_images/firebase-logs.png" alt="The console logs inside of your function will show up here." />
+<p>The console logs inside of your function will show up here.</p>
 
 ## The business logic 📊
 

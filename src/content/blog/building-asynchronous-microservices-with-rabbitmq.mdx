@@ -20,7 +20,8 @@ At it's core, RabbitMQ allows you to decouple your services from one another by 
 
 This architecture means that the producers don't know which consumers are going to read their messages, and the consumers don't know which producers are creating them. The simplest way that we can transmit a message through this system is known as a "direct exchange." Here's a diagram of the data flow.
 
-![This is how RabbitMQ's direct exchange works.](../images/inline_images/RabbitMQ.png "This is how RabbitMQ's \"direct exchange\" works.")
+<img src="/inline_images/RabbitMQ.png" alt="This is how RabbitMQ's direct exchange works." />
+<p>This is how RabbitMQ's "direct exchange" works.</p>
 
 First, the producer microservice creates a message and publishes it to the exchange. The message contains both the payload (RabbitMQ uses binary by default) and the "routing key" of the message. The type of exchange that this message is published to is a "direct exchange," which means that the message will be sent to a single queue, where the <em>binding key</em> of the queue matches the routing key of the message.
 
@@ -32,13 +33,15 @@ Once the message is sent to the correct queue, the consumer can consume it.
 
 The above example is the simplest to understand, but it's not the only kind of communication routing RabbitMQ knows how to perform. The way the message is routed through the system, in fact, is only partly determined by the routing key encoded in the message. The routing is also controlled by the <em>type of exchange</em> used. Another very common exchange type is a "fanout" exchange. In this case, the routing key is ignored, and the message is routed to <em>all</em> of the queues that are bound to it.
 
-![The "fanout" routing strategy sends a message to every bound queue.](../images/inline_images/rabbitMQfanout.png "The \"fanout\" routing strategy sends a message to every bound queue.")
+<img src="/inline_images/rabbitMQfanout.png" alt="The 'fanout' routing strategy sends a message to every bound queue." />
+<p>The "fanout" routing strategy sends a message to every bound queue.</p>
 
 This is basically the pub/sub model. 
 
 There are a few other types of exchanges, but other one we'll cover is the topic exchange. If the direct exchange is the most "precise" form of routing, and the fanout is the least precise, the topic exchange is somewhere in the middle—messages are routed to queues whose binding key partially matches the routing key of the message.
 
-![The topic exchange sends a message to every queue whose binding key partly matches the routing key.](../images/inline_images/rabbitTopicExchange.png "The topic exchange sends a message to every queue whose binding key partly matches the routing key.")
+<img src="/inline_images/rabbitTopicExchange.png" alt="The topic exchange sends a message to every queue whose binding key partly matches the routing key." />
+<p>The topic exchange sends a message to every queue whose binding key partly matches the routing key.</p>
 
 In the preceding exmple, the message was forwarded to two different queues, whose binding keys partially matched the routing key of the message. The message was not sent to the third queue because its binding key did not match, even partly.
 
@@ -52,7 +55,8 @@ $ docker run -dit -p 15672:15672 rabbitmq:3.8.1-management
 
 The "management" portion of the image we are using will create a management dashboard that will let us see the container in action. The dashboard will run on port 15672 inside of the container, which we are binding to the host machine so that we can access it. If you go to `http://localhost:15672` on your local machine, you should now be able to access the management console.
 
-![RabbitMQ's management dashboard provides a powerful GUI for the message broker.](../images/inline_images/RabbitMQDashboard.png "RabbitMQ's management dashboard provides a powerful GUI for the message broker.")
+<img src="/inline_images/RabbitMQDashboard.png" alt="RabbitMQ's management dashboard provides a powerful GUI for the message broker." />
+<p>RabbitMQ's management dashboard provides a powerful GUI for the message broker.</p>
 
 By default, the username is `guest` and the password is `guest` too. After logging in, you should see the management console.
 
@@ -349,7 +353,8 @@ if (!RABBIT_URI) {
 
 If we start up our containers again, we should now be publishing messages to our message broker whenever anyone hits our server. We can check that this is working, even though we don't have a consumer set up yet, by navigating to the management console. Head to `http://localhost:3000` in your browser, and refresh the page a few times. Then head to the management console.
 
-![The management console shows that we've send a few messages to the RabbitMQ message broker.](../images/inline_images/RabbitMQMessages.png "The management console shows that we've send a few messages to the RabbitMQ message broker.")
+<img src="/inline_images/RabbitMQMessages.png" alt="The management console shows that we've send a few messages to the RabbitMQ message broker." />
+<p>The management console shows that we've send a few messages to the RabbitMQ message broker.</p>
 
 Great, we're publishing the times of every request to our website whenever anyone makes an HTTP request. Next, we need to consume this information in our consumer microservice.
 

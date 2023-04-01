@@ -327,7 +327,8 @@ If we open up two browsers to our application, we should be able to send message
 
 Here's the full flow of events.
 
-![Data flow between SocketIO clients and the server](/inline_images/socketioNamespaces.png)
+<img src="/inline_images/socketioNamespaces.png" alt="Data flow between SocketIO clients and the server" />
+<p>Data flow between SocketIO clients and the server</p>
 
 As you can see in the diagram, we could in theory push this data out to many different users of our application. This is what makes Websockets so powerful: rather than forcing the client to long-poll our server to get the latest up-to-date information, we can "push" that data out from the server.
 

@@ -16,7 +16,8 @@ Kubernetes helps us keep our API running and healthy, even when it gets taken do
 
 Let's review the infrastructure briefly. Here's a simplified diagram:
 
-![Kubernetes infrastructure](../images/inline_images/kubernetes.png "The Kubernetes ecosystem is complex! Here's the 30,000 foot overview of how Kubernetes works.")
+<img src="/inline_images/kubernetes.png" alt="Kubernetes infrastructure" />
+<p>The Kubernetes ecosystem is complex! Here's the 30,000 foot overview of how Kubernetes works.</p>
 
 What are all these different parts? Let's go through it step by step.
 
@@ -45,7 +46,8 @@ In order to create the resources necessary to run our cluster, we need to have a
 
 Let's create a new user inside of the Identity Access Management (IAM) console inside of AWS, and grant the user administrative privileges. At the end of this process, you should see a screen like this that gives you some keys for the user. I'm calling the user `eksctl` (the name of the tool we're going to be using later in this tutorial).
 
-![Our IAM user keys](../images/inline_images/eksctl-keys.png "These are the credentials we'll use to modify resources on AWS.")
+<img src="/inline_images/eksctl-keys.png" alt="Our IAM user keys" />
+<p>These are the credentials we'll use to modify resources on AWS.</p>
 
 The screen will show you the credentials for the new user, which we're going to save: the `aws_access_key_id` and the `aws_secret_access_key`. We're putting both of these inside of the `~/.aws/credentials` file on our computer, user a new user. This is the file that the AWS CLI picks up when running commands.
 
@@ -141,7 +143,8 @@ $ eksctl get nodegroup --cluster TestCluster
 
 Still don't believe me? You can actually log into the EC2 instances that make up your cluster the same way that you would any other EC2 instance. Go to the EC2 console in AWS, and you'll see three new EC2 instances created, with brand new IP addresses. 
 
-![Our EC2 instances](../images/inline_images/eks-ec2.png "We can see that our EKS is in fact running a bunch of EC2 instances.")
+<img src="/inline_images/eks-ec2.png" alt="Our EC2 instances" />
+<p>We can see that our EKS is in fact running a bunch of EC2 instances.</p>
 
 And because we enabled SSH access earlier, you can log into any of them with the ssh key:
 
@@ -396,7 +399,8 @@ When debugging an application, sometimes the easiest way to connect to the conta
 
 Here's a simplified example of what that looks like.
 
-![The port-forward command](../images/inline_images/port-forward.png "The port-forward process is responsible for mapping your requests to the correct port on the pod within the cluster.")
+<img src="/inline_images/port-forward.png" alt="The port-forward command" />
+<p>The port-forward process is responsible for mapping your requests to the correct port on the pod within the cluster.</p>
 
 In this example, we'll forward the pod's port (3005) to our local machine's port (3010). We can now curl that address on our local machine and we'll hit the container running inside the pod.
 
@@ -473,12 +477,14 @@ In order to make our pods available to anyone on the internet, we actually want 
 
 This service will create a different resource depending on where you're deploying your infrastructure. Since we're deploying with EKS, it'll create AWS resources to route traffice to our cluster. Pretty cool!
 
-![Kubernetes load balancer service](../images/inline_images/load-balancer.png "The load balancer will provide one public-facing internet address and balance traffic across all of our nodes.")
+<img src="/inline_images/load-balancer.png" alt="Kubernetes load balancer service" />
+<p>The load balancer will provide one public-facing internet address and balance traffic across all of our nodes.</p>
 
 Let's first delete our old NodePort service; we don't need that anymore.
 
 ```text
 $ k delete -f infrastructure/np.yaml
+<img src="" alt="" />
 ```
 
 Create the configuration file for our load balancer. It'll look very similar to our NodePort service.

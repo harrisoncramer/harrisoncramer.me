@@ -99,7 +99,8 @@ ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQy/pHHnlxKiTFRH/FAbAgtL
 
 The `instance_ami` for the specific EC2 server you'd like to use by logging onto AWS, and launching a new EC2 instance.
 
-![AWS Dashboard view](../images/inline_images/aws_ami.png "This is where you can find the AMI of the server that you'd like to deploy.")
+<img src="/inline_images/aws_ami.png" alt="AWS Dashboard view" />
+<p>This is where you can find the AMI of the server that you'd like to deploy.</p>
 
 When we setup ssh for our EC2 server later, the `ssh_public_key` will match with the private key from our computer.
 
@@ -410,7 +411,5 @@ $ docker run -dit -p 80:80 nginxdemos/hello
 ```
 
 Now when we visit `your_ip_here` we should see the Nginx server up and running!
-
-![The landing page of our Nginx server when our docker container is running properly.](../images/posts/nginx-terraform-and-docker.png "The landing page of our application after our infrastructure is running.")
 
 Keep in mind that we may still want to configure other pieces of our webserver if this were a production application, such as SSL certificates for HTTPS and perhaps even software like <a href="https://www.fail2ban.org/wiki/index.php/Main_Page">fail2ban</a> which blocks repeated SSH attempts from specific IP addresses, to make your Port 22 more secure. Alternatively, you could setup stricter routing rules for your security groups or even add a <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html">NACL</a> for the VPC to control traffic more broadly.
