@@ -62,10 +62,12 @@ const postData = JSON.stringify(nonDraftPosts);
           node.addEventListener("mousedown", () => {
             window.location.href = `/${url}`;
           });
-          node.classList.add("hover:bg-app-blue");
-          node.classList.add("hover:text-app-black");
-          node.classList.add("py-2");
-          node.classList.add("px-4");
+          node.classList.add(
+            "hover:bg-app-blue",
+            "hover:text-app-black",
+            "py-2",
+            "px-4"
+          );
           node.textContent = post.frontmatter.title;
           searchResultsNode?.appendChild(node);
         });
