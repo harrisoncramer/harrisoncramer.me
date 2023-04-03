@@ -22,9 +22,7 @@ const postData = JSON.stringify(nonDraftPosts);
 </astro-search>
 
 <script>
-  function basename(str: string, sep: string) {
-    return str.slice(str.lastIndexOf(sep) + 1);
-  }
+  import { basename } from "../utils";
   class Search extends HTMLElement {
     constructor() {
       super();

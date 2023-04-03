@@ -1,4 +1,5 @@
 ---
+import { basename } from "../utils";
 import Social from "../components/Social.astro";
 import { Image } from "@astrojs/image/components";
 import type { CollectionEntry } from "astro:content";
@@ -11,6 +12,12 @@ const dateOptions: object = {
   month: "long",
   day: "numeric",
 };
+
+const posts = await Astro.glob("../content/blog/*.{md,mdx}");
+const url = basename(
+  posts.find((post) => post.frontmatter.title === title)?.url,
+  "/"
+);
 
 const formattedPublishDate = new Date(pubDate).toLocaleDateString(
   "en-US",
@@ -40,7 +47,7 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
           <p class="text-right text-sm hover:underline">
             <a
               class="text-app-white"
-              href="https://www.google.com"
+              href={`https://github.com/harrisoncramer/harrisoncramer.me/blob/main/src/content/blog/${url}`}
               aria-label="edit this page on Github"
               >Edit this page on Github
               <div class="w-4">
