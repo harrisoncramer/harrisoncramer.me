@@ -208,7 +208,7 @@ The Dockerfile is also going to be pretty bare bones. We're building off of the 
 
 In our Dockerfile, we're setting a work directory inside the container, copying over and installing our dependencies, and copying over our code. The only thing to note here is that the EXPOSE keyword <a href="https://docs.docker.com/engine/reference/builder/#expose">does not actually</a> expose that port, we need to do it when we run the container.
 
-```dockerfile title="Dockerfile"
+```docker title="Dockerfile"
 FROM node:14-alpine
 RUN apk --no-cache add curl
 

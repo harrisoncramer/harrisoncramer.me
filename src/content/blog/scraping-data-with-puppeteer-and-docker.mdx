@@ -18,7 +18,7 @@ The working files for this tutorial are online <a href="https://s3.amazonaws.com
 
 Before we start writing our code, let's review our what our directory structure should eventually look like:
 
-```bash:title=directory
+```text
 my_scraper/
   src/
     setupPuppeteer.ts
@@ -29,7 +29,6 @@ my_scraper/
   package.json
   package-lock.json
   tsconfig.json
-
 ```
 
 To begin creating our directory, let's create a `src` folder and create our `index.ts` file inside of it. We'll also run `npm init -y` inside our root folder, to initalize an npm directory, and `tsc init` which will create our `tsconfig.json` file. Next, let's install Puppeteer. I'm installing a specific version. We'll also need to install Typescript in order to compile our code, and `ts-node` to run our code in development:
@@ -44,7 +43,7 @@ $ npm install ts-node -D
 
 Great, now our directory should look like this:
 
-```bash:title=directory
+```text
 my_scraper/
   src/
     index.ts
@@ -55,7 +54,7 @@ my_scraper/
 
 Next, let's go into our `tsconfig.json` file in order to configure how Typescript compiles our code:
 
-```json{5,8-9}:title=tsconfig.json
+```json {5,8-9} title="tsconfig.json"
 {
   "compilerOptions": {
     "target": "ES2015",
@@ -83,7 +82,7 @@ Let's now configure our `package.json` file. Remember, we need to setup a `build
 
 We'll also setup a run script to run our project in development. This won't run inside of our Docker container, but we'll use it while building our scraper. Since we're using Typescript, we're going to have to compile and then run our files in one go, which we can do with the <a href="https://www.npmjs.com/package/ts-node">ts-node</a> package. We can tell ts-node to run our index.ts file.
 
-```json{7,8}:title=package.json
+```json {7,8} title="package.json"
 {
   "name": "docker-puppeteer",
   "version": "1.0.0",
@@ -110,7 +109,7 @@ Nice! Now our setup is done, and we can actually start writing the scraper itsel
 
 The first thing that we'll do is setup our puppeteer instance. This is the headless browser that will do our actual scraping.
 
-```js:title=src/setupPuppeteer.ts
+```typescript title="src/setupPuppeteer.ts"
 import puppeteer from "puppeteer";
 
 const setupPuppeteer = async (): Promise<puppeteer.Browser> => {
@@ -136,7 +135,7 @@ This will create a new browser that we can import into our project. We want to k
 
 The browser has a lot of different methods attached, like the `.close()` method, which we'll use at the end our script. For now, we want to create a new page:
 
-```js:title=src/index.ts
+```typescript title="src/index.ts"
 import { setupPuppeteer } from "./setupPuppeteer";
 
 async function execute() {
@@ -157,7 +156,7 @@ And you should see a Chromium browser open a new page! Great. When you close out
 
 Next, we need to write the logic of navigating to a page, and scraping down the data. In this case, we're going to pull down the tile of a dummy website.
 
-```js{6}:title=src/index.ts
+```typescript {6} title="src/index.ts"
 import { setupPuppeteer } from "./setupPuppeteer";
 
 async function execute() {
@@ -173,7 +172,7 @@ Although some libraries exist to help us parse HTML, like <a href="https://githu
 
 The first argument to the function is a callback function, and the second argument is any values we want to pass into the callback as arguments.
 
-```js{7-9}:title=src/index.ts
+```typescript {7-9} title="src/index.ts"
 import { setupPuppeteer } from "./setupPuppeteer";
 
 async function execute() {
@@ -199,7 +198,7 @@ Next, let's return something from the page. We can return the result of calling 
 
 Let's grab the text of the title page, and return that. Then we can log it locally! Finally, we'll close out of our browser.
 
-```js{7-11}:title=src/index.ts
+```typescript {7-11} title="src/index.ts"
 import { setupPuppeteer } from "./setupPuppeteer";
 
 async function execute() {
@@ -235,7 +234,7 @@ The Dockerfile will contain all the information required to install and run our 
 
 Before continuing, we're going to have to make a few small tweaks to our `setupPuppeteer.ts` file. Currently we're not running the browser in headless mode. This will break inside of a container, which doesn't have a GUI. Simply change the headless option:
 
-```js{3}:title=src/setupPuppeteer.ts
+```typescript {3} title="src/setupPuppeteer.ts"
 const setupPuppeteer = async (): Promise<puppeteer.Browser> => {
   const browserOptions = {
     headless: true,
@@ -261,7 +260,7 @@ Rather than reinventing the wheel, we're going to base our image on one supplied
 
 We're also setting a `workdir` which is where we'll store all of our code inside of the container.
 
-```docker:title=Dockerfile
+```docker
 FROM node:14.16.0-buster-slim@sha256:ffc15488e56d99dbc9b90d496aaf47901c6a940c077bc542f675ae351e769a12
 WORKDIR /app
 RUN  apt-get update \
@@ -286,7 +285,7 @@ $ npm install puppeteer-core
 
 We'll also need to tweak our `setupPuppeteer.ts` file to use the correct dependency, puppeteer-core, and to point to our locally installed version of Chromium inside of our Docker container. It's installed with the Dockerfile script at `/usr/local/bin/google-chrome-stable`
 
-```js{1,8}:title=src/setupPuppeteer.ts
+```typescript {1,8} title="src/setupPuppeteer.ts"
 import puppeteer from "puppeteer-core";
 
 const setupPuppeteer = async (): Promise<puppeteer.Browser> => {
@@ -313,7 +312,7 @@ Now, every time we rebuild our image, if we update our node dependencies, Docker
 
 Next, we'll copy over and install our dependencies inside of `package.json` and `package-lock.json` and install them. We'll also copy over the files inside of our `src` directory and the `tsconfig.json` file, which will be used to build our Typescript files into Javascript, when we run our build command.
 
-```docker{13-22}:title=Dockerfile
+```docker {13-22} title="Dockerfile"
 FROM node:14.16.0-buster-slim@sha256:ffc15488e56d99dbc9b90d496aaf47901c6a940c077bc542f675ae351e769a12
 WORKDIR /app
 RUN  apt-get update \
@@ -339,7 +338,7 @@ RUN npm run build
 ```
 Finally, we're going to use Docker's `CMD` command to tell the container what command to run at startup. We'll tell it to use `node` to run the file inside of our build folder.
 
-```docker{23}:title=Dockerfile
+```docker {23} title="Dockerfile"
 FROM node:14.16.0-buster-slim@sha256:ffc15488e56d99dbc9b90d496aaf47901c6a940c077bc542f675ae351e769a12
 WORKDIR /app
 RUN  apt-get update \
@@ -399,5 +398,3 @@ We hardcoded in the path to Chromium, which won't work in development if you've 
 We might also use this same structure to run a number of different scrapers in sequence, for instance with `Promise.all()`, or on a regular cycle, for instance with the <a href ="https://en.wikipedia.org/wiki/Cron">cron</a> scheduler. The possibilities are endless!
 
 As always, hit me up on <a href="https://www.twitter.com/harrisoncramer">Twitter</a> if you have any questions!
-
-

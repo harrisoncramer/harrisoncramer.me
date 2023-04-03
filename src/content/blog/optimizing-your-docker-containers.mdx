@@ -118,7 +118,7 @@ Finally, we'll set up our start script in our `package.json` file to run our `in
 
 Our Dockerfile will simply copy over our `index.js` file into a working directory, and run the start script.
 
-```dockerfile title="Dockerfile"
+```docker title="Dockerfile"
 FROM node:16.0.0
 WORKDIR /app
 COPY . .
@@ -165,7 +165,7 @@ The other syntax is for specifying different releases of the Debian operating sy
 
 We're going to go with Alpine Linux. You can see the exact image file that we're going to be "layering" on top of <a href="https://github.com/nodejs/docker-node/blob/706364e992c4bc7c390db61f39ac7985f23986d0/16/alpine3.14/Dockerfile">on Github (this is one of the official NodeJS docker images)</a>. Let's modify our Dockerfile.
 
-```dockerfile {1} title="Dockerfile"
+```docker {1} title="Dockerfile"
 FROM node:16.0.0-alpine3.11
 WORKDIR /app
 COPY . .
@@ -200,7 +200,7 @@ $ /app exit
 ```
 As you can see, the curl binary is not installed with Alpine Linux by default. No problem, we can just add it during our build steps. Alpine Linux uses the <a href="https://pkgs.alpinelinux.org/packages">apk</a> package manager (which stands for Alpine package management, surprise surprise). Let's modify our Dockerfile again.
 
-```dockerfile {5} title="Dockerfile"
+```docker {5} title="Dockerfile"
 FROM node:16.0.0-alpine3.11
 WORKDIR /app
 COPY . .
@@ -239,7 +239,7 @@ docker build -t docker_tutorial . # The build context is the "."
 What about our project? Our dockerfile is copying the node_modules directory, which we do not need to send to the engine, because we're re-building it at a later step in our Dockerfile. Let's create a .dockerignore file and tell Docker to ignore the directory. The syntax is similar to the .gitignore syntax.
 
 
-```dockerfile title=".dockerignore"
+```docker title=".dockerignore"
 node_modules/
 ```
 
@@ -295,7 +295,7 @@ Again, pulling directly from the documentation: "With multi-stage builds, you us
 
 If we needed a larger base image for the actual _build_ step in our NodeJS application, the process would look something like this:
 
-```dockerfile title="Dockerfile"
+```docker title="Dockerfile"
 # Build layer
 FROM node:16.0.0 AS builder 
 WORKDIR /app
@@ -319,7 +319,7 @@ When we use the `node:16.0.0-alpine3.11` as our base image, there is _still_ som
 Let's try manually starting from a bare-bones Alpine layer (~5MB) and just adding NodeJS ourselves.
 
 
-```dockerfile {11} title="Dockerfile"
+```docker {11} title="Dockerfile"
 # Build layer
 FROM node:16.0.0 AS builder 
 WORKDIR /app
@@ -358,7 +358,7 @@ root
 ```
 Let's <a href="https://stackoverflow.com/questions/49955097/how-do-i-add-a-user-when-im-using-alpine-as-a-base-image">create a new user</a> called "prod" and a new group called "app" that we can use to run our application, so that if someone compromises our container, they won't have root access to all of our secrets. We can fix that by adding a user to our dockerfile.
 
-```dockerfile {12-13} title="Dockerfile"
+```docker {12-13} title="Dockerfile"
 # Build layer
 FROM node:16.0.0 AS builder 
 WORKDIR /app
@@ -393,7 +393,7 @@ Another option for locking down your container is to use a "distroless" base ima
 
 Since these containers do not contain a shell, the `ENTRYPOINT` command must be in vector format (aka, a single entry). It also means that we cannot connect to these containers the same way we've been connecting to our Alpine Linux containers because they do not have a shell for us to use. Here's what our application might look like rewritten with this format.
 
-```dockerfile {12-13} title="Dockerfile"
+```docker {12-13} title="Dockerfile"
 # Build layer
 FROM node:16.0.0-alpine3.11 AS builder
 WORKDIR /app

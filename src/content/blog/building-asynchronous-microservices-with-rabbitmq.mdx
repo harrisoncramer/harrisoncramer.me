@@ -142,7 +142,7 @@ Finally, we want a script to start up our application.
 
 Now, we need to write our Dockerfile. In a real application, you might have two different dockerfiles, one for development and one for production. Check out <a href="">this repository</a> to see how that's accomplished. For now, let's write up a simple dockerfile to start up this application.
 
-```dockerfile
+```docker
 FROM node:12.18.1-alpine
 
 WORKDIR usr/src/app
