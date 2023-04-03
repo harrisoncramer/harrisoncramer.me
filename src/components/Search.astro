@@ -7,7 +7,7 @@ const postData = JSON.stringify(nonDraftPosts);
 <astro-search data-posts={postData}>
   <input placeholder="Search" class="main-app-search" />
   <div
-    class="absolute bg-app-background-dark pt-2 flex flex-col hidden cursor-pointer rounded-4"
+    class="absolute bg-app-background-dark pt-2 flex-col hidden cursor-pointer rounded-4"
     id="search-results"
   >
   </div>
@@ -22,8 +22,8 @@ const postData = JSON.stringify(nonDraftPosts);
 </astro-search>
 
 <script>
-  function basename(str, sep) {
-    return str.substr(str.lastIndexOf(sep) + 1);
+  function basename(str: string, sep: string) {
+    return str.slice(str.lastIndexOf(sep) + 1);
   }
   class Search extends HTMLElement {
     constructor() {
@@ -43,7 +43,7 @@ const postData = JSON.stringify(nonDraftPosts);
       }
 
       input?.addEventListener("input", (event: Event) => {
-        removeResults(event);
+        removeResults();
         const query = (event.target as HTMLInputElement).value;
 
         searchResultsNode.classList.add("hidden");
@@ -56,7 +56,7 @@ const postData = JSON.stringify(nonDraftPosts);
           // if (post.frontmatter.includes(query)) return true;
         });
 
-        results.slice(0, 5).forEach((post) => {
+        for (const post of results.slice(0, 5)) {
           const node = document.createElement("div");
           const url = basename(post.url, "/").replace(".mdx", "");
           node.addEventListener("mousedown", () => {
@@ -70,7 +70,7 @@ const postData = JSON.stringify(nonDraftPosts);
           );
           node.textContent = post.frontmatter.title;
           searchResultsNode?.appendChild(node);
-        });
+        }
       });
 
       input.addEventListener("blur", removeResults);
