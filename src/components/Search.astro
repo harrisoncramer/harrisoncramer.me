@@ -1,0 +1,80 @@
+---
+const posts = await Astro.glob("../content/blog/*.{md,mdx}");
+const nonDraftPosts = posts.filter((post) => !post.frontmatter.draft);
+const postData = JSON.stringify(nonDraftPosts);
+---
+
+<astro-search data-posts={postData}>
+  <input placeholder="Search" class="main-app-search" />
+  <div
+    class="absolute bg-app-background-dark pt-2 flex-col hidden cursor-pointer rounded-4"
+    id="search-results"
+  >
+  </div>
+
+  <style>
+    .main-app-search {
+      @apply py-2 pl-2 border-b text-app-white bg-app-black outline-none;
+      border-bottom-color: rgb(40, 40, 40);
+      font-family: Lora;
+    }
+  </style>
+</astro-search>
+
+<script>
+  function basename(str: string, sep: string) {
+    return str.slice(str.lastIndexOf(sep) + 1);
+  }
+  class Search extends HTMLElement {
+    constructor() {
+      super();
+
+      // Read the message from the data attribute.
+      const posts = this.dataset.posts;
+      const input = this.querySelector("input") as HTMLInputElement;
+      const searchResultsNode = this.querySelector(
+        "#search-results"
+      ) as HTMLElement;
+
+      function removeResults() {
+        while (searchResultsNode?.firstChild) {
+          searchResultsNode.removeChild(searchResultsNode.firstChild);
+        }
+      }
+
+      input?.addEventListener("input", (event: Event) => {
+        removeResults();
+        const query = (event.target as HTMLInputElement).value;
+
+        searchResultsNode.classList.add("hidden");
+        if (query.length === 0) return;
+        searchResultsNode.classList.remove("hidden");
+
+        const results = JSON.parse(posts).filter((post) => {
+          if (post.frontmatter.title.includes(query)) return true;
+          if (post.frontmatter.description.includes(query)) return true;
+          // if (post.frontmatter.includes(query)) return true;
+        });
+
+        for (const post of results.slice(0, 5)) {
+          const node = document.createElement("div");
+          const url = basename(post.url, "/").replace(".mdx", "");
+          node.addEventListener("mousedown", () => {
+            window.location.href = `/${url}`;
+          });
+          node.classList.add(
+            "hover:bg-app-blue",
+            "hover:text-app-black",
+            "py-2",
+            "px-4"
+          );
+          node.textContent = post.frontmatter.title;
+          searchResultsNode?.appendChild(node);
+        }
+      });
+
+      input.addEventListener("blur", removeResults);
+    }
+  }
+  customElements.define("astro-search", Search);
+</script>

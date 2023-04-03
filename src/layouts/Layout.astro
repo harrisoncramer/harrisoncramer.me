@@ -1,0 +1,125 @@
+---
+// import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import "@fontsource/lora";
+import "@fontsource/playfair-display";
+import "@fontsource/raleway";
+
+import Header from "../components/Header";
+import Search from "../components/Search.astro";
+import "normalize.css";
+const { title, description } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <Header client:load>
+    <Search />
+  </Header>
+  <div class="content-wrapper">
+    <slot />
+  </div>
+  <style is:global>
+    *::selection {
+      @apply bg-app-blue text-app-black;
+    }
+
+    html,
+    body {
+      @apply bg-app-background-dark text-app-white;
+      background-image: url("/fabric-dark.png");
+      background-repeat: repeat;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    form {
+      font-family: "Playfair Display";
+      font-weight: 500;
+    }
+
+    /* Increase title size on computers */
+    @media only screen and (min-width: 875px) {
+      h1 {
+        font-size: 2.75em;
+      }
+    }
+
+    h2 {
+      font-size: 1.75em;
+    }
+
+    p,
+    li {
+      font-size: 1.2em;
+      font-family: "Lora";
+    }
+
+    a {
+      color: #9ec4ff;
+    }
+
+    .content-wrapper {
+      background-size: 12px;
+      padding: 1.5em;
+      display: flex;
+      flex-direction: column;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Blog post content */
+    div[data-rehype-pretty-code-fragment] {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      max-width: 850px;
+      overflow: auto;
+      background-color: #212126;
+    }
+
+    div[data-rehype-pretty-code-title] {
+      padding-right: 12px;
+      text-align: right;
+    }
+
+    pre > code > span {
+      background-color: #212126;
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    pre > code {
+      display: grid;
+      background-color: rgba(200, 200, 255, 0.09);
+    }
+
+    .highlighted {
+      background-color: rgba(200, 200, 255, 0.1);
+      border-left-color: #9ec4ff;
+      border-left-width: 3px;
+      border-left-style: solid;
+    }
+
+    /* Loading image */
+    .skeleton {
+      animation: skeleton-loading 0.5s linear infinite alternate;
+    }
+
+    @keyframes skeleton-loading {
+      0% {
+        @apply bg-app-background-medium;
+      }
+      100% {
+        @apply bg-app-background-medium-dark;
+      }
+    }
+  </style>
+
+
+</html>

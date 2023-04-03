@@ -1,0 +1,39 @@
+---
+title: Welcome to my blog!
+pubDate: 2020-06-22
+description: This is a template post that shows what's possible with my blog.
+heroImage: my-first-post
+imageDescription: An image of some code in an editor
+slug: my-first-post
+draft: true
+---
+import MyCounter from "../../components/MyCounter.tsx"
+
+Welcome to the blog section of my personal website! This is where I'll share what I'm learning about in the software world, both at work and in my personal capacity.
+
+## What will you be writing about?
+
+I'll be focused mostly on Typescript and Golang, but will also upload posts relating to Docker, Kubernetes, and other technologies I'm interested in. I'm also an avid Neovim user, and will ocassionally post about some of the things I'm learning about the editor—whether it's new plugins that speed up productivity, or built-in features that I'm learning to master.
+
+Most of the posts will be for my own reference and will therefore be explanatory or otherwise instructional.
+
+## What's the technology stack of this site?
+
+This site is built on <a aria-label="astro" href="https://www.astro.build">Astro</a> with a CI/CD pipeline using Github Actions. It is hosted on AWS using <a href="https://www.terraform.io/">Terraform</a>, and the <a href="https://github.com/harrisoncramer/harrisoncramer.me">source code</a> is available on Github. The posts in this section are originally written in markdown and converted to HTML. I'll style code snippets like this:
+
+
+```javascript
+var a, b, c;
+a = 5;
+b = 6;
+c = a + b;
+document.getElementById('demo1').innerHTML = c;
+```
+
+Finally, because Astro supports embedding Javascript into markdown via MDX, we can even embed components, like this:
+
+<MyCounter client:load />
+
+The above counter is a React component that I've embedded into the Markdown on this page!
+
+I've recently migrated this entire site from Gatsby (booo, hiss) to Astro. There are likely to be weird quirks or UI bugs. If anything is confusing or looks off, please let me know!

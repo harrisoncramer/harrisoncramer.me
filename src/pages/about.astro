@@ -1,0 +1,36 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title={"About"}
+  description={"A little bit more about me, Harrison Cramer, and this blog"}
+>
+  <div class="mt-4 flex flex-col gap-4">
+    <h1 class="mb-4">Hello!</h1>
+    <p>
+      You're probably looking for the <a aria-label="software blog" href="/"
+        >software blog</a
+      >.
+    </p>
+    <h2 class="mt-4">What is this site?</h2>
+    <p>
+      This blog is intended to serve as a resource for other developers using
+      Go, Vue/React, GraphQL, Kubernetes, and much more. It's built primarily
+      with Astro, Tailwind, Github Actions, and Terraform. Please make a pull
+      request if you want to fix a bug or suggest a feature. The{" "}
+      <a href="https://github.com/harrisoncramer/harrisoncramer.me">
+        repository
+      </a>{" "}
+      is on Github.
+    </p>
+    <h2 class="mt-4">About me</h2>
+    <p>
+      My name is Harrison, and I'm a software engineer living in Brooklyn. Prior
+      to my career in software, I was a reporter in Washington, where I covered
+      foreign policy and the military. Please take a look at my <h
+        href="https://hjc-public.s3.amazonaws.com/cramer_resume.pdf">resume</h
+      > for my full work history.
+    </p>
+  </div>
+</Layout>

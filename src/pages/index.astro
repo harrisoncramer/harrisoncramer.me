@@ -1,0 +1,49 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { CollectionEntry, getCollection } from "astro:content";
+import PostPreview from "../components/PostPreview.astro";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <main>
+    <section>
+      <ul>
+        <PostPreview
+          post={posts.at(0) as CollectionEntry<"blog">}
+          featured={true}
+        />
+      </ul>
+      <ul class={"all-posts"}>
+        {
+          posts
+            .slice(1, posts.length)
+            .map((post) => <PostPreview post={post} />)
+        }
+      </ul>
+    </section>
+  </main>
+</Layout>
+
+<style is:global>
+  .all-posts .post {
+    @apply mb-16;
+  }
+  @media only screen and (min-width: 800px) {
+    .all-posts {
+      @apply grid grid-cols-2 gap-6;
+    }
+
+    .all-posts img {
+      @apply w-full;
+    }
+
+    .all-posts .post {
+      @apply mb-8;
+    }
+  }
+</style>
