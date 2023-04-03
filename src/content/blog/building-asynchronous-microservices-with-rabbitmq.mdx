@@ -10,13 +10,13 @@ slug: building-asynchronous-microservices-with-rabbitmq
 
 Message brokers are a powerful inter-service communication tool when building a distributed application. Rather than forcing every service to communicate synchronously, likely through HTTP requests, message brokers let us decouple the services from each other and communicate <em>asynchronously</em> instead. This can make our application more fault-tolerant, because if one service fails, the entire request will not necessarily fail, and more performant, because our producer can immediately continue executing after it sends a message off to the broker.
 
-One of the most popular open-source message brokers is RabbitMQ. This blog is designed to demonstrate the very basics of RabbitMQ's functionality in Node, and to show how you can convert a potentially synchronous process using the tool. The code for this post is online <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/rabbitmq.tar.gz">here</a>.
+One of the most popular open-source message brokers is RabbitMQ. This blog is designed to demonstrate the very basics of RabbitMQ's functionality in Node, and to show how you can convert a potentially synchronous process using the tool. The code for this post is online <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/rabbitmq.tar.gz">for download from my S3 bucket</a>.
 
 This tutorial leans heavily on Ashley Davis' book "Bootstrapping Microservices" which I'd <a href="https://www.manning.com/books/bootstrapping-microservices-with-docker-kubernetes-and-terraform">highly recommend</a> getting if you are interested in distributed applications.
 
 ## How does RabbitMQ work?
 
-At it's core, RabbitMQ allows you to decouple your services from one another by providing an abstract API through which they can all communicate.  Whitney Lee from IBM gives an excellent overview of RabbitMQ <a href="https://www.youtube.com/watch?v=7rkeORD4jSw">here</a>, where she compares it to a post office: messages come into the broker from producers on the one side, and head out to queues on the other side, based on the "address" provided by the producer. The consumer microservices then pull messages out of those queues and process them, when they're able to.
+At it's core, RabbitMQ allows you to decouple your services from one another by providing an abstract API through which they can all communicate.  There's an excellent overview of RabbitMQ <a href="https://www.youtube.com/watch?v=7rkeORD4jSw">on this Youtube video from Whitney Lee at IBM</a>, where she compares it to a post office: messages come into the broker from producers on the one side, and head out to queues on the other side, based on the "address" provided by the producer. The consumer microservices then pull messages out of those queues and process them, when they're able to.
 
 This architecture means that the producers don't know which consumers are going to read their messages, and the consumers don't know which producers are creating them. The simplest way that we can transmit a message through this system is known as a "direct exchange." Here's a diagram of the data flow.
 

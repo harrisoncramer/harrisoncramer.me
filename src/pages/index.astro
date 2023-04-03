@@ -12,10 +12,12 @@ const posts = (await getCollection("blog")).sort(
 <Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <main>
     <section>
-      <PostPreview
-        post={posts.at(0) as CollectionEntry<"blog">}
-        featured={true}
-      />
+      <ul>
+        <PostPreview
+          post={posts.at(0) as CollectionEntry<"blog">}
+          featured={true}
+        />
+      </ul>
       <ul class={"all-posts"}>
         {
           posts

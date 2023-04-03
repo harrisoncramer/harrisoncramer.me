@@ -10,7 +10,7 @@ slug: optimizing-your-webpack-bundle
 
 Myself and some other engineers were in the process of deploying <a href="https://loql.land">loql.land</a> to a production environment last weekend, and I noticed that we had forgotten to optimize the webpack build. The lighthouse scores were horrific: We were shipping around 9MB to the client! After a few hours of work (mostly research) we were able to cut our bundle size to less than 100KB. 
 
-Here are some of the steps we took, which are generally applicable to all projects. This tutorial is written for Webpack v5, and assumes you have a simple working repository that you would like to optimize. If you'd rather view our finished code, you can download it <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/loql.tar.gz">here</a>.
+Here are some of the steps we took, which are generally applicable to all projects. This tutorial is written for Webpack v5, and assumes you have a simple working repository that you would like to optimize. If you'd rather view our finished code, you can download it <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/loql.tar.gz">from my S3 bucket</a>.
 
 <p class="tip">If you're unfamiliar with tar files, <a class="dark__link" href="https://linuxize.com/post/how-to-extract-unzip-tar-gz-file/">this</a> guide will help you expand the repository!</p>
 

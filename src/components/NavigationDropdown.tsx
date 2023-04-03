@@ -21,7 +21,7 @@ const NavigationDropdown = (): JSX.Element => {
 
   return (
     <nav>
-      <button>
+      <button aria-label="Navigation button">
         <svg
           ref={dropdownRef}
           className="cursor-pointer"

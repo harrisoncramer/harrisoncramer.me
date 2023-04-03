@@ -10,7 +10,7 @@ slug: building-a-powerful-neovim-configuration
 
 I've been using Neovim as my primary editor for about three years. In that span, the editor and community surrounding the tool has undergone a dizzying amount of change. People moved onto Lua, the core team integrated LSPs directly into the editor, and the plugin ecosystem exploded. Much like the ever-changing frontend world, it can be hard to keep up with the latest and greatest with Neovim core, let alone the plugin ecosystem. 
 
-This post is by no means an exhaustive "how to" for setting up debuggers, LSPs, linters, or other tools. Rather, I hope this post gives inspiration to others building their configurations. The post is based on my own, which can be found <a href="https://www.github.com/harrisoncramer/nvim">here</a>.
+This post is by no means an exhaustive "how to" for setting up debuggers, LSPs, linters, or other tools. Rather, I hope this post gives inspiration to others building their configurations. The post is based on my own, which can be found <a href="https://www.github.com/harrisoncramer/nvim">on my Github here</a>.
 
 If you've got ideas on how I can improve my own workflow or ideas about what to cover next, please drop a comment below! 
 
@@ -217,20 +217,20 @@ local stash_filter = function()
 end
 ```
 
-Going through all of the specifics of how to configure and use Telescope is beyond the socpe of this post, especially given that it has it's own plugins which can be configured. But highly recommend checking it out if you're using bare FZF, AG, RG, or another searching tool. My configuration for Telescope is <a href="https://github.com/harrisoncramer/nvim/tree/main/lua/plugins/telescope">here</a>.
+Going through all of the specifics of how to configure and use Telescope is beyond the socpe of this post, especially given that it has it's own plugins which can be configured. But highly recommend checking it out if you're using bare FZF, AG, RG, or another searching tool. My configuration for Telescope is <a href="https://github.com/harrisoncramer/nvim/tree/main/lua/plugins/telescope">part of my dotfiles on Github</a>.
 
 
 ## Testing
 
 I've gone through a series of different test runners with Neovim, and ultimately landed on <a href="https://github.com/nvim-neotest/neotest">Neotest</a>. The tool lets you run tests within the browser directly and gives you amazing jump-to-error support. For instance, within a Vitest file, I can run the file under my cursor with a user-defined hotkey, and see the output both as virtual text within the editor and via a popup in the sidebar.
 
-<img src="/inline_images/neotest-1.png" />
+<img src="/inline_images/neotest-1.png" alt="Neotest" />
 
 The output of the process is also directly available within the editor, which is super nice if you want to see why a test failed or other logging information.
 
-<img src="/inline_images/neotest-2.png" />
+<img src="/inline_images/neotest-2.png" alt="Another Neotest image" />
 
-There are of course times where you'll want to split your test runner into a separate terminal. But I've largely found that Neotest gives me the ability to target specific tests more easily, track output, view error messages, and everything else that I need without context switching from the editor. My configuration for Neotest is <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/neotest.lua">here</a>.
+There are of course times where you'll want to split your test runner into a separate terminal. But I've largely found that Neotest gives me the ability to target specific tests more easily, track output, view error messages, and everything else that I need without context switching from the editor. My configuration for Neotest is <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/neotest.lua">is also part of my dotfiles on Github</a>.
 
 ## Git
 
@@ -290,7 +290,7 @@ Sometimes you need to leave Neovim. I've got two approaches to this. Primarily, 
 
 Often, though, the terminal command that I need is very small (like an `ls` or `grep` or something like that). In those cases, I use <a href="https://github.com/numToStr/FTerm.nvim">FTerm.nvim</a>. It's a simple terminal toggle that you can switch open/closed when you need it. No frills, gets the job done.
 
-A terminal theming tool that I'd recommend is <a href="https://github.com/romkatv/powerlevel10k">powerlevel10k</a>, a ZSH theme that lets you get git status information, AWS environment information, and other goodies in your shell. Finally, I'm using Tmux. I've tried a few different configuration tools but have opted to just roll my own. It's quite simple, and it's <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/tmux/.tmux.conf">here</a>.
+A terminal theming tool that I'd recommend is <a href="https://github.com/romkatv/powerlevel10k">powerlevel10k</a>, a ZSH theme that lets you get git status information, AWS environment information, and other goodies in your shell. Finally, I'm using Tmux. I've tried a few different configuration tools but have opted to just roll my own. It's quite simple, and it's <a href="https://github.com/harrisoncramer/.dotfiles/blob/main/tmux/.tmux.conf">on my dotfiles on Github</a>.
 
 ## LSPs
 

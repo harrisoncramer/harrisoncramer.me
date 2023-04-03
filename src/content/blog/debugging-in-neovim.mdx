@@ -32,7 +32,7 @@ Translating this to a specific language like Golang, we need the following piece
 
 In order to debug a program you need a debugger. This is the tool, typically but not always a binary executable, that runs completely outside of Neovim and attaches to the running process you are trying to debug. To debug the application, I'm going to use the <a href="https://github.com/go-delve/delve">Delve</a> debugger. 
 
-The program that I'm going to "debug" is a simple TCP server implemented in Golang. You can get the same source code <a href="https://github.com/harrisoncramer/go-connect-tcp.git">here</a> or you can use your own program.
+The program that I'm going to "debug" is a simple TCP server implemented in Golang. You can get the same source code <a href="https://github.com/harrisoncramer/go-connect-tcp.git">from my Github, here,</a> or you can use your own program.
 
 You can compile and run the TCP server by navigating to the root directory, and running: 
 
@@ -300,7 +300,7 @@ local go = {
 
 ## Repeating this for NodeJS
 
-The above pattern lets us easily set up debuggers for a variety of different languages and tools. For a full list of the supported configurations you can go <a href="https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation">here</a>.
+The above pattern lets us easily set up debuggers for a variety of different languages and tools. For a full list of the supported configurations you can go <a href="https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation">to Nvim-DAP's documentation on Github</a>.
 
 For instance, let's set up a debugger for Node (server-side Javascript) now.
 
@@ -367,6 +367,6 @@ We've now walked through the installation of the debugger, the debugger adapter,
 
 It's worth mentioning that you can achieve configuration of the debug adapter for Go specifically with <a href="https://github.com/leoluz/nvim-dap-go">nvim-dap-go</a>, which will effectively write the `dap.configurations.go` and `dap.adapters.go` sections of your DAP configuration for you. You'll still need to install the debugger (delve) in order to use it, and the UI. If you prefer a more out-of-the-box configuration for Golang specifically, this plugin is quite nice.
 
-Finally, you can find my personal dotfiles <a href="github.com/harrisoncramer/nvim">here</a> and specifically my debugger configuration <a href="https://github.com/harrisoncramer/nvim/tree/main/lua/plugins/dap">here</a>.
+Finally, you can find my personal dotfiles <a href="github.com/harrisoncramer/nvim">on my Github account</a> and specifically my <a href="https://github.com/harrisoncramer/nvim/tree/main/lua/plugins/dap">debugger configuration</a>.
 
 

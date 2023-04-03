@@ -4,7 +4,6 @@ pubDate: 2021-08-07
 description: Websockets are a great way to breathe life into an otherwise stale application. Implement them easily with SocketIO, the defacto standard for NodeJS applications.
 heroImage: socket
 imageDescription: Socket
-draft: true
 slug: building-a-chat-application-with-socketio
 ---
 
@@ -12,7 +11,7 @@ Adding real-time chat functionality can be a great way of spicing up an otherwis
 
 This post will walk through the basics of setting up a SocketIO server. We'll keep the rest of the application very simple—using vanilla Javascript, with no CSS styling. The same principles would apply here for a production-grade application using Webpack and React, however.
 
-The completed project can be downloaded <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/socketio.tar.gz">here</a>.
+The completed project can be downloaded <a href="https://s3.amazonaws.com/harrisoncramer.me.assets/socketio.tar.gz">from my S3 bucket</a>.
 
 ## The project structure
 
@@ -39,7 +38,7 @@ Then we'll create our `index.html` file that we'll be serving. We'll require `so
 
 ```html {5,23} title="index.html"
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Socket.IO chat</title>
     <script src="/socket.io/socket.io.js"></script>

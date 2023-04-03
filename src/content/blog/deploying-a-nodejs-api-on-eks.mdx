@@ -95,7 +95,7 @@ The `eksctl` CLI takes a number of commands, but the one we're interested in is 
 $ eksctl create cluster --help
 ```
 
-As you can see, there are a ton of options that we can pass to the command. We *could* pass these all in as flags, per the AWS documentation <a href="https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html">here</a>.
+As you can see, there are a ton of options that we can pass to the command. We *could* pass these all in as flags, per the AWS documentation <a href="https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html">on Amazon's EKSCTL documentation</a>.
 
 Instead of passing the information as flags, we're going to define a `.yaml` file that will contain our configuration. We're going to make a configuration file like <a href="https://github.com/weaveworks/eksctl/blob/main/examples/01-simple-cluster.yaml">this</a> from the eksctl repository. This allows us to commit our infrastructure files into our repository for our project. It also is repeatable and tells other developers how our project is configured.
 
@@ -269,7 +269,7 @@ We provide configuration for our cluster through yaml files. We send the data in
 
 Some of the commands that we'll run from here on out will be one-liners, but they will generally only be commands that "get" the current state of our application. We're not going to create or modify resources outside of our configuration files.
 
-<p class="tip">I'd highly recommend setting up an <a class="dark__link" href="https://linuxize.com/post/how-to-create-bash-aliases/">alias</a> for the <code class="language-text">kubectl</code> command, to make it quicker to write. For the rest of this post, I'll be using <code class="language-text">k</code> as an alias. I'd also recommend enabling autocompletion for your shell. I'm using ZSH, and the instructions are <a class="dark__link" href="https://kubernetes.io/docs/tasks/tools/included/optional-kubectl-configs-zsh/">here</a>, but the process is similar for Bash and Powershell</p>
+<p class="tip">I'd highly recommend setting up an <a class="dark__link" href="https://linuxize.com/post/how-to-create-bash-aliases/">alias</a> for the <code class="language-text">kubectl</code> command, to make it quicker to write. For the rest of this post, I'll be using <code class="language-text">k</code> as an alias. I'd also recommend enabling autocompletion for your shell.
 
 Quick note: when we do apply our configuration files, `kubectl` will create the resources inside of the "context" in which it's operating. If the context is not your EKS cluster, then switch it:
 
@@ -485,7 +485,6 @@ Let's first delete our old NodePort service; we don't need that anymore.
 
 ```bash
 $ k delete -f infrastructure/np.yaml
-<img src="" alt="" />
 ```
 
 Create the configuration file for our load balancer. It'll look very similar to our NodePort service.
