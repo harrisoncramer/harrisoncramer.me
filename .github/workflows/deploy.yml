@@ -22,7 +22,7 @@ jobs:
       - name: Send assets to S3 and invalidate old cloudfront distribution
         uses: reggionick/s3-deploy@v3
         with:
-          folder: public
+          folder: dist
           bucket: ${{ secrets.AWS_BUCKET_NAME }}
           bucket-region: ${{ secrets.AWS_BUCKET_REGION }}
           dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
