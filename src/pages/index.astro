@@ -1,10 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
-import { CollectionEntry, getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import PostPreview from "../components/PostPreview.astro";
+import { getNonDraftPosts } from "../utils";
 
-const posts = (await getCollection("blog")).sort(
+const posts = (await getNonDraftPosts()).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 ---
