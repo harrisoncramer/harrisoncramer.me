@@ -1,5 +1,4 @@
 ---
-// import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import "@fontsource/lora";
 import "@fontsource/playfair-display";
 import "@fontsource/raleway";
@@ -8,6 +7,13 @@ import Header from "../components/Header";
 import Search from "../components/Search.astro";
 import "normalize.css";
 const { title, description } = Astro.props;
+
+/* Get stars of repo */
+const response = await fetch(
+  "https://api.github.com/repos/harrisoncramer/harrisoncramer.me"
+);
+const json = await response.json();
+const stars = json.watchers_count as number;
 ---
 
 <html lang="en">
@@ -17,7 +23,7 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
     <title>{title}</title>
   </head>
-  <Header client:load>
+  <Header client:load stars={stars}>
     <Search />
   </Header>
   <div class="content-wrapper">
