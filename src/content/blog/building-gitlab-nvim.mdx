@@ -5,26 +5,29 @@ description: I've recently begun building the first open-source Gitlab client fo
 heroImage: gitlab_and_neovim
 imageDescription: An image of some code in an editor
 slug: building-a-gitlab-client-for-neovim
-draft: true
 ---
 
 You're hard at work, developing some feature, and your colleague sends you a DM: "Can you review my pull request?"
 
 You oblige, leave some comments, and are quickly back to your work. Five minutes later, you get another message: "Can you review the changes?"
 
-Most developers will be familiar with this scenario. Reviewing MRs, while good for the team, is undoubtedly one of the most disruptive events that occurs during the workday. Although we can't completely eliminate the context-switching that reviewing others' code requires, we _can_ bring that review process into the environment we know and love: Neovim.
+Most developers will be familiar with this scenario. Reviewing MRs, while good for the team, is undoubtedly one of the most disruptive events that occurs during the workday. We can't completely eliminate the context-switching that's required for code reviews. We _can_ bring that review process into the best editor on the planet: Neovim.
 
-For the past couple of months, I've been building <a href="https://github.com/harrisoncramer/gitlab.nvim/">gitlab.nvim</a>, a client for Neovim that lets you review and manage merge requests directly within the editor. The plugin lets you approve and revoke approval for merge requests, comment on changes, reply in discussions and mark discussion as completed, and much more.
+For the past couple of months, I've been building <a href="https://github.com/harrisoncramer/gitlab.nvim/">gitlab.nvim</a>, a client for Neovim that lets you review and manage merge requests directly within the editor. The plugin lets you approve and revoke approval for merge requests, comment on changes, reply in discussions, and much more.
 
 ## How it works
 
-The plugin, which is built in Lua and Go, is is designed to interact directly with Gitlab's APIs via the <a href="https://github.com/xanzy/go-gitlab">go-gitlab</a> package -- the same library that Gitlab's CLI tool is built on. 
+The plugin is built in Lua and Go, and is designed to interact directly with Gitlab's APIs via the <a href="https://github.com/xanzy/go-gitlab">go-gitlab</a> package -- the same library that Gitlab's CLI tool is built on. 
 
-When you start up Neovim, the plugin will initialize a Go server that runs in the background. The plugin passes JSON to that server, which is responsible for sending the data over to Gitlab to PUT, PATCH, POST, or otherwise interact with Gitlab to update the MR. This setup allows for the heart of the data processing to occur in a type-safe and easy to debug language, while the UI code stays in the editor itself. This separation of the Gitlab API from the plugin code also makes debugging the server separately much easier -- it's just a normal server running on your machine, and can be Curl'd like any other process.
+When you start up Neovim, the plugin will initialize a Go server that runs in the background. Neovim passes JSON to that server, which sends that data over to Gitlab to update the MR that you've checked out in your terminal. This setup allows for the heart of the data processing to occur in Go, a type-safe and easy to debug language, while the UI code stays in the editor itself. 
+
+This separation of the Gitlab API from the plugin code also makes debugging the server separately much easier -- it's just a normal server running on your machine, and can be Curl'd like any other process.
 
 <img src="/inline_images/plugin_overview.png" alt="The plugin separates the core API logic from the UI logic" />
 
-Let's trace a single request through the system, for instance: Adding an assignee to a merge request. First, you would invoke the `add_reviewer()` function, typically via a keybinding. The function call would look like this:
+## Tracing a Request
+
+Let's trace a single request through the plugin: Adding an assignee to a merge request. First, you would invoke the `add_reviewer()` function, typically via a keybinding. The function call would look like this:
 
 ```lua
 require("gitlab").add_reviewer()
@@ -35,7 +38,7 @@ The plugin is written in a functional style, and this function will call a serie
 M.ensureState(M.ensureProjectMembers(assignees_and_reviewers.add_reviewer))
 ```
 
-The `ensureState` function, which is called first, is responsible for starting the Go server. If the server is already running, it calls the next callback immediately. If not, it'll start the server first, and hit the "info" endpoint immediately. This endpoint sets some basic state for the plugin required for other calls to function, such as the merge request's ID, current reviewers, description and title, and so forth.
+The `ensureState` function, which is called first, is responsible for starting the Go server. If the server is already running, it calls the next callback immediately. If not, it'll start the server first, and hit the "info" endpoint. This endpoint sets some basic state for the plugin required for other calls to function, such as the merge request's ID, current reviewers, description and title, and so forth.
 
 
 ```lua
@@ -66,7 +69,7 @@ end
 
 After that state is initialized, the next callback -- in this case `ensureProjectMembers` -- is called. The `ensureProjectMembers` function is another "ensure" function that is responsible for setting state (in this case it fetches all possible members in the current project). 
 
-As an aside this pattern of assuring state is pretty replicable and is used throughout the plugin for all the commands:
+As an aside, this pattern of assuring state is pretty replicable and is used throughout the plugin for all the other commands. This lets us defer making API calls to Gitlab until they're absolutely necessary:
 
 ```lua
 M.summary                = M.ensureState(summary.summary)
@@ -86,7 +89,7 @@ M.delete_assignee        = M.ensureState(M.ensureProjectMembers(assignees_and_re
 
 Okay, back to the reviewer code: The `add_reviewer` function is called. This code is responsible for opening a popup via Neovim's native `vim.ui.select` API and prompting the user to choose a reviewer from the list of available reviewers. Notice that the `add_popup` function is generalized to accomodate other types of popups:
 
-```lua
+```lua {19-22}
 M.add_reviewer    = function()
   M.add_popup('reviewer')
 end
@@ -113,7 +116,7 @@ M.add_popup       = function(type)
 end
 ```
 
-The key line to notice here is the `job.run_job` line, which kicks off an API call to the Golang server and processes the results into a Lua table. That table is returned to the callback function as the `data` variable here.
+The key line to notice here is the `job.run_job` line, which kicks off an API call to Golang server's `/mr/reviewer` endpoint. The Go server processes the results into a Lua table, which is returned to the callback function as the `data` variable.
 
 What happens on the Go side of the fence?
 
@@ -237,17 +240,17 @@ func ReviewersHandler(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-On a success, this data is passed back to the Lua side of the fence, where it's used to update the UI and notify the user that the success was successful.
+When the call is successful, that data is passed back to the Lua side of the fence, where it's used to update the UI and notify the user that the success was successful. The UI code is responsible for updating the UI to reflect the new state of the MR. When the API call fails, the Lua `job` handler (not shown) will handle it and inform the user.
 
 ## Compiling the Go Binary
 
-Neovim took a quantum leap forward when maintainers embedded Lua into the editor. For the first time, developers could write plugins in a language that was designed for extensibility and ease of use.
+Neovim took a quantum leap forward when maintainers embedded Lua into the editor. For the first time, developers could write plugins in a language other than Vimscript.
 
-However, we'd be kidding ourselves if we said that Lua was the best language for API-heavy tasks, especially when robust and mature libraries exist for external APIs like Gitlab's. Using a combined Lua and Go approach makes it possible to debug the UI and data-fetching sides of the application independently, and to more quickly quickly isolate the cause of bugs.
+However, we'd be kidding ourselves if we said that Lua was the best language for API-heavy tasks, especially when robust and mature libraries already exist for external APIs, like Gitlab's. By combining Lua and Go, we can separate the UI from the data-fetching side of the application. This makes it a lot easier to isolate bugs.
 
-The special sauce is gluing these two sides of the fence together in a way that's stable. 
+The special sauce, of course, is gluing these two sides of the fence together.
 
-Fortunately, amazing plugin managers like <a href="https://github.com/folke/lazy.nvim">Lazy</a> have smoothed over a lot of the rough edges of binary management. In the past this friction might have turned engineeers away from compiled solutions involving languages like Go or Rust.
+Fortunately, amazing plugin managers like <a href="https://github.com/folke/lazy.nvim">Lazy</a> have smoothed over a lot of these rough edges. In the past, this friction might have turned engineeers away from compiled solutions involving languages like Go or Rust.
 
 Now, whenever a user updates the plugin, Lazy will re-run the compilation of the Go binary. For gitlab.nvim, that compilation step is just a Lua function, like this:
 
@@ -303,11 +306,10 @@ end
 
 This is the _simplified_ version of setting a popup, too, since it relies on the <a href="https://github.com/MunifTanjim/nui.nvim">nui.nvim</a> plugin for the management of the popup.
 
-Neovim's APIs for setting text and color are not nearly as robust as those for the web. This isn't surprising: Neovim exists in the terminal and is bound by the laws of physics: set character widths, terminal colors, and so forth. I'm excited to see how this area of the ecosystem develops in the near future.
+Neovim's APIs for setting text and color are not nearly as robust as those for the web. This isn't surprising: Neovim exists in the terminal and is bound by the laws of physics like set character widths and terminal colors. I'm excited to see how this area of the ecosystem develops in the near future.
 
 ## Closing Thoughts
 
-This plugin still has a ways to go: the UI management needs work, and in particular the line number and file detection code needs work (detecting the specific commit hash and file/line number of a comment is surprisingly difficult). But I'm excited to see where it goes, and hope that it can make reviewing MRs a little less painful for developers everywhere.
+This plugin still has a ways to go. In particular, the line number and file detection code needs work, when it comes to leaving comments on MRs. Detecting the specific commit hash and file/line number of a comment is surprisingly difficult. Still, I'm excited to see where it goes, and I hope that it can make reviewing MRs a little less painful for Neovim users everywhere.
 
-If you start using it or have thoughts, please feel free to drop a <a href="https://github.com/harrisoncramer/gitlab.nvim/">issue or suggestion</a> on the project. Cheers!
-
+If you start using it or have thoughts, please feel free to drop a <a href="https://github.com/harrisoncramer/gitlab.nvim/">issue or suggestion</a> on the project.
