@@ -26,7 +26,7 @@ Swagger, recently renamed to OpenAPI, is an [open source API specification](http
 
 When using OpenAPI, engineers can write these contract documents first, often as YAML or JSON, before implementing them in code.
 
-This lets engineers use those contracts in code generation tools to build common boilerplate, validation middleware, cross-langauge type safety, and tests. It also frees engineers to focus the application's business logic.
+This lets engineers use those contracts in code generation tools to build common boilerplate, validation middleware, cross-language type safety, and tests. It also frees engineers to focus the application's business logic.
 
 In a full-stack Typescript application, a contract for a users endpoint might look like this:
 
@@ -134,7 +134,7 @@ Writing YAML or JSON schemas directly instead of typing APIs in your language of
 
 ## RPCs and TRPC
 
-TRPC, or TypeScript remote procedure call, is a newer technology than OpenAPI, and a good option for engineering teams that are working exclusively in Typescript and want to define their API contracts in the same language. The approach here is also applicable with GRPC and other RPC based approaches, but TRPC has an advantage in that the client code can be written in the same langauge as the schema files.
+TRPC, or TypeScript remote procedure call, is a newer technology than OpenAPI, and a good option for engineering teams that are working exclusively in Typescript and want to define their API contracts in the same language. The approach here is also applicable with GRPC and other RPC based approaches, but TRPC has an advantage in that the client code can be written in the same language as the schema files.
 
 Like other RPCs, TRPC defines contracts at the method level, rather than in an external schema file like OpenAPI.
 
