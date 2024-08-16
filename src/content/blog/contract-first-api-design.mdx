@@ -103,9 +103,7 @@ import { getApiV1Users } from "@/api"
 const { data } = await getApiV1Users()
 ```
 
-In this example, the `data` variable is explicitly typed as `GetApiV1UsersByUserIdResponse` from the generated types.
-
-On the server, we can use a library like [express-openapi-validator](https://cdimascio.github.io/express-openapi-validator-documentation/) to validate that our API responses conform to this schema:
+In this example, the `data` variable is explicitly typed as `GetApiV1UsersByUserIdResponse` from the generated types. On the server, we can use a library like [express-openapi-validator](https://cdimascio.github.io/express-openapi-validator-documentation/) to validate that our API responses adhere to this schema:
 
 ```typescript
 import * as OpenApiValidator from 'express-openapi-validator'
@@ -122,38 +120,109 @@ export default OpenApiValidator.middleware({
 })
 ```
 
-This code will show a validation error when a response has an invalida status code, includes data that does not match our schema, and so fortmatch our schema, and so forth.
+This middleware validates that responses from the server conform to the schema.
 
 ### When to Use It
 
-The OpenAPI specification and tooling around it is very stable and it's a great choice. Many different languages have libraries that can interface with OpenAPI specifications and generate code from it.
+The OpenAPI specification and tooling around it is very stable, and it's a great default choice since many different languages can interface with OpenAPI specifications and generate code from it.
 
-It's also a great choice if you expect the application's APIs to be exposed externally and need to provide documentation automatically.
+It's also a great choice if you anticipate that the application's APIs will be exposed externally, and you want to generate documentation automatically.
 
 ### When not to Use It
 
-If you are working purely in one language, writing YAML or JSON directly instead of types directly in the language of choice can feel clunky. In Typescript, for instance, there are schema-first alternatives like TRPC that may provide a better developer experience.
+Writing YAML or JSON schemas directly instead of typing APIs in your language of choice can be a bit clunky. Approaches that use Remote Call Procedures, like TRPC, are schema-first alternatives that may provide a better developer experience if your entire application is written in one language.
 
-This is what we'll get into next.
+## RPCs and TRPC
 
-## TRPC
+TRPC, or TypeScript remote procedure call, is a newer technology than OpenAPI, and a good option for engineering teams that are working exclusively in Typescript and want to define their API contracts in the same language. The approach here is also applicable with GRPC and other RPC based approaches, but TRPC has an advantage in that the client code can be written in the same langauge as the schema files.
 
-TRPC, or TypeScript remote procedure call, is a newer technology than OpenAPI, and a good option for engineering teams that are working exclusively in Typescript and want to define their API contracts in the same language.
-
-Like other RPCs, this tooling defines contracts at the method level, rather than in an external schema file like OpenAPI.
+Like other RPCs, TRPC defines contracts at the method level, rather than in an external schema file like OpenAPI.
 
 This makes the developer tooling top notch, as TPRC integrates seamlessly in real-time (no build step) with LSPs and other editor tools. This can make iterating on API designs faster than when using an OpenAPI specification.
 
-To use TRPC, set up a schema file to define the API contract:
+To use TRPC, we can put our schema and the router code in the same file:
+
+```typescript
+import { z } from 'zod';
+import { trpc } from 'trpc';
+
+const User = z.object({
+  id: z.number(),
+  first_name: z.string(),
+  last_name: z.string(),
+});
+
+export const usersRouter = trpc.router({
+  getSingleUser: trpc.query
+    .query('getSingleUser')
+    .param('userId', z.number())
+    .queryFn(({ userId }) => {
+      // Your logic to fetch a user by ID
+      return { id: userId, first_name: 'John', last_name: 'Doe' };
+    }),
+
+  getUsers: trpc.query.query('getUsers').queryFn(() => {
+    // Your logic to fetch a list of users
+    return [{ id: 1, first_name: 'Alice', last_name: 'Smith' }, { id: 2, first_name: 'Bob', last_name: 'Johnson' }];
+  }),
+});
+```
+
+Defining our API contracts and server logic in one place improves the locality of our code. We could layer additional tooling on top of TRPC to export an OpenAPI schema too, to get the best of both worlds.
 
 ### When to Use It
 
+When building a full-stack application that uses the same language on both sides of an API.
+
 ### When not to Use It
 
-You don't want to define the source of truth in Typescript, and prefer to use YAML or JSON for it's language-agnostic flexibility.
+It might not be the right fit if when working in multiple languages and the schema needs to be language agnostic. By defining the specification in Typescript using Zod, we require engineers to have specific language expertise when domain modeling, which may not always be desirable, particularly if your backend engineers are well-versed in a different language. In those cases, you may prefer to use YAML or JSON for it's language-agnostic flexibility.
 
-## JSON Schema
+## AsyncAPI
+
+AsyncAPI is an offshoot of the OpenAPI specification focused specifically on event-driven architectures.
+
+Like OpenAPI, AsyncAPI expects you to define a schema file for your APIs. However, since AsyncAPI is focused on event-driven architectures, it provides better primitives for dealing with asynchronous code, such as different protocols and support for producers and consumers, rather than servers and clients.
+
+Here's what an AsyncAPI YAML file looks like:
+
+```yaml
+asyncapi: 3.0.0
+info:
+  title: Some example API
+  version: 0.1.0
+channels:
+  user:
+    address: 'users.{userId}'
+    title: Users channel
+    description: This channel is used to exchange messages about user events.
+    messages:
+      userSignedUp:
+        $ref: '#/components/messages/userSignedUp'
+      userCompletedOrder:
+        $ref: '#/components/messages/userCompletedOrder'
+    parameters:
+      userId:
+        $ref: '#/components/parameters/userId'
+    servers:
+      - $ref: '#/servers/production'
+    bindings:
+      amqp:
+        is: queue
+        queue:
+          exclusive: true
+    tags:
+      - name: user
+        description: User-related messages
+    externalDocs:
+      description: 'Find more info here'
+      url: 'https://example.com'
+```
+
+In this example, we define a `user` channel used to exchange messages about users. The different types of messages that the channel expects
+and their shapes are defined within. The AsyncAPI project has [tooling](https://www.asyncapi.com/docs/tools/generator) that you can use to 
+convert these files into client libraries and boilerplate code.
 
 ### When to Use It
 
-### When not to Use It
+For enforcing type safety in event-driven architectures. It's a handy extension of the OpenAPI specification.
