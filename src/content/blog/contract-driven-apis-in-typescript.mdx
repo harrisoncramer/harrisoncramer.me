@@ -1,0 +1,25 @@
+---
+title: Contract Driven APIs in Typescript
+pubDate: 2024-08-15
+description: Different approaches to enforcing schemas across API boundaries in Typescript
+imageDescription: A contract
+heroImage: contract
+tags: ["typescript", "javascript", "apis"]
+slug: contract-driven-apis-in-typescript.mdx
+---
+
+In my opinion, one point of technical friction that becomes easier to resolve when working in a single language like Typescript, is the misalignment of your data model with the environment you're mapping.
+
+As you learn more about your domain, whether it's hotels, or bank transactions, or online dating, you need to tweak parts of the codebase that are confusing, to better reflect your understanding of the domain.
+
+Bit by bit, your original mental model fades away. You add on exceptions here, and modifications there.
+ 
+Having a clear overview of the state of your application's endpoints -- what they return, possible failure cases, and other schema-like attributes, is incredibly helpful.
+
+Here are three approaches to enforcing and sharing that schema across the team.
+
+## OpenAPI and Code Generation
+
+## TRPC
+
+## JSON Schema
