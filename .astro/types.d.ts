@@ -124,9 +124,9 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
-"contract-driven-apis.mdx": {
-  id: "contract-driven-apis.mdx",
-  slug: "contract-driven-apis-in-typescript.mdx",
+"contract-first-api-design.mdx": {
+  id: "contract-first-api-design.mdx",
+  slug: "contract-first-api-design.mdx",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
