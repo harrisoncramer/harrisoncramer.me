@@ -5,6 +5,7 @@ description: I've recently begun building the first open-source Gitlab client fo
 heroImage: gitlab_and_neovim
 imageDescription: An image of some code in an editor
 slug: building-a-gitlab-client-for-neovim
+tags: ["go", "lua", "neovim"]
 ---
 
 You're hard at work, developing some feature, and your colleague sends you a DM: "Can you review my pull request?"
@@ -116,7 +117,7 @@ M.add_popup       = function(type)
 end
 ```
 
-The key line to notice here is the `job.run_job` line, which kicks off an API call to Golang server's `/mr/reviewer` endpoint. The Go server processes the results into a Lua table, which is returned to the callback function as the `data` variable.
+The key line to notice here is the `job.run_job` line, which kicks off an API call to Go server's `/mr/reviewer` endpoint. The Go server processes the results into a Lua table, which is returned to the callback function as the `data` variable.
 
 What happens on the Go side of the fence?
 
