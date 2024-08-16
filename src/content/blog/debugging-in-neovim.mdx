@@ -4,7 +4,7 @@ pubDate: 2022-12-21
 description: Debug your applications directly within Neovim using the Debug Adapter Protocol, or DAP.
 imageDescription: Debugging client in Neovim.
 heroImage: bug
-tags: ["neovim", "debugging", "golang", "javascript"]
+tags: ["neovim", "debugging", "go", "javascript"]
 slug: debugging-in-neovim
 ---
 
@@ -12,7 +12,7 @@ You'll probably spend more time debugging your next application than physically 
 
 The <a href="https://microsoft.github.io/debug-adapter-protocol/specification">Debug Adapter Protocol (DAP)</a> lets Neovim serve as a fully-featured debugger client, letting you attach to a running instance of your code, set breakpoints, inspect variables, examine call stacks, among other helpful debugging techniques.
 
-This post is meant to serve as a basic guide for setting up a debugger in Neovim. Although it applies specifically to Golang, the principles are the same for debuggers for other languages, so long as they implement the Debug Adapter Protocol.
+This post is meant to serve as a basic guide for setting up a debugger in Neovim. Although it applies specifically to Go, the principles are the same for debuggers for other languages, so long as they implement the Debug Adapter Protocol.
 
 ## What is DAP?
 
@@ -20,7 +20,7 @@ The Debug Adapter Protocol, or DAP, is a set of rules for how a debugger communi
 
 <p style="margin-left: 30px;">"The idea behind the Debug Adapter Protocol (DAP) is to abstract the way how the debugging support of development tools communicates with debuggers or runtimes into a protocol .. The Debug Adapter Protocol makes it possible to implement a generic debugger for a development tool that can communicate with different debuggers via Debug Adapters. And Debug Adapters can be re-used across multiple development tools which significantly reduces the effort to support a new debugger in different tools."</p>
 
-Translating this to a specific language like Golang, we need the following pieces:
+Translating this to a specific language like Go, we need the following pieces:
 
 1. Our editor (Neovim)
 2. The DAP "client" (the `nvim-dap` plugin)
@@ -32,7 +32,7 @@ Translating this to a specific language like Golang, we need the following piece
 
 In order to debug a program you need a debugger. This is the tool, typically but not always a binary executable, that runs completely outside of Neovim and attaches to the running process you are trying to debug. To debug the application, I'm going to use the <a href="https://github.com/go-delve/delve">Delve</a> debugger. 
 
-The program that I'm going to "debug" is a simple TCP server implemented in Golang. You can get the same source code <a href="https://github.com/harrisoncramer/go-connect-tcp.git">from my Github, here,</a> or you can use your own program.
+The program that I'm going to "debug" is a simple TCP server implemented in Go. You can get the same source code <a href="https://github.com/harrisoncramer/go-connect-tcp.git">from my Github, here,</a> or you can use your own program.
 
 You can compile and run the TCP server by navigating to the root directory, and running: 
 
@@ -96,7 +96,7 @@ You should see the following message:
 No configuration found for `go`. You need to add configs to `dap.configurations.go` (See `:h dap-configuration`)
 ```
 
-What's going on here? We've installed the debugger, and the debugger adapter for Neovim, but we haven't told nvim-dap what do to for Golang files yet. As the documentation states: "Neovim needs to instruct the debug adapter .. how to launch and connect to the debugee. The debugee is the application you want to debug."
+What's going on here? We've installed the debugger, and the debugger adapter for Neovim, but we haven't told nvim-dap what do to for Go files yet. As the documentation states: "Neovim needs to instruct the debug adapter .. how to launch and connect to the debugee. The debugee is the application you want to debug."
 
 Add the following to your configuration:
 
@@ -264,7 +264,7 @@ This works fine if you want to run the equivalent of `dlv debug .` locally. But 
 3. Attaching to a running debugger by picking it's PID
 4. Attaching to an already running debugger running on a specific port
 
-They look like this, and nvim-dap will ask me which of the configurations I'd like to use when I open it on a Golang file:
+They look like this, and nvim-dap will ask me which of the configurations I'd like to use when I open it on a Go file:
 
 ```lua
 local go = {
@@ -365,7 +365,7 @@ Now we can open up Javascript files and set breakpoints and inspect code the sam
 
 We've now walked through the installation of the debugger, the debugger adapter, configuring the debugger, and adding a UI layer. If something goes wrong during your own setup, check Neovim's messages, and also DAP's logs with `:DapShowLog`.
 
-It's worth mentioning that you can achieve configuration of the debug adapter for Go specifically with <a href="https://github.com/leoluz/nvim-dap-go">nvim-dap-go</a>, which will effectively write the `dap.configurations.go` and `dap.adapters.go` sections of your DAP configuration for you. You'll still need to install the debugger (delve) in order to use it, and the UI. If you prefer a more out-of-the-box configuration for Golang specifically, this plugin is quite nice.
+It's worth mentioning that you can achieve configuration of the debug adapter for Go specifically with <a href="https://github.com/leoluz/nvim-dap-go">nvim-dap-go</a>, which will effectively write the `dap.configurations.go` and `dap.adapters.go` sections of your DAP configuration for you. You'll still need to install the debugger (delve) in order to use it, and the UI. If you prefer a more out-of-the-box configuration for Go specifically, this plugin is quite nice.
 
 Finally, you can find my personal dotfiles <a href="github.com/harrisoncramer/nvim">on my Github account</a> and specifically my <a href="https://github.com/harrisoncramer/nvim/tree/main/lua/plugins/dap">debugger configuration</a>.
 
