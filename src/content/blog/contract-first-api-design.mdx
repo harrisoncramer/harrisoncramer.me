@@ -93,24 +93,17 @@ export type User = {
     id: number;
 };
 
-export type GetApiV1UsersByUserIdData = {
-    path: {
-        /**
-         * Numeric ID of the user
-         */
-        userId: number;
-    };
-};
+export type GetApiV1UsersByUserIdResponse = User;
 ```
 
-These types can be used across the stack to improve developer tooling. On the client, this tool generates code to directly call the API, which can be used like this:
+These types can be used across the stack to improve developer tooling. This tool can also generate client code directly, like this:
 
 ```typescript
 import { getApiV1Users } from "@/api"
 const { data } = await getApiV1Users()
 ```
 
-In this example, the `data` value here is now explicitly typed as `GetApiV1UsersResponse` which is also auto-generated.
+In this example, the `data` variable is now explicitly typed as `GetApiV1UsersByUserIdResponse` from the generated types.
 
 On the server, we can use a library like [express-openapi-validateor](https://cdimascio.github.io/express-openapi-validator-documentation/) to validate that our API responses conform to this schema:
 
