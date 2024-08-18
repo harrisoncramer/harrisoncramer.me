@@ -36,13 +36,13 @@ const NavigationDropdown = (): JSX.Element => {
       </button>
       <ul className={`mt-4 w-48 absolute transition-opacity overflow-hidden ${!isDropdownOpen ? 'opacity-0' : 'opacity-100 shadow-app-background-light shadow-md'} bg-app-black text-app-white shadow rounded-md`}>
         <li>
-          <a className={`block text-xl relative hover:bg-app-background-light text-app-white ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full` } href="/"><h3>Blog</h3></a>
+          <a className={`block text-lg relative hover:bg-app-background-light text-app-white ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full` } href="/"><h3>Blog</h3></a>
         </li>
         <li>
-          <a className={`block text-xl relative hover:bg-app-background-light text-app-white border-t border-b border-app-background-dark ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full` } href="/about"><h3>About</h3></a>
+          <a className={`block text-lg relative hover:bg-app-background-light text-app-white border-t border-b border-app-background-dark ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full` } href="/about"><h3>About</h3></a>
         </li>
         <li>
-          <a className={`block text-xl relative hover:bg-app-background-light text-app-white ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full pb-4` } href="/contact"><h3>Contact</h3></a>
+          <a className={`block text-lg relative hover:bg-app-background-light text-app-white ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full pb-4` } href="/contact"><h3>Contact</h3></a>
         </li>
       </ul>
     </nav>
