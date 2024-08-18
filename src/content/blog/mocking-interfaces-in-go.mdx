@@ -125,7 +125,7 @@ func TestGreeting(t *testing.T) {
 }
 ```
 
-Since the `fakeTranslator` here satisfies the interface (has a `translate` method) we can make use it. But writing new structs like this for every test can be cumbersome. This is where `gomock` comes into play.
+Since the `fakeTranslator` here satisfies the `Translator` interface (has a `Translate` method) we can provide it to the person and test our functionality. But writing fake structs like this to satisfy every interface can be very cumbersome. This is where `gomock` comes into play.
 
 ## Generating Mocks With `gomock`
 
