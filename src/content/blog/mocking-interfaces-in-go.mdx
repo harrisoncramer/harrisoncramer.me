@@ -129,9 +129,7 @@ Since the `fakeTranslator` here satisfies the `Translator` interface (has a `Tra
 
 ## Generating Mocks With `gomock`
 
-The `gomock` tool lets us generate the mocks needed to satisfy our interfaces automatically.
-
-Let's install the CLI tool:
+The `gomock` tool lets us generate the mocks needed to satisfy our interfaces automatically. Let's install the CLI tool:
 
 ```bash
 go install go.uber.org/mock/mockgen@latest
@@ -176,11 +174,9 @@ func TestGreeting(t *testing.T) {
 }
 ```
 
-If we run this, it'll compile, but we'll see an `Unexpected call` error, telling us that there are no calls of the `Translate` method: 
+If we run this, it'll compile, but we'll see an `Unexpected call` error, telling us that there are no calls of the `Translate` method. This is because, while we have a struct that the mock should be called.
 
->> "there are no expected calls of the method "Translate" for that receiver"
-
-This is because the mocks that we generated are smart enough to fail the test when we call them unexpectedly. Let's define a behavior for the mock, now.
+The mock is smart enough to fail the test when we call it unexpectedly. Let's define a behavior for the mock.
 
 ```go {6-8} title="person_test.go"
 func TestGreeting(t *testing.T) {
@@ -208,12 +204,44 @@ This tells our mock translator to expect a `Translate` call with specific parame
 
 The test then calls the method on the person, and the person will call our mock!
 
-While this is a bit of a contrived example, but you can see how the `gomock` tool is useful for mocking out external dependencies, in order to keep your application focused on your own business logic.
+## Creating Stubs
+
+In this case the mock expects to be called _just once_ but if you call it a second time it'll fail. For instance, if we add a second `p.SayGreeting("spanish")` in the above example, we'll see an error telling us that the mock "has already been called the max number of times."
+
+If you'd like to create a _stub_ which will responsd to an invocation any number of times and not fail the test, you can add on a `.AnyTimes()` method to the end of the call chain.
+
+```go {9, 17-19} title="person_test.go"
+func TestGreeting(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockTranslator := mock_main.NewMockTranslator(ctrl)
+
+	want := "Hola, me llamo Harry"
+	mockTranslator.EXPECT().
+		Translate("spanish", gomock.Any()).
+		Return(want).
+        AnyTimes()
+
+	p := person{
+		name:       "Sam",
+		Translator: mockTranslator,
+	}
+
+	got := p.SayGreeting("spanish")
+	p.SayGreeting("spanish")
+	p.SayGreeting("spanish")
+	p.SayGreeting("spanish")
+
+	if got != want {
+		t.Errorf("Got '%s' but wanted '%s'", got, want)
+	}
+} 
+```
+
 
 ## Closing thoughts
 
-In the previous example, the result of the translation service actually has nothing to do with our input. 
+While the previous example is a bit contrived, you can see how the `gomock` tool is useful for mocking out external dependencies, in order to keep your application focused on your own business logic.
 
-The user's name is Sam, but the translated string says that it's Harry. This decoupling is powerful but can lead you to doing dumb stuff in tests, which can lead to false positives or false negatives in the test results. 
+One word of caution, however, is that this decoupling is powerful but can lead to false positives or false negatives in our test results. In our example, for instance, the person's name is Sam, but the translated string says that it's Harry.
 
-Overall, though, the `gomock` library makes it incredibly easy to generate mocks and is a great tool when you have an external service or library that you need to get out of your way, but don't want to have to rewrite all of the test mocks yourself.
+Overall, though, the `gomock` library makes it incredibly easy to generate mocks and is a great tool when you have an external service or library that you just need to get out of your way.
