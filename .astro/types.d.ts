@@ -126,7 +126,7 @@ declare module 'astro:content' {
 } & { render(): Render[".mdx"] },
 "contract-first-api-design.mdx": {
   id: "contract-first-api-design.mdx",
-  slug: "contract-first-api-design.mdx",
+  slug: "contract-first-api-design",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
@@ -155,6 +155,13 @@ declare module 'astro:content' {
 "migrating-from-gatsby-to-astro.mdx": {
   id: "migrating-from-gatsby-to-astro.mdx",
   slug: "migrating-from-gatsby-to-astro",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
+"mocking-interfaces-in-go.mdx": {
+  id: "mocking-interfaces-in-go.mdx",
+  slug: "mocking-interfaces-in-go",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
