@@ -190,7 +190,7 @@ func TestGreeting(t *testing.T) {
 	want := "Hola, me llamo Harry"
 	mockTranslator.EXPECT().
 		Translate("spanish", gomock.Any()).
-		Return()
+		Return(want)
 
 	p := person{
 		name:       "Sam",
