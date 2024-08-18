@@ -174,9 +174,9 @@ func TestGreeting(t *testing.T) {
 }
 ```
 
-If we run this, it'll compile, but we'll see an `Unexpected call` error, telling us that there are no calls of the `Translate` method. This is because, while we have a struct that the mock should be called.
+If we run this, it'll compile, but we'll see an `Unexpected call` error, telling us that there are no calls of the `Translate` method. This is because, our mock is smart enough to fail the test when we call it unexpectedly. 
 
-The mock is smart enough to fail the test when we call it unexpectedly. Let's define a behavior for the mock.
+Let's define a behavior for the mock and an expectation that it'll be called once.
 
 ```go {6-8} title="person_test.go"
 func TestGreeting(t *testing.T) {

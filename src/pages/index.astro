@@ -13,6 +13,7 @@ const posts = (await getNonDraftPosts()).sort(
 <Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <main>
     <section>
+      <h1>Blog Posts</h1>
       <ul>
         <PostPreview
           post={posts.at(0) as CollectionEntry<"blog">}
