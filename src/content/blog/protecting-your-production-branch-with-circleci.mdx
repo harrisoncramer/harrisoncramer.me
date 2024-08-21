@@ -209,17 +209,17 @@ Explore around the GUI for a little bit to get a feel for where everything lives
 
 At the moment, anyone on our team can push code up to our main branch. Let's change that. Navigate to your Github repository in the browser and open up the "Settings" tab. 
 
-<img src="/inline_images/github-settings.png" alt="Github Settings Tab" />
+<img src="/inline_images/github-settings.jpg" alt="Github Settings Tab" />
 
 Next, click on the "Branches" tab. Then we want to add a rule.
 
-<img src="/inline_images/github-branch-rules.png" alt="Github branch rules" />
+<img src="/inline_images/github-branch-rules.jpg" alt="Github branch rules" />
 
 This rule is going to prevent anyone from pushing or merging changes into our master branch until our CircleCI jobs have passed on their code. In the "Branch name pattern" field, we want to write the name of the branch. In this case, main. Then we want to require status checks to pass before merging (these are coming from CircleCI) and we want to select the status checks. In our case, we called the workflow start_app in our configuration file.
 
 Finally, we want to include administrators, so that even they cannot merge into main without passing our checks.
 
-<img src="/inline_images/github-branch-rules.png" alt="Branch rules" />
+<img src="/inline_images/github-branch-rules.jpg" alt="Branch rules" />
 
 > Make sure that you press "Create" at the bottom to create the new branch rule. If you exit this screen without pressing create, the rule won't go into effect.
 
@@ -257,10 +257,10 @@ $ git push --set-upstream origin new-branch
 
 Head over to CircleCI, and you'll see that the error we threw is breaking our pipeline.
 
-<img src="/inline_images/circle-error.png" alt="CircleCI Error" />
+<img src="/inline_images/circle-error.jpg" alt="CircleCI Error" />
 
 Not only that, but when we create a pull request for the main branch from our current branch, we cannot merge. Github now tells us that the status checks are required to pass before merging.
 
-<img src="/inline_images/github-no-error-merge.png" alt="Github status checks" />
+<img src="/inline_images/github-no-error-merge.jpg" alt="Github status checks" />
 
 And that's it! Congratulations, you've now protected your main branch from dirty commits. In the future, you could build your pipeline out to include more robust testing, like with Jest or other test runners. Good luck!

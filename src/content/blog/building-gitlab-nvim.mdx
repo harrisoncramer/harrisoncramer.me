@@ -5,7 +5,7 @@ description: I've recently begun building the first open-source Gitlab client fo
 heroImage: gitlab_and_neovim
 imageDescription: An image of some code in an editor
 slug: building-a-gitlab-client-for-neovim
-tags: ["go", "lua", "neovim"]
+tags: ["go", "lua", "neovim", "terminal"]
 ---
 
 You're hard at work, developing some feature, and your colleague sends you a DM: "Can you review my pull request?"
@@ -24,7 +24,7 @@ When you start up Neovim, the plugin will initialize a Go server that runs in th
 
 This separation of the Gitlab API from the plugin code also makes debugging the server separately much easier -- it's just a normal server running on your machine, and can be Curl'd like any other process.
 
-<img src="/inline_images/plugin_overview.png" alt="The plugin separates the core API logic from the UI logic" />
+<img src="/inline_images/plugin_overview.jpg" alt="The plugin separates the core API logic from the UI logic" />
 
 ## Tracing a Request
 

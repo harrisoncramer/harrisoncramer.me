@@ -5,6 +5,7 @@ description: Websockets are a great way to breathe life into an otherwise stale 
 heroImage: socket
 imageDescription: Socket
 slug: building-a-chat-application-with-socketio
+tags: ["javascript"]
 ---
 
 Adding real-time chat functionality can be a great way of spicing up an otherwise vanilla application. Although the underlying technology—websockets—is far from simple, implementing it with <a href="https://socket.io/">SocketIO</a> is surprisingly simple.
@@ -305,7 +306,7 @@ If we open up two browsers to our application, we should be able to send message
 
 Here's the full flow of events.
 
-<img src="/inline_images/socketioNamespaces.png" alt="Data flow between SocketIO clients and the server" />
+<img src="/inline_images/socketioNamespaces.jpg" alt="Data flow between SocketIO clients and the server" />
 <p>Data flow between SocketIO clients and the server</p>
 
 As you can see in the diagram, we could in theory push this data out to many different users of our application. This is what makes Websockets so powerful: rather than forcing the client to long-poll our server to get the latest up-to-date information, we can "push" that data out from the server.

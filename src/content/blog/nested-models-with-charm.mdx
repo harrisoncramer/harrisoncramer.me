@@ -1,0 +1,215 @@
+---
+title: Terminal Applications in Go
+pubDate: 2024-08-22
+description: Charm's BubbleTea library makes works well with Cobra for building powerful command line tooling for developers
+heroImage: snake
+imageDescription: An image of a snake wrapped around a tree branch
+slug: nested-models-with-charm
+tags: ["go", "terminal"]
+---
+
+What makes good developer tooling? A few things jump to mind:
+
+- It is fast
+- It's easy to deploy/use in different environments
+- It's well documented
+- It's flexible and configurable, and preferably supports scripting and automation
+
+Considering all of these factors, CLIs (Command Line Interfaces) are arguably the most effective developer tooling out there. As text and keyboard-based tools, CLIs are _far better_ than their GUI counterparts at scripting and automation. Tooling that embraces the [linux philosophy](https://en.wikipedia.org/wiki/Unix_philosophy) is by nature extensible and modular.
+
+All that being said, CLIs are not always approachable for new users. They're designed to pipe data from one tool to another, not necessarily to hold application state and display options to an indecisive user, who may just be trying to explore the tool.
+
+This is where TUIs, or Terminal User Interfaces, are a relatively interesting middle ground. 
+
+While they live in the terminal, they're more akin to traditional GUI applications in that they display state and respond to user interactions. In fact, by combining CLIs and TUIs we can get the best of both worlds -- powerful scripting and automatation capabilities, user-friendliness, and state management!
+
+## What are we building?
+
+This post shows how to build a simple and configurable terminal application with Go. I'm using [cobra](https://github.com/spf13/cobra) to parse command options and set up the tool, and [bubbletea](https://github.com/charmbracelet/bubbletea) to build the UI.
+
+## Setting up the Tool with Cobra 🐍
+
+Our `main.go` file is very bare bones, as per Cobra's recommendation.
+
+```go
+package main
+
+import (
+	cmd "github.com/harrisoncramer/nested-models/cmd"
+)
+
+func main() {
+	cmd.Execute()
+}
+```
+
+Then in our `cmd/root.go` file, we'll set flag options (in this case a `token` option and a `config` option). The command is then passed as an argument to another function called `initializeConfig` which parses out the values.
+
+```go
+package cmd
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
+)
+
+/* The init() function is called automatically by Go */
+func init() {
+	rootCmd.PersistentFlags().StringP("token", "t", "", "Token for the Shortcut API. This value will override a `token` set in your config file")
+	rootCmd.PersistentFlags().StringP("config", "", "", "The path to a .yaml configuration file")
+}
+
+var rootCmd = &cobra.Command{
+	Use:   "sh",
+	Short: "Our TUI application",
+	Run: func(cmd *cobra.Command, args []string) {
+		err := initializeConfig(cmd)
+		if err != nil {
+			fmt.Printf("Error parsing configuration: %v", err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("%+v", pluginOpts)
+	},
+}
+
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+```
+
+I've put that command into a separate file called `config.go` which parses out the options from the YAML file, and unpacks them into a variable called `pluginOpts` that we can reference throughout the codebase:
+
+
+```go
+package cmd
+
+import (
+	"errors"
+	"os"
+	"time"
+
+	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
+)
+
+type CliOpts struct {
+	Token   string      `yaml:"token"`
+	Network NetworkOpts `yaml:"network"`
+	Display DisplayOpts `yaml:"display"`
+	Keys    KeyOpts     `yaml:"keys"`
+}
+
+type NetworkOpts struct {
+	Timeout       int `yaml:"timeout"`
+	TimeoutMillis time.Duration
+}
+
+type KeyOpts struct {
+	Up     string `yaml:"up"`
+	Down   string `yaml:"down"`
+	Select string `yaml:"enter"`
+	Back   string `yaml:"back"`
+	Quit   string `yaml:"ctrl+c"`
+}
+
+type DisplayOpts struct {
+	Cursor string
+}
+
+var pluginOpts = CliOpts{}
+
+func initializeConfig(cmd *cobra.Command) error {
+	configFile, _ := cmd.Flags().GetString("config")
+	if configFile != "" {
+		yamlFile, err := os.ReadFile(configFile)
+		if err != nil {
+			return err
+		}
+		err = yaml.Unmarshal(yamlFile, &pluginOpts)
+		if err != nil {
+			return err
+		}
+	}
+
+	if pluginOpts.Display.Cursor == "" {
+		pluginOpts.Display.Cursor = ">"
+	}
+	if pluginOpts.Network.Timeout == 0 {
+		pluginOpts.Network.Timeout = 2000
+	}
+	if pluginOpts.Keys.Up == "" {
+		pluginOpts.Keys.Up = "k"
+	}
+	if pluginOpts.Keys.Down == "" {
+		pluginOpts.Keys.Down = "j"
+	}
+	if pluginOpts.Keys.Select == "" {
+		pluginOpts.Keys.Select = "enter"
+	}
+	if pluginOpts.Keys.Quit == "" {
+		pluginOpts.Keys.Quit = "ctrl+c"
+	}
+	if pluginOpts.Keys.Back == "" {
+		pluginOpts.Keys.Back = "esc"
+	}
+
+	flagToken, err := cmd.Flags().GetString("token")
+	if err != nil {
+		return err
+	}
+	if flagToken == "" && pluginOpts.Token == "" {
+		return errors.New("An API token is required, use --token or provide one in your configuration file!\n")
+	}
+
+	/* The flag will override the config file if present */
+	if flagToken != "" {
+		pluginOpts.Token = flagToken
+	}
+
+	pluginOpts.Network.TimeoutMillis = time.Duration(pluginOpts.Network.Timeout) * time.Millisecond
+
+	return nil
+}
+```
+
+At this point, we should be good to run the application. Let's make a `config.yaml` file in the root of the repository with some settings: 
+
+```yaml
+token: "blah"
+display:
+  cursor: ">>"
+network:
+  timeout: 1000
+keys:
+  select: "o"
+```
+
+And then let's run our application:
+
+```bash
+$ go run . --config ./config.yaml
+{Token:blah Network:{Timeout:1000 TimeoutMillis:1s} Display:{Cursor:>>} Keys:{Up:k Down:j Select:o Back:esc Quit:ctrl+c}}
+```
+
+As you can see, the values from our YAML file are being parsed into the application. We can also override the authorization token if we want by passing in a `--token` flag.
+
+We can also see more about our application by running the `--help` command.
+
+```bash
+$ go run . --config ./config.yaml --help
+Our TUI application
+
+Usage:
+  sh [flags]
+
+Flags:
+      --config string   The path to a .yaml configuration file
+  -h, --help            help for sh
+  -t, --token token     Token for the Shortcut API. This value will override a token set in your config file
+```

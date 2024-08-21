@@ -4,7 +4,7 @@ pubDate: 2022-12-07
 description: Neovim is an unbelievably powerful tool, if you know how to use it. Here are some of my personal takeaways from using it as my primary editor for the past few years.
 imageDescription: An image of my Neovim configuration.
 heroImage: neovim-config
-tags: ["neovim"]
+tags: ["neovim", "terminal"]
 slug: building-a-powerful-neovim-configuration
 ---
 
@@ -224,11 +224,11 @@ Going through all of the specifics of how to configure and use Telescope is beyo
 
 I've gone through a series of different test runners with Neovim, and ultimately landed on <a href="https://github.com/nvim-neotest/neotest">Neotest</a>. The tool lets you run tests within the browser directly and gives you amazing jump-to-error support. For instance, within a Vitest file, I can run the file under my cursor with a user-defined hotkey, and see the output both as virtual text within the editor and via a popup in the sidebar.
 
-<img src="/inline_images/neotest-1.png" alt="Neotest" />
+<img src="/inline_images/neotest-1.jpg" alt="Neotest" />
 
 The output of the process is also directly available within the editor, which is super nice if you want to see why a test failed or other logging information.
 
-<img src="/inline_images/neotest-2.png" alt="Another Neotest image" />
+<img src="/inline_images/neotest-2.jpg" alt="Another Neotest image" />
 
 There are of course times where you'll want to split your test runner into a separate terminal. But I've largely found that Neotest gives me the ability to target specific tests more easily, track output, view error messages, and everything else that I need without context switching from the editor. My configuration for Neotest is <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/neotest.lua">is also part of my dotfiles on Github</a>.
 
@@ -238,7 +238,7 @@ Since it's at the heart of any software engineer's workflow, tight integrations 
 
 The first and probably most essential Git plugin is <a href="https://github.com/tpope/vim-fugitive">Fugitive</a>. This plugin provides a number of useful utilities that let you interact with your git repository without leaving Neovim. I'm primarily using the `:Git` ex-command to pull up a quick view of the changed, deleted, and added files in a given repository. The status window lets you commit files, view an inline-diff for changes, and make commit messages.
 
-<img src="/inline_images/fugitive.png" alt="Gstatus" />
+<img src="/inline_images/fugitive.jpg" alt="Gstatus" />
 <p>You can add files, change commit messages, and more from within the status window.</p>
 
 Fugitive also gives a variety of other super useful commands that let you interact with the history of your repository. The most useful for me are `:Gedit` and `:Gread` commands which, respectively, open up the specified file (the `:Gedit develop:%` command opens a buffer of the current filename on the develop branch) or read a file (the `:Gread` command by itself restores the file to it's unmodified state on the current commit). These are super powerful when combined with Neovim's `%` symbol, which represents the current buffer. For instance, if you're in file `foo.js`, the command `:Gedit 30dks91:%` will open up `foo.js` in new buffer as it existed at the `30dks91` commit.
@@ -247,14 +247,14 @@ Another helpful command is the `:Gvdiffsplit` command, which lets you see the di
 
 Generally speaking, however, when it comes to surfing the git history of a given repository, I prefer to use <a href="https://github.com/sindrets/diffview.nvim">diffview.nvim</a>, which provides a nicer interface.
 
-<img src="/inline_images/diffview.png" alt="Diffview" />
+<img src="/inline_images/diffview.jpg" alt="Diffview" />
 <p>Diffview provides a great interface for browsing through your git history. It even has a built-in merge conflict tool.</p>
 
 The third plugin that I consider essential to my git workflow is <a href="https://github.com/lewis6991/gitsigns.nvim">gitsigns.nvim</a>, which provides git integrations within a single file.
 
 For instance, you can use this tool to do hunk-wise staging of changes, and to see what has changed at a given point in a file without opening up another status window. Combined together, these three plugins let me pretty much stay in my editor all the time. The only time I'm ever really leaving for git is to rebase, or to do a bisect.
 
-<img src="/inline_images/gitsigns.png" alt="Gitsigns" />
+<img src="/inline_images/gitsigns.jpg" alt="Gitsigns" />
 <p>Gitsigns lets you see diffs on a line-by-line basis as you edit a file, and add specific hunks directly within a buffer.</p>
 
 It also places helpful hints in the current buffer's gutter (the blank space on the far left of a buffer) that indicate whether a line has been changed or modified. Super helpful.
@@ -391,6 +391,6 @@ Like the Language Server Protocol, there is a protocol for debuggers, called the
 
 The best debugging package that I've found for Neovim is <a href="https://github.com/mfussenegger/nvim-dap">nvim-dap</a>, which is a DAP client implementation for Neovim. It lets you set breakpoints directly in your buffers and step through code. Another plugin called <a href="https://github.com/rcarriga/nvim-dap-ui">nvim-dap-ui</a> provides an elegant UI for nvim-dap, and is basically a requirement if you're going to be using it. Here's what it looks like on my machine to debug a JavaScript test.
 
-<img src="/inline_images/nvim-dap-ui.png" alt="Nvim-DAP" />
+<img src="/inline_images/nvim-dap-ui.jpg" alt="Nvim-DAP" />
 
 If there's sufficient interest in it, I'll make a separate post about setting up a debugger, because it's quite complicated. But for now, I'll link again to my <a href="https://github.com/harrisoncramer/nvim/blob/main/lua/plugins/dap/init.lua">dotfiles</a> in the hopes that it helps some people.

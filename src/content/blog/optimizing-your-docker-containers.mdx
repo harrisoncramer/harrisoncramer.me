@@ -58,7 +58,7 @@ $ dive nginxdemos/hello
 
 The output of running this command is an interactive CLI, that shows us what files were added to the filesystem with each layer.
 
-<img src="/inline_images/dive_layers.png" alt="Dive image analyzer layers" />
+<img src="/inline_images/dive_layers.jpg" alt="Dive image analyzer layers" />
 <p>You can use the dive tool to inspect the layers of an image more closely.</p>
 
 As you can see in the above image, the Dockerfile ran `ADD hello.conf /etc/nginx/conf.d/`, which created a single file inside the `/etc/nginx/conf.d` directory. The resulting layer was just 373 bytes in size, which is quite small. The base OS for this image is 5.6MB, which is 5.6 million bytes!
@@ -336,7 +336,7 @@ CMD ["node", "index.js"]
 
 The size of the image, if we rebuild it, is now only 49.4MB! And diving into the layers themselves, we'll see that the bulk of that is coming from NodeJS itself.
 
-<img src="/inline_images/dockersmall.png" alt="Docker image compressed" />
+<img src="/inline_images/dockersmall.jpg" alt="Docker image compressed" />
 <p>This container is under 50MB and the bulk of that is coming from NodeJS itself.</p>
 
 This is pretty much as small as your NodeJS container is going to get, unless you start picking apart the NodeJS runtime itself. 

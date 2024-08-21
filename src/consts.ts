@@ -18,5 +18,6 @@ export const TAGS = [
   "aws",
   "api",
   "neovim",
-  "lua"
+  "lua",
+  "terminal",
 ] as const

@@ -173,6 +173,13 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
+"nested-models-with-charm.mdx": {
+  id: "nested-models-with-charm.mdx",
+  slug: "nested-models-with-charm",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
 "optimizing-your-docker-containers.mdx": {
   id: "optimizing-your-docker-containers.mdx",
   slug: "optimizing-your-docker-images-for-production",
