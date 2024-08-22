@@ -485,7 +485,7 @@ Now that we've built and defined our model, we need to wire it up to our parent 
 2. Handle any messages triggered by the child component
 3. Call the `View` method to render the selector, then combine this text with our parent's view
 
-### Calling the Selector's `Update` method
+#### Calling the Selector's `Update` method
 
 Let's tackle the `Update` function first. There are multiple ways to do this. I like defining an additional method on the selector called `maybeUpdate` which will update the component _only if_ a key is pressed. Define the method on your selector model:
 
@@ -525,8 +525,58 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	/* ...all other events */
 ```
 
-### Handling Messages from the Selector
+#### Handling Messages from the Selector
 
-Next, we need to tell the main model how to respond to messages from the selector component.
+Next, we need to tell the main model how to respond to messages triggered by the selector component.
 
-In our case, there's only one 
+In our case, there's only one message type we need to care about: `selectMsg`. We can use type descrimination to react accordingly. For now, we'll just exit the application with a message.
+
+
+```go {17-19} title="app/main.go"
+func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.err != nil {
+		return m, tea.Quit
+	}
+
+	updatedSelector, selectorCmd := m.selector.maybeUpdate(msg)
+	m.selector = updatedSelector
+	if selectorCmd != nil {
+		return m, selectorCmd
+	}
+
+	/* All other events */
+	switch msg := msg.(type) {
+	case errMsg:
+		m.err = msg
+		return m, nil
+	case selectMsg:
+      log.Fatal(fmt.Sprintf("You chose %s", msg.value))
+      os.Exit(0)
+	case tea.KeyMsg:
+		switch msg.String() {
+		case PluginOptions.Keys.Quit:
+			return m, tea.Quit
+		}
+	}
+```
+
+#### Rendering our Full View
+
+The last piece we need to wire up is our view. Right now, our selector's state is updating but we aren't displaying it.
+
+All we need to do is call the `View` method and combine it with our parent's view. Update your main model's `View` method accordingly:
+
+```go
+/* Rest of model cropped for brevity... */
+
+func (m MainModel) View() string {
+	base := "Main View\n"
+	base += m.selector.View()
+	base += fmt.Sprintf("\n\n%s", m.help.View(m.keys))
+	return base
+}
+```
+
+At this point, we should be able to navigate up and down in our view, and make a selection. The selection should print out to the screen and then quit our application. This may seem like a lot of code for such a simple application. It is! But the foundation for more complexity is now in place. Let's handle that next.
+
+## Calling ChatGPT and Handling Latency

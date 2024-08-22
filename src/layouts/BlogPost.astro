@@ -34,8 +34,11 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
       }
       .blog-post-content {
         @apply flex flex-col gap-6 mb-24;
-        li {
+        ul li {
           @apply list-disc ml-6;
+        }
+        ol li {
+          @apply list-decimal ml-6;
         }
       }
     </style>
