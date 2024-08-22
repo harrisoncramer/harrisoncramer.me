@@ -285,7 +285,7 @@ Our `View` method will simply return our application's plugin options in a reada
 
 Our `Update` method will switch on the message type, and for keypresses that match our keybinding for quit, will return a `tea.Quit` command. The `tea.Quit` command is a command provided by BubbleTea that will exit the application.
 
-```go
+```go title="app/main_model.go"
 package app
 
 import (
@@ -325,15 +325,67 @@ Now, when we run our application, we should see the application load and display
 
 Since we are building an application that allows us to choose from a set of options, we want to give the user the ability to scroll between the options, and choose one.
 
-While we could handle this in the parent model, BubbleTea encourages the use of nested models for these types of behaviors.
+While we could handle this in the parent model, BubbleTea encourages the use of nested models for these types of behaviors. When the main model encounters an event that should be handled by a subview, it'll delegate the `Update` behavior to that submodel.
 
 In our main model, let's embed another `tea.Model` called `selector` which is also a tea model.
 
+```go {9-20, 25} title="app/main_model.go"
+package app
 
-Let's build a second model called `Selector` that expects a set of keypresses, and updates it's internal state. It'll render a set of choices.
+import (
+	tea "github.com/charmbracelet/bubbletea"
+)
+
+func NewFirstModel() tea.Model {
+	return MainModel{
+		selector: Selector{
+			options: []Option{
+				{
+					Label: "View Config",
+					Value: "view_config",
+				},
+				{
+					Label: "Second",
+					Value: "second",
+				},
+			},
+		},
+	}
+}
+
+type MainModel struct {
+	selector Selector
+}
 
 
-```go title="app/selector.go"
+func (m Model) Init() tea.Cmd {
+	return nil
+}
+
+func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case PluginOptions.Keys.Quit:
+			return m, tea.Quit
+		}
+	}
+
+	return m, nil
+}
+
+func (m Model) View() string {
+  return fmt.Sprintf("%+v", PluginOptions)
+}
+```
+
+I'm putting the `Selector` model into a different file. This model handles a set of keypresses, and updates it's internal state accordingly. It'll render a set of choices.
+
+The `move` function invocations in the `Update` function mutate the model's state. 
+
+There is also behavior defined for when the select key is pressed. In that case, we return a new command (Commands in BubbleTea are just functions that return messages) which will be handled by the parent.
+
+```go {47,49,51,70-91} title="app/selector.go"
 package app
 
 import (
@@ -372,7 +424,7 @@ func (s Selector) Init() tea.Cmd {
 	return nil
 }
 
-/* Responds to keypresses that are defined in our plugin options and updates the model, and/or selects a value */
+/* Responds to keypresses that are defined in our plugin options and updates the model */
 func (s Selector) Update(msg tea.Msg) (Selector, tea.Cmd) {
 	switch msg := msg.(type) {
 	case optionsMsg:
@@ -421,12 +473,25 @@ func (s *Selector) setOptions(options []Option) {
 	s.options = options
 }
 
-/* Chooses the value at the given index */
+/* Chooses the value at the given index. This message is processed by the main model. */
 func (s Selector) selectVal() tea.Msg {
 	return selectMsg{value: s.options[s.cursor].Value}
 }
+```
 
-/* If a key was pressed, call the update function if it's relevant. This lets us group all of the key logic in one method */
+Now that we've built and defined our model, we need to wire it up to our parent component. We need to:
+
+1. Call the `Update` method on the selector when a relevant key is pressed
+2. Handle any messages triggered by the child component
+3. Call the `View` method to render the selector, then combine this text with our parent's view
+
+### Calling the Selector's `Update` method
+
+Let's tackle the `Update` function first. There are multiple ways to do this. I like defining an additional method on the selector called `maybeUpdate` which will update the component _only if_ a key is pressed. Define the method on your selector model:
+
+```go title="app/selector.go"
+/* Rest of model cropped for brevity ... */
+
 func (s Selector) maybeUpdate(msg tea.Msg) (Selector, tea.Cmd) {
 	switch msg := msg.(type) {
 	case optionsMsg, moveMsg:
@@ -441,3 +506,27 @@ func (s Selector) maybeUpdate(msg tea.Msg) (Selector, tea.Cmd) {
 	return s, nil
 }
 ```
+
+This method will call the actual `Update` method. I like this pattern because it encapsulates all of the selector logic in one place. Now, we can call `maybeUpdate` in our parent model for every event.
+
+```go title="app/main.go"
+func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+	/* Possibly update the selector. If the selectorCmd 
+    is non-null it means that our selector's Update method was called,
+    we want to return that command and re-run our event loop */
+	updatedSelector, selectorCmd := m.selector.maybeUpdate(msg)
+	m.selector = updatedSelector
+	if selectorCmd != nil {
+		return m, selectorCmd
+	}
+
+	switch msg := msg.(type) {
+	/* ...all other events */
+```
+
+### Handling Messages from the Selector
+
+Next, we need to tell the main model how to respond to messages from the selector component.
+
+In our case, there's only one 
