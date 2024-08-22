@@ -25,9 +25,11 @@ While they live in the terminal, they're more akin to traditional GUI applicatio
 
 ## What are we building?
 
-This post shows how to build a simple and configurable terminal application with Go. I'm using [cobra](https://github.com/spf13/cobra) to parse command options and set up the tool, and [bubbletea](https://github.com/charmbracelet/bubbletea) to build the UI.
+This post shows how to build a simple and configurable terminal application with Go for interacting with ChatGPT. 
 
-## Setting up the Tool with Cobra 🐍
+The tool uses [Cobra](https://github.com/spf13/cobra) to set up the command, [Viper](https://github.com/spf13/viper) to load and manage the tool's configuration, and [Bubbletea](https://github.com/charmbracelet/bubbletea) to build the UI. The tools and strategies used here can be extended to build terminal applications of all kinds.
+
+## Setting up with Cobra and Viper 🐍
 
 Our `main.go` file is very bare bones, as per Cobra's recommendation.
 
@@ -35,7 +37,7 @@ Our `main.go` file is very bare bones, as per Cobra's recommendation.
 package main
 
 import (
-	cmd "github.com/harrisoncramer/nested-models/cmd"
+	cmd "github.com/harrisoncramer/my-gpt/cmd"
 )
 
 func main() {
@@ -43,16 +45,16 @@ func main() {
 }
 ```
 
-Then in our `cmd/root.go` file, we'll set flag options (in this case a `token` option and a `config` option). The command is then passed as an argument to another function called `initializeConfig` which parses out the values.
+In our `cmd/root.go` file, we'll set flag options (in this case a `token` option and a `config` option). When our root command is called, the `cmd` struct is passed as an argument to another function called `initializeConfig` which parses our configuration for the application.
 
-```go title="cmd/root.go"
+```go {22} title="cmd/root.go" 
 package cmd
 
 import (
 	"fmt"
 	"os"
 
-	app "github.com/harrisoncramer/nested-models/app"
+	app "github.com/harrisoncramer/my-gpt/app"
 	"github.com/spf13/cobra"
 )
 
@@ -64,7 +66,7 @@ func init() {
 
 /* Set up the command. Right now, there's just one, the root command */
 var rootCmd = &cobra.Command{
-	Use:   "sh",
+	Use:   "my-gpt",
 	Short: "A TUI for interacting with ChatGPT from the command line",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := initializeConfig(cmd)
@@ -85,7 +87,7 @@ func Execute() {
 }
 ```
 
-I've put the `initializeConfig` function into a separate file called `config.go` which parses out the options from the YAML file, and unpacks them into the application. Rather than loading and parsing the YAML directly, this function uses [viper](https://github.com/spf13/viper) which lets us elegantly set defaults, allows hot-reloading on configuration changes, and has other benefits.
+I've put the `initializeConfig` function into a separate file called `config.go`. This function loads a YAML file, and unpacks it into the application. Rather than loading and parsing the YAML with a typical reader, we use [Viper](https://github.com/spf13/viper). The library lets use easily set default values, hot reload our configuration when the yaml changes, and has other benefits.
 
 ```go title="cmd/config.go"
 package cmd
@@ -93,13 +95,13 @@ package cmd
 import (
 	"fmt"
 
-	app "github.com/harrisoncramer/nested-models/app"
-	"github.com/harrisoncramer/nested-models/shared"
+	app "github.com/harrisoncramer/my-gpt/app"
+	"github.com/harrisoncramer/my-gpt/shared"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-/* Sets default configuration options then reads in the configuration file and sets it in the app */
+/* Sets the default configuration options, then reads in the config file into our app */
 func initializeConfig(cmd *cobra.Command) error {
 	p := shared.PluginOpts{}
 	viper.SetConfigName("config")
@@ -129,14 +131,68 @@ func initializeConfig(cmd *cobra.Command) error {
 		return fmt.Errorf("Fatal error unmarshalling configuration file: %v", err)
 	}
 
+  /* Set the config optios on our app */
 	app.PluginOptions = p
 	return nil
 }
 ```
 
-Finally, we need to create our app code, that 
+The `shared` package at this point just contains one file, which includes our type for our plugin options:
 
-At this point, we should be good to run the application. Let's make a `config.yaml` file in the root of the repository with some settings: 
+```go title="shared/types.go"
+package shared
+
+/* The options for the plugin, read into the application by Viper from a YAML file */
+type PluginOpts struct {
+	Token   string      `mapstructure:"token"`
+	Network NetworkOpts `mapstructure:"network"`
+	Display DisplayOpts `mapstructure:"display"`
+	Keys    KeyOpts     `mapstructure:"keys"`
+}
+
+type NetworkOpts struct {
+	Timeout int `mapstructure:"timeout"`
+}
+
+type KeyOpts struct {
+	Up     string `mapstructure:"up"`
+	Down   string `mapstructure:"down"`
+	Select string `mapstructure:"select"`
+	Back   string `mapstructure:"back"`
+	Quit   string `mapstructure:"quit"`
+}
+
+type DisplayOpts struct {
+	Cursor string `mapstructure:"cursor"`
+}
+```
+
+And our `app` module, for now, just contains a global variable called `PluginOptions`
+
+```go
+package app
+
+import (
+	"fmt"
+	"github.com/harrisoncramer/my-gpt/shared"
+)
+
+/* Global plugin options shared across models */
+var PluginOptions shared.PluginOpts
+
+func Start() {
+  fmt.Printf("%+v", PluginOptions)
+}
+```
+
+If all goes well, when we run our application:
+
+1. The Cobra tool will run our root command
+2. The Viper code will read in our config file, and set missing default values
+4. Viper will set the configuration in our app package
+3. The app package will start, and print out the configuration
+
+Let's make a `config.yaml` file in the root of the repository with some settings: 
 
 ```yaml title="config.yaml"
 token: "blah"
@@ -148,16 +204,16 @@ keys:
   select: "o"
 ```
 
-And then let's run our application:
+And then let's run our application!
 
 ```bash
 $ go run . --config ./config.yaml
 {Token:blah Network:{Timeout:1000 TimeoutMillis:1s} Display:{Cursor:>>} Keys:{Up:k Down:j Select:o Back:esc Quit:ctrl+c}}
 ```
 
-As you can see, the values from our YAML file are being parsed into the application. We can also override the authorization token if we want by passing in a `--token` flag.
+As you can see, the values from our YAML file are being parsed into the application. We can override the token if we want by passing in a `--token` flag.
 
-We can also see more about our application by running the `--help` command.
+Thanks to Cobra, we can also see more about our application by running the `--help` command.
 
 ```bash
 $ go run . --config ./config.yaml --help
@@ -171,3 +227,5 @@ Flags:
   -h, --help            help for sh
   -t, --token token     Token for the Shortcut API. This value will override a token set in your config file
 ```
+
+## The Basic Model with BubbleTea 🧋
