@@ -31,7 +31,7 @@ This post shows how to build a simple and configurable terminal application with
 
 Our `main.go` file is very bare bones, as per Cobra's recommendation.
 
-```go
+```go title="main.go"
 package main
 
 import (
@@ -45,33 +45,35 @@ func main() {
 
 Then in our `cmd/root.go` file, we'll set flag options (in this case a `token` option and a `config` option). The command is then passed as an argument to another function called `initializeConfig` which parses out the values.
 
-```go
+```go title="cmd/root.go"
 package cmd
 
 import (
 	"fmt"
 	"os"
 
+	app "github.com/harrisoncramer/nested-models/app"
 	"github.com/spf13/cobra"
 )
 
 /* The init() function is called automatically by Go */
 func init() {
-	rootCmd.PersistentFlags().StringP("token", "t", "", "Token for the Shortcut API. This value will override a `token` set in your config file")
-	rootCmd.PersistentFlags().StringP("config", "", "", "The path to a .yaml configuration file")
+	rootCmd.PersistentFlags().StringP("token", "t", "", "The API token used to communicate with ChatGPT")
+	rootCmd.PersistentFlags().StringP("config", "", "", "The path to a .yaml configuration file, by default the current directory")
 }
 
+// Set up our command, right now there's just one and it's the root command
 var rootCmd = &cobra.Command{
 	Use:   "sh",
-	Short: "Our TUI application",
+	Short: "A TUI for interacting with ChatGPT from the command line",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := initializeConfig(cmd)
 		if err != nil {
-			fmt.Printf("Error parsing configuration: %v", err)
+			fmt.Printf("Error configuring application: %v", err)
 			os.Exit(1)
 		}
 
-		fmt.Printf("%+v", pluginOpts)
+		app.Start()
 	},
 }
 
@@ -83,104 +85,60 @@ func Execute() {
 }
 ```
 
-I've put that command into a separate file called `config.go` which parses out the options from the YAML file, and unpacks them into a variable called `pluginOpts` that we can reference throughout the codebase:
+I've put the `initializeConfig` function into a separate file called `config.go` which parses out the options from the YAML file, and unpacks them into the application. Rather than loading and parsing the YAML directly, this function uses [viper](https://github.com/spf13/viper) which lets us elegantly set defaults, allows hot-reloading on configuration changes, and has other benefits.
 
-
-```go
+```go title="cmd/config.go"
 package cmd
 
 import (
-	"errors"
-	"os"
-	"time"
+	"fmt"
 
+	app "github.com/harrisoncramer/nested-models/app"
+	"github.com/harrisoncramer/nested-models/shared"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
+	"github.com/spf13/viper"
 )
 
-type CliOpts struct {
-	Token   string      `yaml:"token"`
-	Network NetworkOpts `yaml:"network"`
-	Display DisplayOpts `yaml:"display"`
-	Keys    KeyOpts     `yaml:"keys"`
-}
-
-type NetworkOpts struct {
-	Timeout       int `yaml:"timeout"`
-	TimeoutMillis time.Duration
-}
-
-type KeyOpts struct {
-	Up     string `yaml:"up"`
-	Down   string `yaml:"down"`
-	Select string `yaml:"enter"`
-	Back   string `yaml:"back"`
-	Quit   string `yaml:"ctrl+c"`
-}
-
-type DisplayOpts struct {
-	Cursor string
-}
-
-var pluginOpts = CliOpts{}
-
+/* Sets default configuration options then reads in the configuration file and sets it in the app */
 func initializeConfig(cmd *cobra.Command) error {
+	p := shared.PluginOpts{}
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.SetDefault("display.cursor", ">")
+	viper.SetDefault("network.timeout", 2000)
+	viper.SetDefault("keys.up", "k")
+	viper.SetDefault("keys.down", "j")
+	viper.SetDefault("keys.select", "enter")
+	viper.SetDefault("keys.quit", "ctrl+c")
+	viper.SetDefault("keys.back", "esc")
+	viper.BindPFlag("token", cmd.PersistentFlags().Lookup("token"))
+
+	/* Look for config file in current directory by default */
 	configFile, _ := cmd.Flags().GetString("config")
-	if configFile != "" {
-		yamlFile, err := os.ReadFile(configFile)
-		if err != nil {
-			return err
-		}
-		err = yaml.Unmarshal(yamlFile, &pluginOpts)
-		if err != nil {
-			return err
-		}
+	if configFile == "" {
+		configFile = "."
 	}
+	viper.AddConfigPath(configFile)
+	err := viper.ReadInConfig()
 
-	if pluginOpts.Display.Cursor == "" {
-		pluginOpts.Display.Cursor = ">"
-	}
-	if pluginOpts.Network.Timeout == 0 {
-		pluginOpts.Network.Timeout = 2000
-	}
-	if pluginOpts.Keys.Up == "" {
-		pluginOpts.Keys.Up = "k"
-	}
-	if pluginOpts.Keys.Down == "" {
-		pluginOpts.Keys.Down = "j"
-	}
-	if pluginOpts.Keys.Select == "" {
-		pluginOpts.Keys.Select = "enter"
-	}
-	if pluginOpts.Keys.Quit == "" {
-		pluginOpts.Keys.Quit = "ctrl+c"
-	}
-	if pluginOpts.Keys.Back == "" {
-		pluginOpts.Keys.Back = "esc"
-	}
-
-	flagToken, err := cmd.Flags().GetString("token")
 	if err != nil {
-		return err
-	}
-	if flagToken == "" && pluginOpts.Token == "" {
-		return errors.New("An API token is required, use --token or provide one in your configuration file!\n")
+		return fmt.Errorf("Fatal error reading configuration file: %v", err)
 	}
 
-	/* The flag will override the config file if present */
-	if flagToken != "" {
-		pluginOpts.Token = flagToken
+	if err := viper.Unmarshal(&p); err != nil {
+		return fmt.Errorf("Fatal error unmarshalling configuration file: %v", err)
 	}
 
-	pluginOpts.Network.TimeoutMillis = time.Duration(pluginOpts.Network.Timeout) * time.Millisecond
-
+	app.PluginOptions = p
 	return nil
 }
 ```
 
+Finally, we need to create our app code, that 
+
 At this point, we should be good to run the application. Let's make a `config.yaml` file in the root of the repository with some settings: 
 
-```yaml
+```yaml title="config.yaml"
 token: "blah"
 display:
   cursor: ">>"
