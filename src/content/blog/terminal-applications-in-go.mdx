@@ -25,11 +25,19 @@ While they live in the terminal, they're more akin to traditional GUI applicatio
 
 ## What are we building?
 
-This post shows how to build a simple and configurable terminal application with Go for interacting with ChatGPT. 
+This post shows how to build a simple and configurable terminal application with Go for interacting with ChatGPT. The application will present us with a list of choices, and allow us to send our choice to ChatGPT, which will then return an answer to the prompt.
 
 The tool uses [Cobra](https://github.com/spf13/cobra) to set up the command, [Viper](https://github.com/spf13/viper) to load and manage the tool's configuration, and [Bubbletea](https://github.com/charmbracelet/bubbletea) to build the UI. The tools and strategies used here can be extended to build terminal applications of all kinds.
 
 ## Setting up with Cobra and Viper 🐍
+
+Initialize your module first!
+
+```bash
+mkdir my-gpt && cd my-gpt
+go mod init
+touch main.go
+```
 
 Our `main.go` file is very bare bones, as per Cobra's recommendation.
 
@@ -211,9 +219,7 @@ $ go run . --config ./config.yaml
 {Token:blah Network:{Timeout:1000 TimeoutMillis:1s} Display:{Cursor:>>} Keys:{Up:k Down:j Select:o Back:esc Quit:ctrl+c}}
 ```
 
-As you can see, the values from our YAML file are being parsed into the application. We can override the token if we want by passing in a `--token` flag.
-
-Thanks to Cobra, we can also see more about our application by running the `--help` command.
+As you can see, the values from our YAML file are being parsed into the application. We can override the token if we want by passing in a `--token` flag. Thanks to Cobra, we can also see more about our application by running the `--help` command.
 
 ```bash
 $ go run . --config ./config.yaml --help
@@ -225,7 +231,213 @@ Usage:
 Flags:
       --config string   The path to a .yaml configuration file
   -h, --help            help for sh
-  -t, --token token     Token for the Shortcut API. This value will override a token set in your config file
+  -t, --token token     Token for the ChatGPT API. This value will override a token set in your config file
 ```
 
+Now that we've got our CLI configured, let's work on building our stateful application.
+
 ## The Basic Model with BubbleTea 🧋
+
+BubbleTea uses an MVC pattern to control state and render views. I'd recommend familiarizing yourself with it and [Elm's model](https://guide.elm-lang.org/architecture/) for application architecture, on which BubbleTea is based.
+
+To start, let's update our `Start` function so that it actually starts our application:
+
+```go {16-21} title="app/main.go"
+package app
+
+import (
+	"fmt"
+	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/harrisoncramer/my-gpt/shared"
+)
+
+/* Global plugin options shared across models */
+var PluginOptions shared.PluginOpts
+
+/* Initializes the root model and starts the TUI application */
+func Start() {
+	m := NewFirstModel()
+	p := tea.NewProgram(m)
+	if _, err := p.Run(); err != nil {
+		fmt.Printf("Error starting BubbleTea: %v", err)
+		os.Exit(1)
+	}
+}
+```
+
+We now need to define our BubbleTea model.
+
+The model can only be passed to `tea.NewProgram` when it has a set of methods: `Init`, `Update`, and `View`. These methods satisfy BubbleTea's `tea.Model` interface.
+
+When our model first starts, it calls the `Init` function. The function is responsible for any initial work, such as reaching out to APIs or setting initial data in our model. The application then enters an update cycle.
+
+The cycle responds to events (like a keypress or a window resize event) via the `Update` method. These events are passed as `tea.Msg` arguments to the method. The method takes these messages and modifies our application state (and possibly returns more commands, which will re-trigger the update cycle). 
+
+Finally, the `View` function is responsible for taking our model's state and rendering the view, which is just a string.
+
+Let's set up the methods to satisfy that interface. 
+
+Our `Init` method is a no-op. 
+
+Our `View` method will simply return our application's plugin options in a readable form. 
+
+Our `Update` method will switch on the message type, and for keypresses that match our keybinding for quit, will return a `tea.Quit` command. The `tea.Quit` command is a command provided by BubbleTea that will exit the application.
+
+```go
+package app
+
+import (
+	tea "github.com/charmbracelet/bubbletea"
+)
+
+func NewFirstModel() tea.Model {
+	return MainModel{}
+}
+
+type MainModel struct {}
+
+func (m Model) Init() tea.Cmd {
+	return nil
+}
+
+func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case PluginOptions.Keys.Quit:
+			return m, tea.Quit
+		}
+	}
+
+	return m, nil
+}
+
+func (m Model) View() string {
+  return fmt.Sprintf("%+v", PluginOptions)
+}
+```
+
+Now, when we run our application, we should see the application load and display our configuration. Pressing our quit key (by default `ctrl+c`) will exit the application.
+
+## Building a Selector Component
+
+Since we are building an application that allows us to choose from a set of options, we want to give the user the ability to scroll between the options, and choose one.
+
+While we could handle this in the parent model, BubbleTea encourages the use of nested models for these types of behaviors.
+
+In our main model, let's embed another `tea.Model` called `selector` which is also a tea model.
+
+
+Let's build a second model called `Selector` that expects a set of keypresses, and updates it's internal state. It'll render a set of choices.
+
+
+```go title="app/selector.go"
+package app
+
+import (
+	"fmt"
+	"strings"
+
+	tea "github.com/charmbracelet/bubbletea"
+)
+
+type Option struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
+}
+
+type Selector struct {
+	cursor  int
+	options []Option
+}
+
+type Direction string
+
+const (
+	Up   Direction = "up"
+	Down Direction = "down"
+)
+
+type moveMsg struct {
+	direction Direction
+}
+
+type selectMsg struct {
+	value string
+}
+
+func (s Selector) Init() tea.Cmd {
+	return nil
+}
+
+/* Responds to keypresses that are defined in our plugin options and updates the model, and/or selects a value */
+func (s Selector) Update(msg tea.Msg) (Selector, tea.Cmd) {
+	switch msg := msg.(type) {
+	case optionsMsg:
+		s.setOptions(msg.options)
+	case tea.KeyMsg:
+		switch msg.String() {
+		case PluginOptions.Keys.Down:
+			s.move(Down)
+		case PluginOptions.Keys.Up:
+			s.move(Up)
+		case PluginOptions.Keys.Select:
+			return s, s.selectVal
+		}
+	}
+	return s, nil
+}
+
+/* Renders the choices and the current cursor */
+func (s Selector) View() string {
+	base := ""
+	for i, option := range s.options {
+		if i == s.cursor {
+			base += fmt.Sprintf("%s %s\n", PluginOptions.Display.Cursor, option.Label)
+		} else {
+			base += fmt.Sprintf("%s %s\n", strings.Repeat(" ", len(PluginOptions.Display.Cursor)), option.Label)
+		}
+	}
+	return base
+}
+
+/* Moves the cursor up or down among the options */
+func (s *Selector) move(direction Direction) {
+	if direction == Up {
+		if s.cursor > 0 {
+			s.cursor--
+		}
+	} else {
+		if s.cursor < len(s.options)-1 {
+			s.cursor++
+		}
+	}
+}
+
+/* Sets options on the selector */
+func (s *Selector) setOptions(options []Option) {
+	s.options = options
+}
+
+/* Chooses the value at the given index */
+func (s Selector) selectVal() tea.Msg {
+	return selectMsg{value: s.options[s.cursor].Value}
+}
+
+/* If a key was pressed, call the update function if it's relevant. This lets us group all of the key logic in one method */
+func (s Selector) maybeUpdate(msg tea.Msg) (Selector, tea.Cmd) {
+	switch msg := msg.(type) {
+	case optionsMsg, moveMsg:
+		return s.Update(msg)
+	case tea.KeyMsg:
+		switch msg.String() {
+		case PluginOptions.Keys.Down, PluginOptions.Keys.Up, PluginOptions.Keys.Select:
+			return s.Update(msg)
+		}
+	}
+
+	return s, nil
+}
+```
