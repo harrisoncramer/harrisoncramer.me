@@ -173,13 +173,6 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
-"nested-models-with-charm.mdx": {
-  id: "nested-models-with-charm.mdx",
-  slug: "nested-models-with-charm",
-  body: string,
-  collection: "blog",
-  data: InferEntrySchema<"blog">
-} & { render(): Render[".mdx"] },
 "optimizing-your-docker-containers.mdx": {
   id: "optimizing-your-docker-containers.mdx",
   slug: "optimizing-your-docker-images-for-production",
@@ -225,6 +218,13 @@ declare module 'astro:content' {
 "speeding-up-circleci-builds-with-caching.mdx": {
   id: "speeding-up-circleci-builds-with-caching.mdx",
   slug: "speeding-up-circleci-builds-with-caching",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
+"terminal-applications-in-go.mdx": {
+  id: "terminal-applications-in-go.mdx",
+  slug: "nested-models-with-charm",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">

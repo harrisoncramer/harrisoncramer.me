@@ -62,7 +62,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("config", "", "", "The path to a .yaml configuration file, by default the current directory")
 }
 
-// Set up our command, right now there's just one and it's the root command
+/* Set up the command. Right now, there's just one, the root command */
 var rootCmd = &cobra.Command{
 	Use:   "sh",
 	Short: "A TUI for interacting with ChatGPT from the command line",
