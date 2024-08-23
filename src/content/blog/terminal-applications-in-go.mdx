@@ -4,7 +4,7 @@ pubDate: 2024-08-22
 description: Charm's BubbleTea library makes works well with Cobra for building powerful command line tooling for developers
 heroImage: snake
 imageDescription: An image of a snake wrapped around a tree branch
-slug: nested-models-with-charm
+slug: terminal-applications-in-go
 tags: ["go", "terminal"]
 ---
 
@@ -70,7 +70,7 @@ import (
 
 /* The init() function is called automatically by Go */
 func init() {
-	rootCmd.PersistentFlags().StringP("token", "t", "", "Token for the ChatGPT API. This value will override a `token` set in your config file. \nIf neither is found, will default to $OPEN_API_KEY environment variable")
+	rootCmd.PersistentFlags().StringP("token", "t", "", "Token for the ChatGPT API. This value will override a `token` set in your config file. \nIf neither is found, will default to $OPENAI_API_KEY environment variable")
 	rootCmd.PersistentFlags().StringP("config", "", "", "The path to a .yaml configuration file, by default the current directory")
 }
 
@@ -134,8 +134,10 @@ func parseConfig(cmd *cobra.Command) (shared.PluginConfig, error) {
 	}
 	viper.AddConfigPath(configFile)
 	err := viper.ReadInConfig()
-	if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-		return shared.PluginConfig{}, fmt.Errorf("Fatal error reading configuration file: %v", err)
+	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return fmt.Errorf("Fatal error reading configuration file: %v\n", err)
+		}
 	}
 
 	if err := viper.Unmarshal(&p); err != nil {
