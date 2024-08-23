@@ -53,7 +53,7 @@ const Header = ({ children, stars }: HeaderProps): JSX.Element => {
           <img src="/arrow-left.svg" alt="reddit" className="invert" />
         </div>
         <div className="flex items-center bg-app-white px-2 gap-1 rounded-sm">
-          <span className="text-app-black text-sm h-full flex items-center">{JSON.stringify(stars)}</span>
+          <span className="text-app-black text-sm h-full flex items-center mt-1">{JSON.stringify(stars)}</span>
           <img src="/star.svg" alt="reddit"/>
         </div>
       </a>
