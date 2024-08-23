@@ -245,6 +245,8 @@ Now that we've got our CLI configured, let's work on building our stateful appli
 
 BubbleTea uses an MVC pattern to control state and render views. I'd recommend familiarizing yourself with it and [Elm's model](https://guide.elm-lang.org/architecture/) for application architecture, on which BubbleTea is based.
 
+It took me a while to grok BubbleTea, even though I'm coming from a web development background and am used to developing reactive applications. The biggest "aha" moment for me was when I realized that all messages flow _down_ in the application and start out at the topmost parent model.
+
 To start, let's update our `Start` function so that it actually starts our application:
 
 ```go {16-21} title="app/main.go"
@@ -489,35 +491,17 @@ Now that we've built and defined our model, we need to wire it up to our parent 
 
 #### Calling the Selector's `Update` method
 
-Let's tackle the `Update` function first. There are multiple ways to do this. I like defining an additional method on the selector called `maybeUpdate` which will update the component _only if_ a key is pressed. Define the method on your selector model:
+Let's tackle the `Update` function first. In order for the selector to process keystrokes that originally are passed to the parent, we delegate those keys to the selector model.
 
-```go title="app/selector.go"
-/* Rest of model cropped for brevity ... */
-
-func (s Selector) maybeUpdate(msg tea.Msg) (Selector, tea.Cmd) {
-	switch msg := msg.(type) {
-	case optionsMsg, moveMsg:
-		return s.Update(msg)
-	case tea.KeyMsg:
-		switch msg.String() {
-		case PluginOptions.Keys.Down, PluginOptions.Keys.Up, PluginOptions.Keys.Select:
-			return s.Update(msg)
-		}
-	}
-
-	return s, nil
-}
-```
-
-This method will call the actual `Update` method. I like this pattern because it encapsulates all of the selector logic in one place. Now, we can call `maybeUpdate` in our parent model for every event.
+We can do this by calling the selector's `Update` method _first_ regardless of the key pressed, and returning the updated model and a (possibly nil) command from the child. 
 
 ```go title="app/main.go"
 func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	/* Possibly update the selector. If the selectorCmd 
-    is non-null it means that our selector's Update method was called,
-    we want to return that command and re-run our event loop */
-	updatedSelector, selectorCmd := m.selector.maybeUpdate(msg)
+    is non-null it means that we want to process that event first
+    and re-run our event loop */
+	updatedSelector, selectorCmd := m.selector.Update(msg)
 	m.selector = updatedSelector
 	if selectorCmd != nil {
 		return m, selectorCmd
@@ -527,7 +511,9 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	/* ...all other events */
 ```
 
-If any of these keys are pressed we'll update the state of the selector and reassign it to the parent. If the keypress triggers a command (like a selection) we return that command as well so that the event loop can restart.
+I like this pattern because it encapsulates all of the selector logic in one place. The downside is that you may be updating the child component unnecessarily (versus if you only called it for the correct keystrokes). This is in my opinion a good tradeoff.
+
+If the keypress triggers a command (like a selection) we return that command as well so that the event loop can restart.
 
 #### Handling Messages from the Selector
 
@@ -826,7 +812,6 @@ That's it! The code is super extensible. For instance, it's not difficult to exp
 
 ## Closing Thoughts
 
-It took me a while to grok BubbleTea, even though I'm coming from a web development background and am used to developing reactive applications. The biggest "aha" moment for me was when I realized that all messages flow _down_ in the application and start out at the topmost parent model.
 
 The tool is nonetheless super powerful and it's a far better alternative to building with Bash or most other CLI tools, especially when combined with Cobra, where you can automatically pass arguments to your application and jump immediately to specific views!
 
