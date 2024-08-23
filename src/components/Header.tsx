@@ -30,7 +30,7 @@ const Header = ({ children, stars }: HeaderProps): JSX.Element => {
   }, [scrollTop])
 
   return (
-      <nav className={`shadow z-10 p-4 top-0 sticky flex items-center justify-between mr-4 transition-opacity bg-app-black text-app-white ${scrolling ? 'opacity-0' : 'opacity-100'}`}>
+      <nav className={`shadow z-10 p-4 top-0 sticky flex items-center justify-between pr-4 transition-opacity bg-app-black text-app-white ${scrolling ? 'opacity-0' : 'opacity-100'}`}>
       <div className="flex items-center gap-4">
         <NavigationDropdown />
         { children }
@@ -49,7 +49,7 @@ const Header = ({ children, stars }: HeaderProps): JSX.Element => {
             </g>
           </svg>
         </div>
-        <div className="w-3 flex items-center mr-[-14px]">
+        <div className="w-3 flex items-center mr-[-12px]">
           <img src="/arrow-left.svg" alt="reddit" className="invert" />
         </div>
         <div className="flex items-center bg-app-white px-2 gap-1 rounded-sm">

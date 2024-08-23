@@ -48,9 +48,16 @@ const postData = JSON.stringify(nonDraftPosts);
         if (query.length === 0) return;
         searchResultsNode.classList.remove("hidden");
 
-        const results = JSON.parse(posts).filter((post) => {
+        const results = JSON.parse(posts!).filter((post) => {
           if (post.frontmatter.title.includes(query)) return true;
           if (post.frontmatter.description.includes(query)) return true;
+          console.log(post.frontmatter.tags);
+          if (
+            post.frontmatter.tags.some((tag: string) =>
+              tag.toLowerCase().startsWith(query.toLowerCase())
+            )
+          )
+            return true;
           // if (post.frontmatter.includes(query)) return true;
         });
 

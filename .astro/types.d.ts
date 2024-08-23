@@ -224,7 +224,7 @@ declare module 'astro:content' {
 } & { render(): Render[".mdx"] },
 "terminal-applications-in-go.mdx": {
   id: "terminal-applications-in-go.mdx",
-  slug: "nested-models-with-charm",
+  slug: "terminal-applications-in-go",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
