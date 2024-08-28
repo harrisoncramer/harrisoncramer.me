@@ -500,22 +500,20 @@ We can do this by calling the selector's `Update` method _first_ regardless of t
 ```go title="app/main.go"
 func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
+	var cmds = []tea.Cmd{}
+
 	/* Possibly update the selector. If the selectorCmd 
-    is non-null it means that we want to process that event first
-    and re-run our event loop */
-	updatedSelector, selectorCmd := m.selector.Update(msg)
-	m.selector = updatedSelector
-	if selectorCmd != nil {
-		return m, selectorCmd
-	}
+    is non-null it means that we want to process that event lets
+    add it to our list of commands */
+	var cmd tea.Cmd
+	m.selector, cmd = m.selector.Update(msg)
+	cmds = append(cmds, cmd)
 
 	switch msg := msg.(type) {
 	/* ...all other events */
 ```
 
-I like this pattern because it encapsulates all of the selector logic in one place. The downside is that you may be updating the child component unnecessarily (versus if you only called it for the correct keystrokes). This is in my opinion a good tradeoff.
-
-If the keypress triggers a command (like a selection) we return that command as well so that the event loop can restart.
+I like this pattern because it encapsulates all of the selector logic in one place. The downside is that you may be calling the Update method unnecessarily (versus if you only called it for the correct keystrokes). This is in my opinion a good tradeoff.
 
 #### Handling Messages from the Selector
 
@@ -529,11 +527,11 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	}
 
-	updatedSelector, selectorCmd := m.selector.maybeUpdate(msg)
-	m.selector = updatedSelector
-	if selectorCmd != nil {
-		return m, selectorCmd
-	}
+	/* Handle possible commands by selector */
+	var cmd tea.Cmd
+	m.selector, cmd = m.selector.Update(msg)
+	cmds = append(cmds, cmd)
+
 
 	/* All other events */
 	switch msg := msg.(type) {
@@ -575,14 +573,12 @@ But the foundation for more complexity is now in place. Let's handle that next.
 
 Let's add the following `case` our our `Update` method in our main model, which will handle the `selectMsg` message type when someone makes a selection.
 
-```go {10-17} title="app/main.go"
+```go {8-15} title="app/main.go"
 func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
-	updatedSelector, selectorCmd := m.selector.maybeUpdate(msg)
-	m.selector = updatedSelector
-	if selectorCmd != nil {
-		return m, selectorCmd
-	}
+	var cmd tea.Cmd
+	m.selector, cmd = m.selector.Update(msg)
+	cmds = append(cmds, cmd)
 
 	switch msg := msg.(type) {
 	case selectMsg:
