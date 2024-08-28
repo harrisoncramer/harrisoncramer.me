@@ -152,7 +152,7 @@ func parseConfig(cmd *cobra.Command) (shared.PluginConfig, error) {
 }
 ```
 
-The `shared` package at this point just contains one file, which includes our type for our plugin options:
+The `shared` package at this point just contains one file, which includes our type for our plugin options. This is the struct that we are unpacking our configuration into. We could also use Viper's `Get` method, but I like having all of the configuration in one place:
 
 ```go title="shared/types.go"
 package shared
