@@ -124,6 +124,13 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
+"building-your-own-lsp-in-go.mdx": {
+  id: "building-your-own-lsp-in-go.mdx",
+  slug: "building-your-own-language-server-in-go",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
 "contract-first-api-design.mdx": {
   id: "contract-first-api-design.mdx",
   slug: "contract-first-api-design",
