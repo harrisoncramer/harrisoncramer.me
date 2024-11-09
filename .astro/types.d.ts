@@ -159,6 +159,13 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
+"easy-wins-for-the-lazy-interviewee.mdx": {
+  id: "easy-wins-for-the-lazy-interviewee.mdx",
+  slug: "five-soft-skills-for-hard-tech-interviews",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
 "migrating-from-gatsby-to-astro.mdx": {
   id: "migrating-from-gatsby-to-astro.mdx",
   slug: "migrating-from-gatsby-to-astro",
