@@ -9,6 +9,8 @@ export const TAGS = [
   "debugging",
   "go",
   "astro",
+  "software design",
+  "architecture",
   "tests",
   "typescript",
   "kubernetes",
