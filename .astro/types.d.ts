@@ -159,6 +159,7 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
+<<<<<<< HEAD
 "easy-wins-for-the-lazy-interviewee.mdx": {
   id: "easy-wins-for-the-lazy-interviewee.mdx",
   slug: "five-soft-skills-for-hard-tech-interviews",
@@ -166,6 +167,16 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
+||||||| parent of 48cc4cf (Added post about incrementalism)
+=======
+"embracing-incrementalism.mdx": {
+  id: "embracing-incrementalism.mdx",
+  slug: "embracing-incrementalism",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
+>>>>>>> 48cc4cf (Added post about incrementalism)
 "migrating-from-gatsby-to-astro.mdx": {
   id: "migrating-from-gatsby-to-astro.mdx",
   slug: "migrating-from-gatsby-to-astro",
