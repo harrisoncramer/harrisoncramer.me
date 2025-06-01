@@ -1,0 +1,48 @@
+#!/bin/bash
+set -euo pipefail
+
+#MISE description="Creates a new blog post"
+
+TITLE=$(gum input --placeholder "Enter the title" --prompt "Title: ")
+SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:] \n' | tr ' ' '-')
+FILENAME="$SLUG.mdx"
+
+# Build image
+URL=$(gum input --placeholder "Image URL" --prompt "Image URL: ")
+IMAGE_DESCRIPTION=$(gum input --placeholder "Image description" --prompt "Image Description: ")
+
+IMAGE_NAME=$(uuidgen | tr '[:upper:]' '[:lower:]')
+IMAGE_SLUG="$MISE_CONFIG_ROOT/src/assets/posts/$IMAGE_NAME.jpg"
+curl -s "$URL" |
+  ffmpeg -v error -i - -vf "scale='min(1000,iw)':'min(1000,ih)':force_original_aspect_ratio=decrease" -q:v 2 -f image2 "$IMAGE_SLUG"
+
+DESCRIPTION=$(gum input --placeholder "Blog post hook" --prompt "Blog post hook: ")
+
+FILENAME="$SLUG.mdx"
+DATE="$(date +%Y-%m-%d)"
+
+TAGS=$(gum choose neovim ci javascript microservices docker debugging go astro software design architecture tests typescript kubernetes circleci react terraform aws api neovim lua terminal --no-limit | xargs)
+makeTags() {
+  echo "$TAGS" | awk '{
+  printf("[");
+  for(i=1;i<=NF;i++){
+    printf("\"%s\"", $i);
+    if(i<NF) printf(", ")
+  }
+  print "]"
+}'
+}
+TAGS=$(makeTags)
+
+echo "---
+title: $TITLE
+pubDate: $DATE
+description: $DESCRIPTION
+imageDescription: $IMAGE_DESCRIPTION
+heroImage: $IMAGE_NAME
+slug: $SLUG
+tags: $TAGS
+---" >>"src/content/blog/$FILENAME"
+
+echo "src/content/blog/$FILENAME" | pbcopy
+gum log --level info "Copied src/content/blog/$FILENAME to clipboard."

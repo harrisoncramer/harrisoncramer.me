@@ -1,0 +1,9 @@
+[settings]
+
+[tools]
+node = "22"
+"go:github.com/charmbracelet/gum" = "v0.16.0"
+
+[env]
+ # Makes NPM binaries available in the user's shell directly
+_.path = ['{{config_root}}/node_modules/.bin']
