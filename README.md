@@ -1,6 +1,6 @@
 # harrisoncramer.me
 
-This is my personal software blog, at <a href="https://www.harrisoncramer.me">harrisoncramer.me</a>.
+This is the source code for <a href="https://www.harrisoncramer.me">harrisoncramer.me</a>, my software blog.
 
 It's built with Astro, uses Github Actions for CI/CD, and Terraform for the AWS infrastructure. 
 
