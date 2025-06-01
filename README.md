@@ -1,11 +1,23 @@
 # harrisoncramer.me
 
-This <a href="https://www.harrisoncramer.me">blog</a> is intended to serve as a resource for software developers. It's my personal software blog.
+This is <a href="https://www.harrisoncramer.me">, my personal software blog.
 
-It's built with Astro, uses Github Actions for CI/CD, and Terraform for the AWS infrastructure.
+It's built with Astro, uses Github Actions for CI/CD, and Terraform for the AWS infrastructure. 
 
-I've recently introduced tags to the repository to track version releases
+I'm using Mise and Gum for tooling to generate new blog post files.
 
-## Shrinking Assets
+## Setup
 
-All assets need to be compressed w/ ffmpeg. The command is: `ffmpeg -i input.jpg -vf "scale='min(800,iw)':'min(800,ih)':force_original_aspect_ratio=decrease" -q:v 2 output.jpg`
+Install and start the server:
+
+```bash
+mise install
+npm install
+npm dev
+```
+
+Create a blog post:
+
+```bash
+mise create
+```
