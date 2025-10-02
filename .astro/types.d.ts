@@ -124,6 +124,13 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
+"building-your-own-lsp-in-go.mdx": {
+  id: "building-your-own-lsp-in-go.mdx",
+  slug: "building-your-own-language-server-in-go",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
 "contract-first-api-design.mdx": {
   id: "contract-first-api-design.mdx",
   slug: "contract-first-api-design",
@@ -148,6 +155,13 @@ declare module 'astro:content' {
 "deploying-a-nodejs-api-on-eks.mdx": {
   id: "deploying-a-nodejs-api-on-eks.mdx",
   slug: "deploying-a-nodejs-api-on-eks",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
+"easy-wins-for-the-lazy-interviewee.mdx": {
+  id: "easy-wins-for-the-lazy-interviewee.mdx",
+  slug: "five-soft-skills-for-hard-tech-interviews",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
@@ -204,6 +218,13 @@ declare module 'astro:content' {
 "real-time-web-scraping-with-firebase-and-twilio.mdx": {
   id: "real-time-web-scraping-with-firebase-and-twilio.mdx",
   slug: "real-time-web-scraping-with-firebase-and-twilio",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
+"repeat-yourself.mdx": {
+  id: "repeat-yourself.mdx",
+  slug: "repeat-yourself",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">

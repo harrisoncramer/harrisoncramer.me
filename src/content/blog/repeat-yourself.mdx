@@ -1,0 +1,53 @@
+---
+title: Repeat yourself
+pubDate: 2025-10-2
+description: Don't believe what you've heard about repetition. Why repeating yourself in code is often better than the alternative.
+imageDescription: Repetition
+heroImage: 573d42df-c524-417b-b187-1be5665a1c70
+slug: repeat-yourself
+---
+
+Repetition gives structure. Structure gives context. And context is everything when navigating a large codebase. This are several reasons for this:
+
+1. Patterns are safe. It's harder to make mistakes with guardrails up.
+2. Patterns are understandable. If you've seen it before, you'll understand it faster.
+4. Patterns are replicable, by definition.
+
+Repeated code is not a bad thing. Whether it's a new hire trying to navigate the codebase, or an LLM assistant building a solution, repetition gives software engineers a mental framework to use in solving problems.
+
+## Patterns are Safe
+
+If a pattern is well-established in a codebase, 
+
+While it's sometimes the case that antipatterns take hold and reduce code clarity or locality, the majority of the time, widespread coding patterns are introduced in an attempt to guide some repeated behavior into a familiar set of keystrokes, so that the chances for mistakes in an implementation are reduced. Patterns like a state-machine provide guardrails when dealing with a finite problem, for instance, that make writing bug-free code a lot easier.
+
+When you repeat a well-known pattern in the codebase, like MVC, or a singleton, or a naming conventions, it's also much easier to identify the parts of the code that _don't adhere to that pattern_. 
+
+This makes parts of the code that are riskier "stick out" to reviewers, and makes it obvious where you're adding business logic, versus performing mundane operations like shipping data over an API or writing it to a database. Which leads to the next point.
+
+## Patterns are Understandable
+
+Repeating yourself has another benefit: it makes the code easier to understand.
+
+Although it sounds counterintuitive, writing predictable, boring code is one of the most valuable things you can do as an engineer. First, it lets _you_ save your mental bandwidth for the things that matter. By shrinking down the problem space that you (and your coworkers) have to focus on, you'll have more time and energy to focus on the core business logic . 
+
+It's pretty obvious if you've ever opened up a codebase with minimal repetition. Every feature has it's own implementations can't just look at a file, scan the code, and roughly know what it does. Without repetition, you're left with a bunch of bespoke implementations of code that are hard to grok, very quickly. 
+ 
+You know you’re in a healthy codebase when you can glance at a file and roughly know what it does. That’s not magic — that’s pattern recognition.
+
+## Patterns are Replicable
+
+Repetition is essential for automation. Tools like macros, code generators, or LLMs (large language models) depend on predictable patterns to work effectively. If every file does things slightly differently, automation falls apart.
+
+Linting, for instance, requires code to be structured a certain way in order to be helpful. Well-patterned codebases are also easier for static analysis to vet, as well.
+
+Repetition is a selling point for tools like Protocol Buffers, for instance. Because the generated code is extremely repetitive and well structured, it's easy to build plugins on top of it, for instance, test mocks or documentation. When structure is enforced by tooling, developers can depend on it.
+
+One of the biggest limitations of large language models in coding workflows is that they don’t (typically) remember your architecture. They’re smart, but they’re also being dropped into a codebase halfway through a sprint, with no idea what the internal conventions are.
+
+By reading patterns, LLMs can infer structure and intent much more effectively. They turn into a coworker who has been at the company for years, rather than some random doing a take-home test.
+
+Repetition isn’t bad. Redundancy is.
+
+The goal should never be to remove all repetition, just to reduce line count. The goal should be to make that repetition obvious, enforceable, and navigable.
+
