@@ -56,7 +56,15 @@ This is really useful when the concrete type is a typed constant in Go, much lik
 You can do indexed based string interpolation in Go:
 
 ```go
-fmt.Sprintf("%[2]s %[2]s %[1]s %[1]s %[3]s", "one", "two", "three") // yields "one two one one three"
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	fmt.Printf("%[1]s %[1]s %[2]s %[2]s %[3]s", "one", "two", "three") // yields "one one two two three"
+}
 ```
 
 This is helpful if you have to interpolate the same value multiple times and want to reduce repetition and make the interpolation easier to follow.
