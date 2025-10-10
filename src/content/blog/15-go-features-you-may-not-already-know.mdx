@@ -1,0 +1,410 @@
+---
+title: 15 Go Features You May Not Already Know
+pubDate: 2025-10-09
+description: Some of my favorite tidbits from the past year of working with Go.
+imageDescription: A gopher hiding in the grass.
+heroImage: bded67b5-7fe8-4e2e-b46a-4ba90c1779cd
+slug: 15-go-features-you-may-not-already-know
+tags: ["go"]
+---
+
+One of the best ways to learn something new is to write down something you've learned about it regularly. Over the past year, I've been doing this with the Go programming language. Here are some of my favorite lesser-known tidbits about the language.
+
+## Ranging Directly over Integers
+
+As of Go 1.22, you can range over an integer:
+
+```go
+for i := range 10 {
+    fmt.Println(i + 1) // 1, 2, 3 ... 10
+}
+```
+
+## Renaming Packages
+
+You can use Go's LSP to rename _packages_, not just regular variables. The newly named package will be updated in all references. As a bonus, it even renames the directory!
+
+## Constraining Generic Function Signatures
+
+You can use the `~` operator to constrain a generic type signature. For instance, for typed constants, you can do this:
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type someConstantType string
+
+const someConstant someConstantType = "foo" // Underlying type is a string
+
+func main() {
+	msg := buildMessage(someConstant)
+	fmt.Println(msg)
+}
+
+func buildMessage[T ~string](value T) string { // This accepts any value whose underlying type is a string
+	return fmt.Sprintf("The underlying string value is: '%s'", value)
+}
+```
+
+This is really useful when the concrete type is a typed constant in Go, much like an `enum` in another language.
+
+## Index-based String Interpolation
+
+You can do indexed based string interpolation in Go:
+
+```go
+fmt.Sprintf("%[2]s %[2]s %[1]s %[1]s %[3]s", "one", "two", "three") // yields "one two one one three"
+```
+
+This is helpful if you have to interpolate the same value multiple times and want to reduce repetition and make the interpolation easier to follow.
+
+## The `time.After` function
+
+The `time.After` function creates a channel that will be sent a message after x seconds. When used in combination with a select statement it can be an easy way of setting a deadline for another routine.
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch := make(chan string)
+
+	go func() {
+		time.Sleep(2 * time.Second)
+		ch <- "result"
+	}()
+
+	select {
+	case res := <-ch:
+		fmt.Println("Received:", res)
+	case <-time.After(1 * time.Second):
+		fmt.Println("Timeout: did not receive a result in time")
+	}
+}
+```
+
+## The `embed` package
+
+The "embed" package lets you embed non-Go files directly into the Go binary. There is no need to read them from disk at runtime. 
+
+You can embed HTML, JS, even images. The huge advantage, besides speed, is that if your program compiles, you don't have to worry about bad or broken file paths. Pretty cool!
+
+## Using `len()` with Strings
+
+The `len()` built-in in Go doesn't return the number of characters in a string, it returns the number of bytes, as we cannot assume that string literals contain one byte per character (hence, runes). 
+
+Runes correspond to code points in Go, which are between 2 and 4 bytes long. Although source code in Go is UTF-8 encoded, strings may not be.
+
+## Nil Interfaces
+
+What do you think this prints?
+
+```go
+package main
+
+import "fmt"
+
+type Animal interface {
+	Speak()
+}
+
+type Dog struct{}
+
+func (d *Dog) Speak() {}
+
+func main() {
+	var d *Dog = nil
+	var a Animal = d
+	fmt.Println(a == nil)
+}
+
+```
+
+The answer: is false!
+
+This occurs because even though the _value_ is nil, the type of the variable is a _non-nil interface_. 
+
+Go "boxes" that value in an interface, which is not nil. This can really bite you if you return interfaces from functionsl Once you return that value, even if it's nil, if you've typed the return value as an interface, Go "boxes" the result, and the nil assertion no longer works. 
+
+```go
+package main
+
+import "fmt"
+
+type Car interface {
+	Honk()
+}
+
+type Honda struct{}
+
+func (h *Honda) Honk() {
+	fmt.Println("Beep!")
+}
+
+func giveCar() Car {
+	var h *Honda // h is nil
+	return h     // nil *Honda wrapped in Car interface
+}
+
+func main() {
+	c := giveCar()
+	if c == nil {
+		fmt.Println("This will never print!")
+	}
+}
+```
+
+In this example, `c` is a boxed nil value, therefore, the check `c == nil` will always be false.
+
+## Invoking Methods on Nil Values
+
+Relatedly, you can actually invoke a method on a nil struct. This is valid Go:
+
+```go
+package main
+
+import "fmt"
+
+type Foo struct {
+	Val string
+}
+
+func (f *Foo) Hello() {
+	fmt.Println("hi from nil pointer receiver")
+}
+
+func main() {
+	var f *Foo = nil
+	f.Hello() // This is fine!
+
+	fmt.Println(f.Val) // This is not!
+}
+```
+
+It should go without saying, of course, that attempting to access a property on this would still panic.
+
+## Variable References with Ranging over Maps
+
+When updating a map inside of a loop there's no guarantee that the update will be made during that iteration. The only guarantee is that by the time the loop finishes, the map contains your updates.
+
+```go
+func main() {
+	m := map[int]int{1: 1, 2: 2, 3: 3}
+
+	for key, value := range m {
+		fmt.Printf("%d = %d\n", key, value)
+		if key == 1 {
+			for i := 10; i < 20; i++ {
+				m[i] = i * 10 // Add many entries
+			}
+		}
+	}
+}
+```
+
+For instance, in the above code, you may or _may not_ see the values we add inside the loop printed. 
+
+This is because of the way objects are managed internally in Go. In Go, when you add a new key/value, the langauge hashes that key and puts it into a storage bucket. If Go's iteration has already "looked in" that bucket in the object, your new entry won't be visited in the loop.
+
+This is different than, for instance, python, which has a "stable insertion order" that guarantees that this won't happen. The reason Go does this: speed!
+
+## Returning Custom Errors
+
+It's often helpful in Go to return unexpected errors as typed errors, so that you can provide additional context for debugging or other upstream uses. Defining them as types lets you attach structured data via errors.As, and implement custom logic, while still satisfying the error interface. We almost never do this but I'd be curious to see when this is helpful and may try to use this pattern soon
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+type MyError struct {
+	Message string
+	Code    int
+}
+
+func (e *MyError) Error() string {
+	return fmt.Sprintf("Error %d: %s", e.Code, e.Message)
+}
+
+func someFunction() error {
+	return &MyError{Message: "something went wrong", Code: 404}
+}
+
+func main() {
+	err := someFunction()
+	if err != nil {
+		var myErr *MyError
+		if errors.As(err, &myErr) {
+			fmt.Printf("Handled typed error: %s\n", myErr.Error())
+		} else {
+			fmt.Printf("Unhandled error: %s\n", err)
+		}
+	}
+}
+```
+
+## Context-Aware Go Functions
+
+In a function that's context aware you should always select on the context for a channel send or receive. This is because you may end up waiting needlessly for that operation to complete despite the context being cancelled.
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
+func contextAwareFunction(ctx context.Context) {
+	ch := make(chan string)
+
+	go func() {
+		time.Sleep(2 * time.Second)
+		ch <- "operation complete"
+	}()
+
+	select {
+	case msg := <-ch:
+		fmt.Println(msg)
+	case <-ctx.Done():
+		fmt.Println("operation cancelled")
+	}
+}
+
+func main() {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	contextAwareFunction(ctx)
+}
+```
+
+If you don't check the context, your function could block indefinitely on the channel (or any other blocking operation) even though the caller has stopped caring.
+
+Bonus fact: the Go context is cancelled after an HTTP handler finishes and the response is fully sent, even in success responses. This is why you need to be careful with context propagation. For instance you can introduce race conditions by passing along context to an event publisher from an HTTP request, where the fast HTTP response can cancel the propagated context and prevent the publication of the event. This is an important TIL!
+
+## Empty Structs
+
+You'll often see Go developers sending empty Go structs around. Why this, and not say, a boolean?
+
+In Go, empty structs occupy zero bytes. The Go runtime handles all zero-sized allocations, including empty structs, by returning a single, special memory address that takes up no space.
+
+This is why they're commonly used to signal on channels when you don't actually have to send any data. Compare this to booleans, which still must occupy some space.
+
+## The Go compiler and the `range` keyword
+
+The Go compiler "lowers" the range keyword into basic loops before Go is further compiled. The implementation is different depending on what's being lowered, e.g. a map, slice, or sequence like from the iter package. 
+
+Interestingly, for the iter package, it actually translates a break call inside of a range to the "false" that would be returned typically by the yield function to stop iteration.
+
+## Hidden Interface satisfaction
+
+Hidden interface satisfaction causes issues with struct embedding. 
+
+Say, for instance, you embed a `time.Time` struct onto a JSON response field and try to marshal that parent. 
+
+When you embed structs, you also implicitly promote any methods they contain. Since the `time.Time` method has a `MarshalJSON()` method, the compiler will run that over the regular marshalling behavior. 
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+)
+
+type Event struct {
+	Name      string `json:"name"`
+	time.Time `json:"timestamp"`
+}
+
+func main() {
+	event := Event{
+		Name: "Launch",
+		Time: time.Date(2023, time.November, 10, 23, 0, 0, 0, time.UTC),
+	}
+
+	jsonData, _ := json.Marshal(event)
+	fmt.Println(string(jsonData)) // "2023-11-10T23:00:00Z" weird right?
+
+}
+```
+
+In this example, the `Event` struct embeds a `time.Time` field. When marshalling the `Event` struct to JSON, the `MarshalJSON()` method of the `time.Time` type is automatically called to format the _entire result_ which ends up not printing what you'd expect.
+
+This is true of other methods too, which can lead to weird and hard to track down bugs. Be careful with struct embedding!
+
+## The `-` tag for JSON
+
+Using the "-" tag when Marshalling JSON will cause the field to be omitted. This is nice if you have private data on a field that's also needed for an API response.
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type User struct {
+	Name     string `json:"name"`
+	Password string `json:"-"`
+	Email    string `json:"email"`
+}
+
+func main() {
+	user := User{
+		Name:     "John Doe",
+		Password: "supersecret",
+		Email:    "john.doe@example.com",
+	}
+
+	data, err := json.Marshal(user)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(string(data)) // Only {"name":"John Doe","email":"john.doe@example.com"}, not password!
+}
+```
+
+This is a contrived example, you obviously wouldn't be this careless with a password. But it's a handy feature nonetheless.
+
+## Comparing Times
+
+When converting a Time in Go to a String, the stringer automatically appends timezone information, which is why string comparisons won't work. Instead, use the .Equal() method, which compares times: "Equal reports whether t and u represent the same time instant. Two times can be equal even if they are in different locations."
+
+## The `wg.Go` Function
+
+Go 1.25 introduced a `waitgroup.Go` function that lets you add Go routines to a waitgroup more easily. It takes the place of using the go keyword, it looks like this:
+
+```go
+wg.Go(func() {
+    // your goroutine code here
+})
+```
+
+The implementation is just a wrapper around this:
+
+```go
+func (wg *WaitGroup) Go(f func()) {
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        f()
+    }()
+}
+```

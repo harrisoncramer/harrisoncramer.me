@@ -96,6 +96,13 @@ declare module 'astro:content' {
 
 	const entryMap: {
 		"blog": {
+"15-go-features-you-may-not-already-know.mdx": {
+  id: "15-go-features-you-may-not-already-know.mdx",
+  slug: "15-go-features-you-may-not-already-know",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
 "building-a-chat-application-with-socketio.mdx": {
   id: "building-a-chat-application-with-socketio.mdx",
   slug: "building-a-chat-application-with-socketio",
