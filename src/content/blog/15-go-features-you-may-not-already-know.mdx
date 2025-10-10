@@ -1,10 +1,10 @@
 ---
-title: 15 Go Features You May Not Already Know
+title: 15 Go Subtleties You May Not Already Know
 pubDate: 2025-10-09
 description: Some of my favorite tidbits from the past year of working with Go.
 imageDescription: A gopher hiding in the grass.
 heroImage: bded67b5-7fe8-4e2e-b46a-4ba90c1779cd
-slug: 15-go-features-you-may-not-already-know
+slug: 15-go-sublteties-you-may-not-already-know
 tags: ["go"]
 ---
 
@@ -255,7 +255,9 @@ func main() {
 
 ## Context-Aware Go Functions
 
-In a function that's context aware you should always select on the context for a channel send or receive. This is because you may end up waiting needlessly for that operation to complete despite the context being cancelled.
+In a function that's context aware you should always select on the context, as well as the channel. This is because you may end up waiting needlessly for that operation to complete despite the context being cancelled.
+
+For instance, in the below example, the operation runs longer than a timeout:
 
 ```go
 package main
@@ -270,8 +272,8 @@ func contextAwareFunction(ctx context.Context) {
 	ch := make(chan string)
 
 	go func() {
-		time.Sleep(2 * time.Second)
-		ch <- "operation complete"
+		time.Sleep(5 * time.Second)
+		ch <- "operation complete" // Takes 5 seconds to send...
 	}()
 
 	select {
@@ -283,16 +285,16 @@ func contextAwareFunction(ctx context.Context) {
 }
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second) // Only 1 second timeout
 	defer cancel()
 
 	contextAwareFunction(ctx)
 }
 ```
 
-If you don't check the context, your function could block indefinitely on the channel (or any other blocking operation) even though the caller has stopped caring.
+This is a good example of why you need to select on context in channel operations - without it, the function would wait the full 5 seconds, even though the context was cancelled after 1 second.
 
-Bonus fact: the Go context is cancelled after an HTTP handler finishes and the response is fully sent, even in success responses. This is why you need to be careful with context propagation. For instance you can introduce race conditions by passing along context to an event publisher from an HTTP request, where the fast HTTP response can cancel the propagated context and prevent the publication of the event. This is an important TIL!
+Bonus fact: the Go context is cancelled after an HTTP handler finishes and the response is fully sent, even in success responses. This is why you need to be careful with context propagation. For instance you can introduce race conditions by passing along context to an event publisher from an HTTP request, where the fast HTTP response can cancel the propagated context and prevent the publication of the event.
 
 ## Empty Structs
 
@@ -346,7 +348,7 @@ In this example, the `Event` struct embeds a `time.Time` field. When marshalling
 
 This is true of other methods too, which can lead to weird and hard to track down bugs. Be careful with struct embedding!
 
-## The `-` tag for JSON
+## The "`-`" tag for JSON
 
 Using the "-" tag when Marshalling JSON will cause the field to be omitted. This is nice if you have private data on a field that's also needed for an API response.
 
@@ -386,6 +388,26 @@ This is a contrived example, you obviously wouldn't be this careless with a pass
 ## Comparing Times
 
 When converting a Time in Go to a String, the stringer automatically appends timezone information, which is why string comparisons won't work. Instead, use the .Equal() method, which compares times: "Equal reports whether t and u represent the same time instant. Two times can be equal even if they are in different locations."
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	t1 := time.Date(2024, 1, 1, 15, 0, 0, 0, time.UTC)
+	t2 := t1.In(time.FixedZone("EST", -5*3600)) // Adds timezone info
+
+	fmt.Println(t1.String() == t2.String()) // prints false
+	fmt.Println(t1.Equal(t2))               // prints true!
+
+}
+```
+
+This often comes up in testing and continuous integration. 
 
 ## The `wg.Go` Function
 

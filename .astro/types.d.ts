@@ -98,7 +98,7 @@ declare module 'astro:content' {
 		"blog": {
 "15-go-features-you-may-not-already-know.mdx": {
   id: "15-go-features-you-may-not-already-know.mdx",
-  slug: "15-go-features-you-may-not-already-know",
+  slug: "15-go-sublteties-you-may-not-already-know",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
