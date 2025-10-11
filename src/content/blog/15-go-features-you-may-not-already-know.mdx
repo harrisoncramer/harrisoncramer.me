@@ -82,7 +82,7 @@ import (
 )
 
 func main() {
-	ch := make(chan string)
+	ch := make(chan string, 1)
 
 	go func() {
 		time.Sleep(2 * time.Second)
@@ -203,7 +203,7 @@ The answer: is false!
 
 This occurs because even though the _value_ is nil, the type of the variable is a _non-nil interface_. 
 
-Go "boxes" that value in an interface, which is not nil. This can really bite you if you return interfaces from functionsl Once you return that value, even if it's nil, if you've typed the return value as an interface, Go "boxes" the result, and the nil assertion no longer works. 
+Go "boxes" that value in an interface, which is not nil. This can really bite you if you return interfaces from functionsl Once you return that value, even if it's nil, if you've typed the return value as an interface. The nil check no longer works as you'd expect.
 
 ```go
 package main
@@ -289,7 +289,7 @@ This is different than, for instance, python, which has a "stable insertion orde
 
 ## Returning Custom Errors
 
-It's often helpful in Go to return unexpected errors as typed errors, so that you can provide additional context for debugging or other upstream uses. Defining them as types lets you attach structured data via errors.As, and implement custom logic, while still satisfying the error interface. We almost never do this but I'd be curious to see when this is helpful and may try to use this pattern soon
+It's often helpful in Go to return unexpected errors as typed errors, so that you can provide additional context for debugging or other upstream uses. Defining them as types lets you attach structured data via errors.As, and implement custom logic, while still satisfying the error interface.
 
 ```go
 package main
