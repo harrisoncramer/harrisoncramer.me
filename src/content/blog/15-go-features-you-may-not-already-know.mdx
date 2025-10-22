@@ -203,7 +203,7 @@ The answer: is false!
 
 This occurs because even though the _value_ is nil, the type of the variable is a _non-nil interface_. 
 
-Go "boxes" that value in an interface, which is not nil. This can really bite you if you return interfaces from functionsl Once you return that value, even if it's nil, if you've typed the return value as an interface. The nil check no longer works as you'd expect.
+Go "boxes" that value in an interface, which is not nil. This can really bite you if you return interfaces from functions. Once you return the value, even if it's nil, if you've typed the return value as an interface, the nil check no longer works as you'd expect. For instance:
 
 ```go
 package main
@@ -264,7 +264,9 @@ It should go without saying, of course, that attempting to access a property on 
 
 ## Variable References with Ranging over Maps
 
-When updating a map inside of a loop there's no guarantee that the update will be made during that iteration. The only guarantee is that by the time the loop finishes, the map contains your updates.
+When updating a map inside of a loop there's no guarantee that the update will be made during that iteration. 
+
+The only guarantee is that by the time the loop finishes, the map contains your updates. Of course, you'd probably never want to do this (it's just bad code) but it's interesting nonetheless to understand.
 
 ```go
 func main() {
