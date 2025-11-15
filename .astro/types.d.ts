@@ -264,6 +264,13 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
+"the-empathetic-engineer.mdx": {
+  id: "the-empathetic-engineer.mdx",
+  slug: "the-empathetic-engineer",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
 },
 
 	};
