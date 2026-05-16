@@ -131,13 +131,6 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
-"building-your-own-lsp-in-go.mdx": {
-  id: "building-your-own-lsp-in-go.mdx",
-  slug: "building-your-own-language-server-in-go",
-  body: string,
-  collection: "blog",
-  data: InferEntrySchema<"blog">
-} & { render(): Render[".mdx"] },
 "contract-first-api-design.mdx": {
   id: "contract-first-api-design.mdx",
   slug: "contract-first-api-design",
@@ -250,6 +243,13 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
+"software-leaders-are-media-illiterate.mdx": {
+  id: "software-leaders-are-media-illiterate.mdx",
+  slug: "software-managers-are-media-illiterate",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
 "speeding-up-circleci-builds-with-caching.mdx": {
   id: "speeding-up-circleci-builds-with-caching.mdx",
   slug: "speeding-up-circleci-builds-with-caching",
@@ -260,6 +260,13 @@ declare module 'astro:content' {
 "terminal-applications-in-go.mdx": {
   id: "terminal-applications-in-go.mdx",
   slug: "terminal-applications-in-go",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
+"the-empathetic-engineer.mdx": {
+  id: "the-empathetic-engineer.mdx",
+  slug: "the-empathetic-engineer",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
