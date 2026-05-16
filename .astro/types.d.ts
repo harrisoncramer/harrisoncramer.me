@@ -243,9 +243,9 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
-"software-devs-are-media-illiterate.mdx": {
-  id: "software-devs-are-media-illiterate.mdx",
-  slug: "software-devs-are-media-illiterate",
+"software-leaders-are-media-illiterate.mdx": {
+  id: "software-leaders-are-media-illiterate.mdx",
+  slug: "software-managers-are-media-illiterate",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
