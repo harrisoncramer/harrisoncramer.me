@@ -131,13 +131,6 @@ declare module 'astro:content' {
   collection: "blog",
   data: InferEntrySchema<"blog">
 } & { render(): Render[".mdx"] },
-"building-your-own-lsp-in-go.mdx": {
-  id: "building-your-own-lsp-in-go.mdx",
-  slug: "building-your-own-language-server-in-go",
-  body: string,
-  collection: "blog",
-  data: InferEntrySchema<"blog">
-} & { render(): Render[".mdx"] },
 "contract-first-api-design.mdx": {
   id: "contract-first-api-design.mdx",
   slug: "contract-first-api-design",
@@ -246,6 +239,13 @@ declare module 'astro:content' {
 "setting-up-docker-with-terraform-and-ec2.mdx": {
   id: "setting-up-docker-with-terraform-and-ec2.mdx",
   slug: "setting-up-docker-with-terraform-and-ec2",
+  body: string,
+  collection: "blog",
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".mdx"] },
+"software-devs-are-media-illiterate.mdx": {
+  id: "software-devs-are-media-illiterate.mdx",
+  slug: "software-devs-are-media-illiterate",
   body: string,
   collection: "blog",
   data: InferEntrySchema<"blog">
