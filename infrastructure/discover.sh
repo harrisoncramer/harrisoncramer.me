@@ -55,12 +55,12 @@ note() { REPORT+="$1"$'\n'; }
 
 emit_bucket() {
   local label="$1" bucket="$2"
-  local ownership pab_json versioning
+  local ownership pab_json versioning acl_json
 
   printf 'import {\n  to = aws_s3_bucket.%s\n  id = "%s"\n}\n\n' "$label" "$bucket"
   printf 'import {\n  to = aws_s3_bucket_policy.%s\n  id = "%s"\n}\n\n' "$label" "$bucket"
 
-  if ownership=$(probe "$bucket" get-bucket-ownership-controls "Rules[0].ObjectOwnership"); then
+  if ownership=$(probe "$bucket" get-bucket-ownership-controls "OwnershipControls.Rules[0].ObjectOwnership"); then
     printf 'import {\n  to = aws_s3_bucket_ownership_controls.%s\n  id = "%s"\n}\n\n' "$label" "$bucket"
     note "aws_s3_bucket_ownership_controls.${label}: live value is ${ownership}. Add to s3.tf:"
     note ""
@@ -72,10 +72,6 @@ emit_bucket() {
     note "  }"
     note "}"
     note ""
-    if [ "$ownership" = "BucketOwnerEnforced" ]; then
-      note "  ACLs are disabled on this bucket. Do not add aws_s3_bucket_acl.${label}."
-      note ""
-    fi
   else
     ownership=""
     note "aws_s3_bucket_ownership_controls.${label}: not set on the account, nothing to add."
@@ -101,14 +97,39 @@ emit_bucket() {
     note ""
   fi
 
-  if [ "$ownership" != "BucketOwnerEnforced" ]; then
-    printf 'import {\n  to = aws_s3_bucket_acl.%s\n  id = "%s,public-read"\n}\n\n' "$label" "$bucket"
+  if [ "$ownership" = "BucketOwnerEnforced" ]; then
+    note "aws_s3_bucket_acl.${label}: ACLs are disabled on this bucket. Delete aws_s3_bucket_acl.${label} from s3.tf."
+    note ""
+  elif acl_json=$(aws s3api get-bucket-acl --bucket "$bucket" --output json 2>/dev/null); then
+    if echo "$acl_json" | jq -e '[.Grants[] | select(
+         .Grantee.URI == "http://acs.amazonaws.com/groups/global/AllUsers"
+         and .Permission == "READ")] | length > 0' >/dev/null; then
+      printf 'import {\n  to = aws_s3_bucket_acl.%s\n  id = "%s,public-read"\n}\n\n' "$label" "$bucket"
+    else
+      note "aws_s3_bucket_acl.${label}: no public READ grant, so this is not public-read. Live grants:"
+      note ""
+      note "$(echo "$acl_json" | jq -r '.Grants[] | "  \(.Permission) to \(.Grantee.URI // .Grantee.ID // .Grantee.Type)"')"
+      note ""
+      note "  Reconcile the acl value in s3.tf before importing it, then add the import by hand."
+      note ""
+    fi
+  else
+    note "aws_s3_bucket_acl.${label}: could not read the ACL. Delete aws_s3_bucket_acl.${label} from s3.tf or import it by hand."
+    note ""
   fi
 
   versioning=$(probe "$bucket" get-bucket-versioning "Status") || versioning=""
   if [ -n "$versioning" ] && [ "$versioning" != "None" ]; then
     printf 'import {\n  to = aws_s3_bucket_versioning.%s\n  id = "%s"\n}\n\n' "$label" "$bucket"
-    note "aws_s3_bucket_versioning.${label}: live status is ${versioning}."
+    note "aws_s3_bucket_versioning.${label}: live status is ${versioning}. s3.tf must declare:"
+    note ""
+    note "resource \"aws_s3_bucket_versioning\" \"${label}\" {"
+    note "  bucket = aws_s3_bucket.${label}.id"
+    note ""
+    note "  versioning_configuration {"
+    note "    status = \"${versioning}\""
+    note "  }"
+    note "}"
     note ""
   else
     note "aws_s3_bucket_versioning.${label}: no versioning configuration, nothing to add."

@@ -34,9 +34,14 @@ the distribution, and the certificate the distribution is actually serving.
 
 The script also writes a reconciliation report to stderr. Some of this bucket
 configuration cannot be inferred from the old code, so the script reads the live
-values and prints the resource blocks to paste into `s3.tf`. Ownership controls and
-the public access block are the two that matter. A bucket created in 2020 may carry
-neither, in which case the report says so and nothing needs adding.
+values and prints the resource blocks to paste into `s3.tf`. Ownership controls, the public
+access block, the bucket ACL and versioning are all read from the account rather than
+assumed. A bucket created in 2020 may carry no ownership controls and no public access
+block, in which case the report says so and nothing needs adding.
+
+Paste what the report tells you to paste before running the plan. An import block whose
+target is missing from the configuration is only caught at plan time, not by
+`terraform validate`, so a skipped paste shows up as terraform refusing the whole plan.
 
 Then:
 
