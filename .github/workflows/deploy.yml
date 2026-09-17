@@ -35,6 +35,15 @@ jobs:
         env:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_BUCKET_REGION }}
           BUCKET: ${{ secrets.AWS_BUCKET_NAME }}
+      - name: Send the Pagefind WebAssembly to S3
+        run: |
+          aws s3 cp dist/pagefind/ "s3://$BUCKET/pagefind/" \
+            --recursive --exclude "*" --include "*.pagefind" \
+            --content-type "application/wasm" \
+            --cache-control "public,max-age=300,must-revalidate"
+        env:
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_BUCKET_REGION }}
+          BUCKET: ${{ secrets.AWS_BUCKET_NAME }}
       - name: Invalidate the cloudfront distribution
         run: |
           aws cloudfront create-invalidation \

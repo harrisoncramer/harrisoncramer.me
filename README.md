@@ -21,3 +21,11 @@ Create a blog post:
 ```bash
 mise create
 ```
+
+## Search
+
+Search is powered by <a href="https://pagefind.app">Pagefind</a>, which indexes the built HTML in `dist/` as a postbuild step. The dev server reads that same index, so search is empty until you have built at least once:
+
+```bash
+mise search-index
+```

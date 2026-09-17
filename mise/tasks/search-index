@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+
+#MISE description="Builds the Pagefind search index so the dev server can serve it"
+
+cd "$MISE_CONFIG_ROOT"
+
+npm run build

@@ -1,10 +1,4 @@
----
-const posts = await Astro.glob("../content/blog/*.{md,mdx}");
-const nonDraftPosts = posts.filter((post) => !post.frontmatter.draft);
-const postData = JSON.stringify(nonDraftPosts);
----
-
-<astro-search data-posts={postData}>
+<astro-search>
   <input placeholder="Search" class="main-app-search" />
   <div
     class="absolute bg-app-background-dark pt-2 flex-col hidden cursor-pointer rounded-4"
@@ -22,17 +16,17 @@ const postData = JSON.stringify(nonDraftPosts);
 </astro-search>
 
 <script>
-  import { basename } from "../utils";
   class Search extends HTMLElement {
     constructor() {
       super();
 
-      // Read the message from the data attribute.
-      const posts = this.dataset.posts;
       const input = this.querySelector("input") as HTMLInputElement;
       const searchResultsNode = this.querySelector(
         "#search-results"
       ) as HTMLElement;
+
+      let pagefind: any;
+      let latestQuery = "";
 
       function removeResults() {
         while (searchResultsNode?.firstChild) {
@@ -40,32 +34,38 @@ const postData = JSON.stringify(nonDraftPosts);
         }
       }
 
-      input?.addEventListener("input", (event: Event) => {
-        removeResults();
-        const query = (event.target as HTMLInputElement).value;
+      async function loadPagefind() {
+        if (!pagefind) {
+          pagefind = await import("/pagefind/pagefind.js");
+          await pagefind.init();
+        }
+        return pagefind;
+      }
 
+      input?.addEventListener("input", async (event: Event) => {
+        const query = (event.target as HTMLInputElement).value;
+        latestQuery = query;
+
+        removeResults();
         searchResultsNode.classList.add("hidden");
         if (query.length === 0) return;
+
+        const engine = await loadPagefind();
+        const search = await engine.search(query);
+        const results = await Promise.all(
+          search.results.slice(0, 5).map((result: any) => result.data())
+        );
+
+        if (latestQuery !== query) return;
+
+        removeResults();
+        if (results.length === 0) return;
         searchResultsNode.classList.remove("hidden");
 
-        const results = JSON.parse(posts!).filter((post) => {
-          if (post.frontmatter.title.includes(query)) return true;
-          if (post.frontmatter.description.includes(query)) return true;
-          console.log(post.frontmatter.tags);
-          if (
-            post.frontmatter.tags.some((tag: string) =>
-              tag.toLowerCase().startsWith(query.toLowerCase())
-            )
-          )
-            return true;
-          // if (post.frontmatter.includes(query)) return true;
-        });
-
-        for (const post of results.slice(0, 5)) {
+        for (const result of results) {
           const node = document.createElement("div");
-          const url = basename(post.url, "/").replace(".mdx", "");
           node.addEventListener("mousedown", () => {
-            window.location.href = `/${url}`;
+            window.location.href = result.url;
           });
           node.classList.add(
             "hover:bg-app-blue",
@@ -73,12 +73,16 @@ const postData = JSON.stringify(nonDraftPosts);
             "py-2",
             "px-4"
           );
-          node.textContent = post.frontmatter.title;
+          node.textContent = result.meta.title;
           searchResultsNode?.appendChild(node);
         }
       });
 
-      input.addEventListener("blur", removeResults);
+      input.addEventListener("blur", () => {
+        latestQuery = "";
+        searchResultsNode.classList.add("hidden");
+        removeResults();
+      });
     }
   }
   customElements.define("astro-search", Search);
