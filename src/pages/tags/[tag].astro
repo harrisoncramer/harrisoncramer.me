@@ -1,5 +1,5 @@
 ---
-import { SITE_TITLE, SITE_DESCRIPTION, TAGS } from "../../consts";
+import { SITE_TITLE, SITE_DESCRIPTION, TAGS, slugifyTag } from "../../consts";
 import { getCollection } from "astro:content";
 import PostPreview from "../../components/PostPreview.astro";
 import Layout from "../../layouts/Layout.astro";
@@ -7,30 +7,26 @@ import Layout from "../../layouts/Layout.astro";
 /* The getStaticPaths function returns an array of page routes, and all of the pages at those routes will use the same template defined in the file. */
 export async function getStaticPaths() {
 
-  const tags = TAGS.map((tag) => ({ params: { tag } }));
   const postsWithSlugs = await getCollection("blog");
   /* Create a page for each tag, passing in the tag as a parameter.
   Pass in the tag as a parameter (which will replace [tag] in the file) 
   and pass in the matching posts as props */
-  return tags.map((value) => ({
-    ...value,
+  return TAGS.map((tag) => ({
     params: {
-      tag: value.params.tag,
+      tag: slugifyTag(tag),
     },
     props: {
-      posts: postsWithSlugs.filter((post) =>
-        post.data.tags?.includes(value.params.tag)
-      ),
+      label: tag,
+      posts: postsWithSlugs.filter((post) => post.data.tags?.includes(tag)),
     },
   }));
 }
 
-const { tag } = Astro.params;
-const { posts } = Astro.props;
+const { label, posts } = Astro.props;
 ---
 
 <Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <h2 class="mb-4">{tag[0].toUpperCase() + tag.slice(1)} posts</h2>
+  <h2 class="mb-4">{label[0].toUpperCase() + label.slice(1)} posts</h2>
   <ul class="all-posts">
     {posts.map((post: any) => <PostPreview post={post} featured={true} />)}
   </ul>

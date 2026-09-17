@@ -21,15 +21,12 @@ DESCRIPTION=$(gum input --placeholder "Blog post hook" --prompt "Blog post hook:
 FILENAME="$SLUG.mdx"
 DATE="$(date +%Y-%m-%d)"
 
-TAGS=$(gum choose neovim ci javascript microservices docker debugging go astro software design architecture tests typescript kubernetes circleci react terraform aws api neovim lua terminal --no-limit | xargs)
+TAGS=$(gum choose neovim ci javascript microservices docker debugging go astro "software design" architecture tests typescript kubernetes circleci react terraform aws api lua terminal --no-limit)
 makeTags() {
-  echo "$TAGS" | awk '{
-  printf("[");
-  for(i=1;i<=NF;i++){
-    printf("\"%s\"", $i);
-    if(i<NF) printf(", ")
-  }
-  print "]"
+  printf '%s' "$TAGS" | awk 'NF {
+  printf("%s\"%s\"", n++ ? ", " : "[", $0)
+} END {
+  printf("%s]\n", n ? "" : "[")
 }'
 }
 TAGS=$(makeTags)
