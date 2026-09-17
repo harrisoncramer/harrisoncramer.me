@@ -18,8 +18,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
 
-    // Error in Terraform. Hard-coded for now, see: https://github.com/hashicorp/terraform-provider-aws/issues/15102
-    domain_name = "harrisoncramer.me.s3-website-us-east-1.amazonaws.com" //aws_s3_bucket.site.bucket_regional_domain_name
+    domain_name = aws_s3_bucket_website_configuration.site.website_endpoint
     origin_id   = local.s3_origin_id
   }
 
