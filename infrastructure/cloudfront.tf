@@ -37,11 +37,29 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     compress               = true
     min_ttl                = 0
     default_ttl            = 300
-    max_ttl                = 300
+    max_ttl                = 3600
     forwarded_values {
-      query_string = true
+      query_string = false
       cookies {
-        forward = "all"
+        forward = "none"
+      }
+    }
+  }
+
+  ordered_cache_behavior {
+    path_pattern           = "/_astro/*"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = local.s3_origin_id
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
+    min_ttl                = 31536000
+    default_ttl            = 31536000
+    max_ttl                = 31536000
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
       }
     }
   }
@@ -50,7 +68,14 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   custom_error_response {
     error_caching_min_ttl = 0
     error_code            = 404
-    response_code         = 200
+    response_code         = 404
+    response_page_path    = "/404.html"
+  }
+
+  custom_error_response {
+    error_caching_min_ttl = 0
+    error_code            = 403
+    response_code         = 404
     response_page_path    = "/404.html"
   }
 

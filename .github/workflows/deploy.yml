@@ -19,13 +19,29 @@ jobs:
         run: npm ci
       - name: Build production site
         run: npm run build
-      - name: Send assets to S3 and invalidate old cloudfront distribution
-        uses: reggionick/s3-deploy@v3
-        with:
-          folder: dist
-          bucket: ${{ secrets.AWS_BUCKET_NAME }}
-          bucket-region: ${{ secrets.AWS_BUCKET_REGION }}
-          dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+      - name: Send hashed assets to S3
+        run: |
+          aws s3 sync dist/ "s3://$BUCKET/" --delete \
+            --exclude "*" --include "_astro/*" \
+            --cache-control "public,max-age=31536000,immutable"
+        env:
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_BUCKET_REGION }}
+          BUCKET: ${{ secrets.AWS_BUCKET_NAME }}
+      - name: Send the rest of the site to S3
+        run: |
+          aws s3 sync dist/ "s3://$BUCKET/" --delete \
+            --exclude "_astro/*" \
+            --cache-control "public,max-age=300,must-revalidate"
+        env:
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_BUCKET_REGION }}
+          BUCKET: ${{ secrets.AWS_BUCKET_NAME }}
+      - name: Invalidate the cloudfront distribution
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*"
+        env:
+          AWS_DEFAULT_REGION: us-east-1
       - name: Notify
         uses: 8398a7/action-slack@v3
         with:

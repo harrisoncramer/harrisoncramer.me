@@ -1,6 +1,7 @@
 ---
 import { Image } from "@astrojs/image/components";
 import type { CollectionEntry } from "astro:content";
+import { slugifyTag } from "../consts";
 interface Props {
   post: CollectionEntry<"blog">;
   featured?: boolean;
@@ -20,7 +21,7 @@ const { tags } = post.data;
     {
       tags &&
         tags?.map((tag) => (
-          <a class="tag" href={`/tags/${tag}`}>
+          <a class="tag" href={`/tags/${slugifyTag(tag)}`}>
             {tag}
           </a>
         ))
