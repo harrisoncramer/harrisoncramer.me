@@ -16,3 +16,9 @@ variable "application" {
   description = "Tag to apply to resources to indicate application"
   type        = string
 }
+
+variable "aws_profile" {
+  description = "Named AWS profile to run against. Leave unset to use the default credential chain."
+  type        = string
+  default     = null
+}
