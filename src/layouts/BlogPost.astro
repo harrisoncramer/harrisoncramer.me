@@ -45,10 +45,10 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
   </head>
   <body>
     <main>
-      <article>
-        <h1 class="title">{title}</h1>
-        <p class="text-lg mb-8">{description}</p>
-        <div class="flex items-center gap-2 mb-1">
+      <article data-pagefind-body>
+        <h1 class="title" data-pagefind-meta="title">{title}</h1>
+        <p class="text-lg mb-8" data-pagefind-meta="description">{description}</p>
+        <div class="flex items-center gap-2 mb-1" data-pagefind-ignore>
           <date class="flex-1 font-playfair">{formattedPublishDate}</date>
           <p class="text-right text-sm hover:underline">
             <a
