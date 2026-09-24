@@ -6,32 +6,72 @@ import Layout from "../layouts/Layout.astro";
   title={"About"}
   description={"A little bit more about me, Harrison Cramer, and this blog"}
 >
-  <div class="mt-4 flex flex-col gap-4">
-    <h1 class="mb-4">Hello!</h1>
-    <p>
+  <main class="about">
+    <h1 class="title">Hello!</h1>
+    <p class="lede">
       You're probably looking for the <a aria-label="software blog" href="/"
         >software blog</a
       >.
     </p>
-    <h2 class="mt-4">What is this site?</h2>
-    <p>
-      This blog is intended to serve as a resource for other developers using
-      Go, Vue/React, GraphQL, Kubernetes, and much more. It's built primarily
-      with Astro, Tailwind, Github Actions, and Terraform. Please make a pull
-      request if you want to fix a bug or suggest a feature. The{" "}
-      <a href="https://github.com/harrisoncramer/harrisoncramer.me">
-        repository
-      </a>{" "}
-      is on Github.
-    </p>
-    <h2 class="mt-4">About me</h2>
-    <p>
-      My name is Harrison, and I'm a software engineer living in Brooklyn. Prior
-      to my career in software, I was a reporter in Washington, where I covered
-      foreign policy and the military. Please take a look at my <a
-        href="https://s3.amazonaws.com/harrisoncramer.me.assets/Cramer_Resume.pdf"
-        >resume</a
-      > for my full work history.
-    </p>
-  </div>
+    <section>
+      <h2>What is this site?</h2>
+      <p>
+        This blog is intended to serve as a resource for other developers using
+        Go, Vue/React, GraphQL, Kubernetes, and much more. It's built primarily
+        with Astro, Tailwind, Github Actions, and Terraform. Please make a pull
+        request if you want to fix a bug or suggest a feature. The{" "}
+        <a href="https://github.com/harrisoncramer/harrisoncramer.me">
+          repository
+        </a>{" "}
+        is on Github.
+      </p>
+    </section>
+    <section>
+      <h2>About me</h2>
+      <p>
+        My name is Harrison, and I'm a software engineer living in Brooklyn.
+        Prior to my career in software, I was a reporter in Washington, where I
+        covered foreign policy and the military. Please take a look at my <a
+          href="https://s3.amazonaws.com/harrisoncramer.me.assets/Cramer_Resume.pdf"
+          >resume</a
+        > for my full work history.
+      </p>
+    </section>
+  </main>
 </Layout>
+
+<style>
+  .about {
+    @apply mb-24 flex flex-col;
+  }
+
+  .title {
+    @apply mb-0 leading-tight;
+  }
+
+  .lede {
+    @apply mt-4 mb-4 text-lg text-app-gray;
+  }
+
+  section {
+    @apply mt-8 border-t border-app-background-medium pt-6;
+  }
+
+  h2 {
+    @apply m-0 leading-tight;
+  }
+
+  section p {
+    @apply mt-4 mb-0;
+    line-height: 1.65;
+  }
+
+  a {
+    @apply underline decoration-app-blue/40 decoration-1 underline-offset-4 transition-[text-decoration-color] duration-200;
+  }
+
+  a:hover,
+  a:focus-visible {
+    @apply decoration-app-blue decoration-2;
+  }
+</style>
