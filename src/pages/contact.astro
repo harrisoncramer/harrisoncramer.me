@@ -1,48 +1,117 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const links = [
+  {
+    label: "LinkedIn",
+    handle: "harrison-cramer",
+    href: "https://linkedin.com/in/harrison-cramer",
+  },
+  {
+    label: "Github",
+    handle: "harrisoncramer",
+    href: "https://github.com/harrisoncramer",
+  },
+  {
+    label: "Twitter",
+    handle: "@harrisoncramer",
+    href: "https://twitter.com/harrisoncramer",
+  },
+  {
+    label: "Reddit",
+    handle: "KingOfCramers",
+    href: "https://www.reddit.com/user/KingOfCramers/",
+  },
+];
 ---
 
 <Layout
   title={"Contact page"}
   description={"The best way to contact me, Harrison Cramer"}
 >
-  <h1>Contact</h1>
-  <p>
-    Please direct any professional inquiries to my LinkedIn account.<p>
-      <p class="mb-8">
-        I'm always looking for interesting projects to work on, particularly in
-        the open source community. If you think I could be a good fit for your
-        team, please don't hesitate to reach out.
-      </p>
-      <p>
-        LinkedIn:{" "}
-        <a aria-label="LinkedIn" href="https://linkedin.com/in/harrison-cramer"
-          >harrison-cramer</a
-        >
-      </p>
-      <p>
-        Github: <a aria-label="Github" href="https://github.com/harrisoncramer"
-          >harrisoncramer</a
-        >
-      </p>
-      <p>
-        Twitter:{" "}
-        <a aria-label="Twitter" href="https://twitter.com/harrisoncramer"
-          >@harrisoncramer</a
-        >
-      </p>
-      <p>
-        Reddit:{" "}
-        <a aria-label="Reddit" href="https://www.reddit.com/user/KingOfCramers/"
-          >KingOfCramers</a
-        >
-      </p>
+  <main class="contact">
+    <h1 class="title">Contact</h1>
+    <p class="lede">
+      Please direct any professional inquiries to my LinkedIn account.
     </p>
-    <style>
-      p {
-        margin: 0.25em;
-        display: inline-block;
+    <p class="body">
+      I'm always looking for interesting projects to work on, particularly in
+      the open source community. If you think I could be a good fit for your
+      team, please don't hesitate to reach out.
+    </p>
+    <ul class="links">
+      {
+        links.map(({ label, handle, href }) => (
+          <li>
+            <a class="link" aria-label={label} href={href}>
+              <span class="label">{label}</span>
+              <span class="handle">{handle}</span>
+              <span class="arrow" aria-hidden="true">
+                &rarr;
+              </span>
+            </a>
+          </li>
+        ))
       }
-    </style>
-  </p>
+    </ul>
+  </main>
 </Layout>
+
+<style>
+  .contact {
+    @apply mb-24 flex flex-col;
+  }
+
+  .title {
+    @apply mb-0 leading-tight;
+  }
+
+  .lede {
+    @apply mt-4 mb-0 text-lg text-app-gray;
+  }
+
+  .body {
+    @apply mt-4 mb-0;
+    line-height: 1.65;
+  }
+
+  .links {
+    @apply mt-10 flex list-none flex-col p-0;
+  }
+
+  .links li {
+    font-size: inherit;
+  }
+
+  .link {
+    @apply flex items-baseline gap-4 border-t border-app-background-medium py-4 text-app-white transition-colors duration-200;
+  }
+
+  .links li:last-child .link {
+    @apply border-b;
+  }
+
+  .label {
+    @apply w-24 shrink-0 text-sm text-app-gray opacity-70;
+    font-family: Lora;
+  }
+
+  .handle {
+    @apply flex-1 text-lg;
+    font-family: Lora;
+  }
+
+  .arrow {
+    @apply -translate-x-2 text-app-blue opacity-0 transition duration-300 ease-out-expo;
+  }
+
+  .link:hover .handle,
+  .link:focus-visible .handle {
+    @apply text-app-blue;
+  }
+
+  .link:hover .arrow,
+  .link:focus-visible .arrow {
+    @apply translate-x-0 opacity-100;
+  }
+</style>
