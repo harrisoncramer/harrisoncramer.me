@@ -30,10 +30,14 @@ const { title, description } = Astro.props;
 
     html,
     body {
-      @apply bg-app-background-dark text-app-white;
-      background-image: url("/fabric-dark.png");
-      background-repeat: repeat;
+      @apply min-h-screen bg-app-background-dark text-app-white;
+      background-image:
+        radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(0,0,0,0.02) 15%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.08) 35%, rgba(0,0,0,0.12) 45%, rgba(0,0,0,0.17) 55%, rgba(0,0,0,0.22) 65%, rgba(0,0,0,0.28) 75%, rgba(0,0,0,0.34) 85%, rgba(0,0,0,0.4) 100%),
+        url("/fabric-dark.png");
+      background-attachment: fixed, scroll;
+      background-repeat: no-repeat, repeat;
     }
+
 
     h1,
     h2,
@@ -65,7 +69,7 @@ const { title, description } = Astro.props;
 
     p,
     li {
-      font-size: 1.2em;
+      font-size: 1.05em;
       font-family: "Lora";
     }
 
@@ -80,6 +84,13 @@ const { title, description } = Astro.props;
       flex-direction: column;
       max-width: 900px;
       margin: 0 auto;
+    }
+
+    @media (max-width: 767.98px) {
+      .content-wrapper {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
     }
 
     /* Blog post content */

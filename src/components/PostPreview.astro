@@ -95,7 +95,7 @@ const { tags } = post.data;
   }
 
   .description {
-    @apply mt-2 text-lg text-app-gray;
+    @apply mt-2 text-lg text-app-white/80;
   }
 
   .post-tags {
@@ -107,8 +107,10 @@ const { tags } = post.data;
     font-family: Lora;
   }
 
-  .tag:hover,
-  .tag:focus-visible {
-    @apply border-app-blue text-app-blue;
+  @media (hover: hover) {
+    .tag:hover,
+    .tag:focus-visible {
+      @apply border-app-blue text-app-blue;
+    }
   }
 </style>

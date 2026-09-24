@@ -51,7 +51,8 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
         scroll-margin-top: 5rem;
       }
       .blog-post-content :global(:is(p, li)) {
-        line-height: 1.65;
+        font-size: 1.05em;
+        line-height: 1.55;
       }
       .blog-post-content :global(:not(pre) > code) {
         @apply rounded-sm bg-app-background-light px-1.5 py-0.5 text-app-gray;
@@ -69,7 +70,7 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
         @apply decoration-app-blue decoration-2;
       }
       .blog-post-content {
-        @apply flex flex-col gap-6 mb-24;
+        @apply flex flex-col gap-4 mb-24;
         ul li {
           @apply list-disc ml-6;
         }
@@ -110,7 +111,7 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
                 aspectRatio={16 / 9}
                 src={import(`../assets/posts/${heroImage}.jpg`)}
                 alt={imageDescription}
-                class="skeleton"
+                class="skeleton rounded-sm"
                 fit="cover"
               />
               <Social title={title} />
