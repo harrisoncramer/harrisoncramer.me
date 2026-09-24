@@ -61,9 +61,11 @@ const { tags } = post.data;
     @apply block w-full transition duration-500 ease-out-expo;
   }
 
-  .card:hover .hero,
-  .card:focus-visible .hero {
-    @apply scale-[1.03] brightness-110;
+  @media (hover: hover) {
+    .card:hover .hero,
+    .card:focus-visible .hero {
+      @apply scale-[1.03] brightness-110;
+    }
   }
 
   .title {
@@ -80,9 +82,11 @@ const { tags } = post.data;
     padding-bottom: 2px;
   }
 
-  .card:hover .title-text,
-  .card:focus-visible .title-text {
-    background-size: 100% 2px;
+  @media (hover: hover) {
+    .card:hover .title-text,
+    .card:focus-visible .title-text {
+      background-size: 100% 2px;
+    }
   }
 
   .date {
