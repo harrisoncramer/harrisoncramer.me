@@ -16,6 +16,7 @@
     "@astrojs/rss": "^2.1.1",
     "@astrojs/sitemap": "^1.1.0",
     "@astrojs/tailwind": "^3.1.1",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@fontsource/lora": "^4.5.13",
     "@fontsource/playfair-display": "^4.5.13",
     "@types/react": "^18.0.28",

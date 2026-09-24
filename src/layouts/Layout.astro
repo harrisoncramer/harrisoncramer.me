@@ -1,6 +1,7 @@
 ---
 import "@fontsource/lora";
 import "@fontsource/playfair-display";
+import "@fontsource/jetbrains-mono";
 
 import Header from "../components/Header";
 import Search from "../components/Search.astro";
@@ -26,6 +27,29 @@ const { title, description } = Astro.props;
   <style is:global>
     *::selection {
       @apply bg-app-blue text-app-black;
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(158, 196, 255, 0.2) transparent;
+    }
+
+    *::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background-color: rgba(158, 196, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(158, 196, 255, 0.35);
     }
 
     html,
@@ -95,20 +119,31 @@ const { title, description } = Astro.props;
 
     /* Blog post content */
     div[data-rehype-pretty-code-fragment] {
+      position: relative;
+      max-width: 100%;
+      overflow: visible;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      background-color: #22272e;
+    }
+
+    div[data-rehype-pretty-code-fragment] pre {
+      overflow-x: auto;
+      overflow-y: visible;
+      max-width: 100%;
       padding-top: 12px;
       padding-bottom: 12px;
-      max-width: 850px;
-      overflow: auto;
-      background-color: #212126;
     }
 
     div[data-rehype-pretty-code-title] {
-      padding-right: 12px;
+      position: absolute;
+      top: 8px;
+      right: 12px;
       text-align: right;
     }
 
     pre > code > span {
-      background-color: #212126;
+      background-color: #22272e;
       padding-left: 12px;
       padding-right: 12px;
     }
@@ -116,6 +151,33 @@ const { title, description } = Astro.props;
     pre > code {
       display: grid;
       background-color: rgba(200, 200, 255, 0.09);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.9em;
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      padding: 2px 10px;
+      font-size: 0.75rem;
+      font-family: "JetBrains Mono", monospace;
+      color: rgba(158, 196, 255, 0.5);
+      background: transparent;
+      border: 1px solid rgba(158, 196, 255, 0.15);
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    div[data-rehype-pretty-code-fragment]:hover .code-copy-btn {
+      opacity: 1;
+    }
+
+    .code-copy-btn:hover {
+      color: rgba(158, 196, 255, 0.8);
+      border-color: rgba(158, 196, 255, 0.3);
     }
 
     .highlighted {

@@ -8,7 +8,7 @@ import { createReadStream, existsSync, statSync } from "node:fs";
 import { extname } from "node:path";
 
 const prettyCodeOptions = {
-  theme: "dark-plus",
+  theme: "github-dark-dimmed",
   onVisitLine(node) {
     if (node.children.length === 0) {
       node.children = [

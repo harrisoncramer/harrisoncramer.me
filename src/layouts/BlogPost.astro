@@ -126,17 +126,21 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
     </main>
   </body>
   <script is:inline>
-    /* Copies code blocks to clipboard */
-    const copiers = document.querySelectorAll(".title-info");
-    for (const copier of Array.from(copiers)) {
-      const parent = copier.closest(".code-block");
-      const target = parent.querySelector(".content-slot");
-      copier.addEventListener("click", () => {
-        const content = target.innerText;
-        navigator.clipboard.writeText(content);
+    document.querySelectorAll("div[data-rehype-pretty-code-fragment]").forEach(function(block) {
+      var btn = document.createElement("button");
+      btn.className = "code-copy-btn";
+      btn.textContent = "Copy";
+      block.style.position = "relative";
+      block.appendChild(btn);
+      btn.addEventListener("click", function() {
+        var code = block.querySelector("pre code");
+        if (code) {
+          navigator.clipboard.writeText(code.innerText).then(function() {
+            btn.textContent = "Copied!";
+            setTimeout(function() { btn.textContent = "Copy"; }, 1500);
+          });
+        }
       });
-
-      document.querySelector(".astro-code").classList.add("bg-app-black");
-    }
+    });
   </script>
 </html>
