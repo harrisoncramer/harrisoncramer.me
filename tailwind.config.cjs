@@ -29,6 +29,7 @@ module.exports = {
       xl: '1440px',
     },
     colors: {
+      transparent: 'transparent',
       'app-blue': "#9ec4ff",
       'app-white': '#ffffff',
       'app-black': '#0d0d0d',

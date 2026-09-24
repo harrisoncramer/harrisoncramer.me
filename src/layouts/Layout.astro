@@ -27,12 +27,14 @@ try {
     <meta name="description" content={description} />
     <title>{title}</title>
   </head>
-  <Header client:load stars={stars}>
-    <Search />
-  </Header>
-  <div class="content-wrapper">
-    <slot />
-  </div>
+  <body>
+    <Header client:load stars={stars} path={Astro.url.pathname}>
+      <Search />
+    </Header>
+    <div class="content-wrapper">
+      <slot />
+    </div>
+  </body>
   <style is:global>
     *::selection {
       @apply bg-app-blue text-app-black;
