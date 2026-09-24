@@ -32,6 +32,29 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
       .last-updated-on {
         font-style: italic;
       }
+      .title {
+        @apply leading-tight;
+      }
+      .edit-link {
+        @apply flex items-center gap-2 text-app-gray opacity-70 transition duration-200;
+      }
+      .edit-link:hover,
+      .edit-link:focus-visible {
+        @apply text-app-blue opacity-100;
+      }
+      .edit-link svg g {
+        fill: currentColor;
+      }
+      .blog-post-content :global(:is(h2, h3, h4)) {
+        scroll-margin-top: 5rem;
+      }
+      .blog-post-content :global(a) {
+        @apply underline decoration-app-blue/40 decoration-1 underline-offset-4 transition-[text-decoration-color] duration-200;
+      }
+      .blog-post-content :global(a:hover),
+      .blog-post-content :global(a:focus-visible) {
+        @apply decoration-app-blue decoration-2;
+      }
       .blog-post-content {
         @apply flex flex-col gap-6 mb-24;
         ul li {
@@ -47,12 +70,12 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
     <main>
       <article data-pagefind-body>
         <h1 class="title" data-pagefind-meta="title">{title}</h1>
-        <p class="text-lg mb-8" data-pagefind-meta="description">{description}</p>
+        <p class="text-lg mb-8 text-app-gray" data-pagefind-meta="description">{description}</p>
         <div class="flex items-center gap-2 mb-1" data-pagefind-ignore>
-          <date class="flex-1 font-playfair">{formattedPublishDate}</date>
-          <p class="text-right text-sm hover:underline">
+          <time class="flex-1 font-['Lora'] text-sm text-app-gray opacity-70" datetime={new Date(pubDate).toISOString()}>{formattedPublishDate}</time>
+          <p class="text-right text-sm">
             <a
-              class="text-app-white"
+              class="edit-link"
               href={`https://github.com/harrisoncramer/harrisoncramer.me/blob/main/src/content/blog/${url}`}
               aria-label="edit this page on Github"
               >Edit this page on Github

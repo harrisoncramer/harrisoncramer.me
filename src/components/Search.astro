@@ -1,20 +1,35 @@
-<astro-search class="search">
-  <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <circle cx="11" cy="11" r="7"></circle>
-    <path d="m20 20-3.5-3.5"></path>
-  </svg>
-  <input
-    type="search"
-    placeholder="Search"
-    class="input"
-    role="combobox"
-    aria-label="Search posts"
-    aria-autocomplete="list"
+<astro-search class="search" data-expanded="false">
+  <button
+    type="button"
+    class="toggle"
+    aria-label="Open search"
     aria-expanded="false"
-    aria-controls="search-results"
-    autocomplete="off"
-    spellcheck="false"
-  />
+    aria-controls="search-field"
+    data-search-toggle
+  >
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+  </button>
+  <div class="field" id="search-field">
+    <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+    <input
+      type="search"
+      placeholder="Search"
+      class="input"
+      role="combobox"
+      aria-label="Search posts"
+      aria-autocomplete="list"
+      aria-expanded="false"
+      aria-controls="search-results"
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </div>
   <div class="panel" data-search-panel hidden>
     <ul class="results" id="search-results" role="listbox" aria-label="Search results"></ul>
     <p class="status" role="status" data-search-status></p>
@@ -30,7 +45,46 @@
 
   <style>
     .search {
-      @apply relative block w-full md:w-56;
+      @apply flex items-center md:relative md:block md:w-56;
+    }
+
+    .toggle {
+      @apply flex h-10 w-10 items-center justify-center rounded-sm text-app-white hover:bg-app-background-light md:hidden;
+    }
+
+    .toggle svg {
+      @apply h-5 w-5;
+    }
+
+    .toggle:focus-visible {
+      @apply bg-app-background-light;
+      outline: none;
+    }
+
+    .field {
+      @apply relative;
+    }
+
+    @media (max-width: 767.98px) {
+      .field {
+        @apply invisible absolute left-4 right-16 top-1/2 z-10 -translate-y-1/2;
+        clip-path: inset(0 0 0 100%);
+        transition: clip-path 160ms cubic-bezier(0.7, 0, 0.84, 0), visibility 0s 160ms;
+      }
+
+      .search[data-expanded="true"] .field {
+        @apply visible;
+        clip-path: inset(0);
+        transition: clip-path 220ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s;
+      }
+
+      .search[data-expanded="true"] .toggle {
+        @apply invisible;
+      }
+
+      :global(header:has(astro-search[data-expanded="true"]) [data-site-title]) {
+        opacity: 0;
+      }
     }
 
     .icon {
@@ -38,7 +92,7 @@
     }
 
     .search:focus-within .icon {
-      @apply text-app-blue opacity-100;
+      @apply opacity-100;
     }
 
     .input {
@@ -58,16 +112,13 @@
       appearance: none;
     }
 
-    .input:hover {
+    .input:hover,
+    .input:focus {
       @apply border-app-gray/30;
     }
 
-    .input:focus {
-      @apply border-app-blue;
-    }
-
     .panel {
-      @apply absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-sm border border-app-background-medium bg-app-black shadow-3xl md:left-auto md:w-80;
+      @apply absolute left-0 right-0 top-full z-20 overflow-hidden border-t border-app-background-medium bg-app-black shadow-3xl md:left-auto md:mt-2 md:w-80 md:rounded-sm md:border;
     }
 
     .item {
@@ -171,6 +222,8 @@
 
   class Search extends HTMLElement {
     private input!: HTMLInputElement;
+    private toggle!: HTMLButtonElement;
+    private mobile = window.matchMedia("(max-width: 767.98px)");
     private panel!: HTMLElement;
     private list!: HTMLUListElement;
     private status!: HTMLElement;
@@ -182,6 +235,7 @@
 
     connectedCallback() {
       this.input = this.querySelector("input") as HTMLInputElement;
+      this.toggle = this.querySelector("[data-search-toggle]") as HTMLButtonElement;
       this.panel = this.querySelector("[data-search-panel]") as HTMLElement;
       this.list = this.querySelector('[role="listbox"]') as HTMLUListElement;
       this.status = this.querySelector("[data-search-status]") as HTMLElement;
@@ -192,6 +246,26 @@
       this.input.addEventListener("keydown", this.onKeyDown);
       this.addEventListener("focusout", this.onFocusOut);
       this.panel.addEventListener("mousedown", this.onPanelMouseDown);
+      this.toggle.addEventListener("click", this.onToggle);
+      this.mobile.addEventListener("change", this.onBreakpoint);
+    }
+
+    disconnectedCallback() {
+      this.mobile.removeEventListener("change", this.onBreakpoint);
+    }
+
+    private onToggle = () => {
+      this.setExpanded(true);
+      this.input.focus();
+    };
+
+    private onBreakpoint = () => {
+      this.setExpanded(false);
+    };
+
+    private setExpanded(isExpanded: boolean) {
+      this.dataset.expanded = String(isExpanded);
+      this.toggle.setAttribute("aria-expanded", String(isExpanded));
     }
 
     private onFocus = () => {
@@ -206,6 +280,7 @@
     private onFocusOut = (event: FocusEvent) => {
       if (event.relatedTarget instanceof Node && this.contains(event.relatedTarget)) return;
       this.close();
+      this.setExpanded(false);
     };
 
     private onPanelMouseDown = (event: MouseEvent) => {
@@ -232,9 +307,16 @@
           return;
         }
         case "Escape":
-          if (this.panel.hidden) return;
-          event.preventDefault();
-          this.close();
+          if (!this.panel.hidden) {
+            event.preventDefault();
+            this.close();
+            return;
+          }
+          if (this.mobile.matches && this.dataset.expanded === "true") {
+            event.preventDefault();
+            this.setExpanded(false);
+            this.toggle.focus();
+          }
           return;
       }
     };

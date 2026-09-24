@@ -53,10 +53,11 @@ const Header = ({ children, stars, path }: HeaderProps): JSX.Element => {
       ref={headerRef}
       className={`sticky top-0 z-10 bg-app-black text-app-white shadow transition-[transform,visibility] duration-300 ${isHidden ? "invisible -translate-y-full" : "visible translate-y-0"}`}
     >
-      <div className="grid grid-cols-[1fr_auto] items-center gap-x-8 gap-y-3 px-4 py-3 md:grid-cols-[1fr_auto_1fr]">
+      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-x-2 px-4 py-3 md:grid-cols-[1fr_auto_1fr] md:gap-x-8">
         <a
           href="/"
-          className="col-start-1 row-start-1 justify-self-start font-['Playfair_Display'] text-base text-app-white"
+          data-site-title
+          className="col-start-1 row-start-1 justify-self-start font-['Playfair_Display'] text-base text-app-white transition-opacity duration-200"
         >
           {SITE_TITLE}
         </a>
@@ -77,11 +78,11 @@ const Header = ({ children, stars, path }: HeaderProps): JSX.Element => {
           </ul>
         </nav>
 
-        <nav aria-label="Main" className="col-start-2 row-start-1 justify-self-end md:hidden">
+        <nav aria-label="Main" className="col-start-3 row-start-1 md:hidden">
           <NavigationDropdown links={NAV_LINKS} path={currentPath} />
         </nav>
 
-        <div className="col-span-2 row-start-2 flex items-center gap-4 md:col-span-1 md:col-start-3 md:row-start-1 md:justify-self-end">
+        <div className="col-start-2 row-start-1 flex items-center gap-4 justify-self-end md:col-start-3">
           {children}
           {stars !== null && (
             <a

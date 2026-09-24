@@ -17,42 +17,94 @@ const { tags } = post.data;
 ---
 
 <li class={`post ${featured ? "mb-12 list-none" : ""}`}>
-  <div class="post-tags">
-    {
-      tags &&
-        tags?.map((tag) => (
+  <a class="card" href={`/${post.slug}`}>
+    <div class="frame">
+      <Image
+        format="avif"
+        width={featured ? 900 : 750}
+        aspectRatio={16 / 9}
+        src={import(`../assets/posts/${post.data.heroImage}.jpg`)}
+        alt={post.data.imageDescription}
+        class="skeleton hero"
+        fit="cover"
+      />
+    </div>
+    <h2 class="title"><span class="title-text">{post.data.title}</span></h2>
+    <time class="date" datetime={new Date(post.data.pubDate).toISOString()}>
+      {new Date(post.data.pubDate).toLocaleDateString("en-US", dateOptions)}
+    </time>
+    <p class="description">{post.data.description}</p>
+  </a>
+  {
+    tags && tags.length > 0 && (
+      <div class="post-tags">
+        {tags.map((tag) => (
           <a class="tag" href={`/tags/${slugifyTag(tag)}`}>
             {tag}
           </a>
-        ))
-    }
-  </div>
-  <a class="text-app-white" aria-label={post.data.title} href={`/${post.slug}`}>
-    <Image
-      format="avif"
-      width={featured ? 900 : 750}
-      aspectRatio={16 / 9}
-      src={import(`../assets/posts/${post.data.heroImage}.jpg`)}
-      alt={post.data.imageDescription}
-      class="skeleton"
-      fit="cover"
-    />
-    <h2 class="mt-2">
-      {post.data.title}
-    </h2>
-    <date class="flex-1 font-playfair text-sm block mt-3 mb-1"
-      >{new Date(post.data.pubDate).toLocaleDateString("en-US", dateOptions)}
-    </date>
-    <p class="text-lg">{post.data.description}</p>
-  </a>
+        ))}
+      </div>
+    )
+  }
 </li>
 
 <style>
-  .post-tags {
-    @apply flex text-sm font-sans gap-2 justify-end;
+  .card {
+    @apply block text-app-white;
   }
 
-  .post-tags a.tag {
-    @apply bg-app-blue text-app-black px-1 pt-1 rounded-t-sm;
+  .frame {
+    @apply overflow-hidden rounded-sm;
+  }
+
+  .hero {
+    @apply block w-full transition duration-500 ease-out-expo;
+  }
+
+  .card:hover .hero,
+  .card:focus-visible .hero {
+    @apply scale-[1.03] brightness-110;
+  }
+
+  .title {
+    @apply mt-4 leading-tight;
+  }
+
+  .title-text {
+    @apply bg-no-repeat transition-[background-size] duration-300 ease-out-expo;
+    background-image: linear-gradient(theme("colors.app-blue"), theme("colors.app-blue"));
+    background-position: 50% 100%;
+    background-size: 0% 2px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    padding-bottom: 2px;
+  }
+
+  .card:hover .title-text,
+  .card:focus-visible .title-text {
+    background-size: 100% 2px;
+  }
+
+  .date {
+    @apply mt-2 block text-sm text-app-gray opacity-70;
+    font-family: Lora;
+  }
+
+  .description {
+    @apply mt-2 text-lg text-app-gray;
+  }
+
+  .post-tags {
+    @apply mt-4 flex flex-wrap gap-2;
+  }
+
+  .tag {
+    @apply rounded-sm border border-app-background-medium px-2 py-0.5 text-xs text-app-gray transition-colors duration-200;
+    font-family: Lora;
+  }
+
+  .tag:hover,
+  .tag:focus-visible {
+    @apply border-app-blue text-app-blue;
   }
 </style>

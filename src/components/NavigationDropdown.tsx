@@ -47,23 +47,28 @@ const NavigationDropdown = ({ links, path }: NavigationDropdownProps): JSX.Eleme
       <button
         ref={buttonRef}
         type="button"
-        className="flex h-10 w-10 items-center justify-center rounded-sm hover:bg-app-background-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-app-blue"
+        className="relative flex h-10 w-10 items-center justify-center rounded-sm text-app-white outline-none hover:bg-app-background-light focus-visible:bg-app-background-light"
         aria-label="Menu"
         aria-expanded={isOpen}
         aria-controls={MENU_ID}
         onClick={() => setIsOpen((open) => !open)}
       >
-        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          {isOpen ? (
-            <path d="M19.07 3.51 12 10.59 4.93 3.51 3.51 4.93 10.59 12l-7.08 7.07 1.42 1.42L12 13.41l7.07 7.08 1.42-1.42L13.41 12l7.08-7.07z" />
-          ) : (
-            <path d="M2 5h20v2H2zm0 6h20v2H2zm0 6h20v2H2z" />
-          )}
-        </svg>
+        <span
+          aria-hidden="true"
+          className={`absolute h-0.5 w-5 bg-app-white transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? "rotate-45" : "-translate-y-1.5"}`}
+        />
+        <span
+          aria-hidden="true"
+          className={`absolute h-0.5 w-5 bg-app-white transition-opacity duration-150 ${isOpen ? "opacity-0" : "opacity-100"}`}
+        />
+        <span
+          aria-hidden="true"
+          className={`absolute h-0.5 w-5 bg-app-white transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? "-rotate-45" : "translate-y-1.5"}`}
+        />
       </button>
       <ul
         id={MENU_ID}
-        className={`${isOpen ? "block" : "hidden"} absolute left-0 right-0 top-full border-t border-app-background-medium bg-app-black shadow-md`}
+        className={`absolute left-0 right-0 top-full border-t border-app-background-medium bg-app-black shadow-md ${isOpen ? "visible [clip-path:inset(0_0_-1rem_0)] [transition:clip-path_220ms_cubic-bezier(0.16,1,0.3,1),visibility_0s]" : "invisible [clip-path:inset(0_0_100%_0)] [transition:clip-path_160ms_cubic-bezier(0.7,0,0.84,0),visibility_0s_160ms]"}`}
       >
         {links.map((link) => (
           <li key={link.href}>
