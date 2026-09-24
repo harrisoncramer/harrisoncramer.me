@@ -69,7 +69,7 @@ const { tags } = post.data;
   }
 
   .title {
-    @apply mt-4 leading-tight;
+    @apply mt-4 leading-tight font-bold;
   }
 
   .title-text {
@@ -90,12 +90,12 @@ const { tags } = post.data;
   }
 
   .date {
-    @apply mt-2 block text-sm text-app-gray opacity-70;
+    @apply mt-2 block text-xs uppercase tracking-wide text-app-gray-dim;
     font-family: Lora;
   }
 
   .description {
-    @apply mt-2 text-lg text-app-white/80;
+    @apply mt-2 text-base text-app-gray-light;
   }
 
   .post-tags {
@@ -103,7 +103,7 @@ const { tags } = post.data;
   }
 
   .tag {
-    @apply rounded-sm border border-app-background-medium px-2 py-0.5 text-xs text-app-gray transition-colors duration-200;
+    @apply rounded-sm border border-app-background-medium px-2 py-0.5 text-xs text-app-gray-dim transition-colors duration-200;
     font-family: Lora;
   }
 

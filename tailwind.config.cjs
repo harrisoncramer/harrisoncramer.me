@@ -38,6 +38,8 @@ module.exports = {
       'app-background-medium-dark': '#1e1e1e',
       'app-background-light': '#242424',
       'app-gray': '#C9D1D9',
+      'app-gray-light': '#b0b8c0',
+      'app-gray-dim': '#888888',
     },
     extend: {
       screens: {

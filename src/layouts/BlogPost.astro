@@ -51,8 +51,9 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
         scroll-margin-top: 5rem;
       }
       .blog-post-content :global(:is(p, li)) {
-        font-size: 1.05em;
-        line-height: 1.55;
+        font-size: 1.1em;
+        line-height: 1.75;
+        color: #e8ebed;
       }
       .blog-post-content :global(:not(pre) > code) {
         @apply rounded-sm bg-app-background-light px-1.5 py-0.5 text-app-gray;
@@ -70,7 +71,7 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
         @apply decoration-app-blue decoration-2;
       }
       .blog-post-content {
-        @apply flex flex-col gap-4 mb-24;
+        @apply flex flex-col gap-6 mb-24;
         ul li {
           @apply list-disc ml-6;
         }
@@ -84,9 +85,9 @@ const formattedPublishDate = new Date(pubDate).toLocaleDateString(
     <main>
       <article data-pagefind-body>
         <h1 class="title" data-pagefind-meta="title">{title}</h1>
-        <p class="text-lg mb-8 text-app-gray" data-pagefind-meta="description">{description}</p>
+        <p class="text-lg mb-8 text-app-gray-light" data-pagefind-meta="description">{description}</p>
         <div class="flex items-center gap-2 mb-3" data-pagefind-ignore>
-          <time class="flex-1 font-['Lora'] text-sm text-app-gray opacity-70" datetime={new Date(pubDate).toISOString()}>{formattedPublishDate}</time>
+          <time class="flex-1 font-['Lora'] text-sm text-app-gray-dim" datetime={new Date(pubDate).toISOString()}>{formattedPublishDate}</time>
           <a
             class="edit-link"
             href={`https://github.com/harrisoncramer/harrisoncramer.me/blob/main/src/content/blog/${url}`}
