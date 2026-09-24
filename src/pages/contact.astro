@@ -43,13 +43,8 @@ const links = [
       {
         links.map(({ label, handle, href }) => (
           <li>
-            <a class="link" href={href}>
-              <span class="label">{label}</span>
-              <span class="handle">{handle}</span>
-              <span class="arrow" aria-hidden="true">
-                &rarr;
-              </span>
-            </a>
+            <span class="label">{label}</span>
+            <a href={href}>{handle}</a>
           </li>
         ))
       }
@@ -76,42 +71,19 @@ const links = [
   }
 
   .links {
-    @apply mt-10 flex list-none flex-col p-0;
-  }
-
-  .links li {
-    font-size: inherit;
-  }
-
-  .link {
-    @apply flex items-baseline gap-4 border-t border-app-background-medium py-4 text-app-white transition-colors duration-200;
-  }
-
-  .links li:last-child .link {
-    @apply border-b;
+    @apply mt-8 flex list-none flex-col gap-2 p-0;
   }
 
   .label {
-    @apply w-24 shrink-0 text-sm text-app-gray opacity-70;
-    font-family: Lora;
+    @apply inline-block w-24 text-app-gray;
   }
 
-  .handle {
-    @apply flex-1 text-lg;
-    font-family: Lora;
+  a {
+    @apply underline decoration-app-blue/40 decoration-1 underline-offset-4 transition-[text-decoration-color] duration-200;
   }
 
-  .arrow {
-    @apply -translate-x-2 text-app-blue opacity-0 transition duration-300 ease-out-expo;
-  }
-
-  .link:hover .handle,
-  .link:focus-visible .handle {
-    @apply text-app-blue;
-  }
-
-  .link:hover .arrow,
-  .link:focus-visible .arrow {
-    @apply translate-x-0 opacity-100;
+  a:hover,
+  a:focus-visible {
+    @apply decoration-app-blue decoration-2;
   }
 </style>
