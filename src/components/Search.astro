@@ -1,89 +1,411 @@
-<astro-search>
-  <input placeholder="Search" class="main-app-search" />
-  <div
-    class="absolute bg-app-background-dark pt-2 flex-col hidden cursor-pointer rounded-4"
-    id="search-results"
+<astro-search class="search" data-expanded="false">
+  <button
+    type="button"
+    class="toggle"
+    aria-label="Open search"
+    aria-expanded="false"
+    aria-controls="search-field"
+    data-search-toggle
   >
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+  </button>
+  <div class="field" id="search-field">
+    <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+    <input
+      type="search"
+      placeholder="Search"
+      class="input"
+      role="combobox"
+      aria-label="Search posts"
+      aria-autocomplete="list"
+      aria-expanded="false"
+      aria-controls="search-results"
+      autocomplete="off"
+      spellcheck="false"
+    />
   </div>
+  <div class="panel" data-search-panel hidden>
+    <ul class="results" id="search-results" role="listbox" aria-label="Search results"></ul>
+    <p class="status" role="status" data-search-status></p>
+  </div>
+  <template data-search-option>
+    <li class="item" role="none">
+      <a class="option" role="option" tabindex="-1" aria-selected="false">
+        <span class="title" data-title></span>
+        <span class="excerpt" data-excerpt></span>
+      </a>
+    </li>
+  </template>
 
   <style>
-    .main-app-search {
-      @apply py-2 pl-2 border-b text-app-white bg-app-black outline-none;
-      border-bottom-color: rgb(40, 40, 40);
+    .search {
+      @apply flex items-center md:relative md:block md:w-56;
+    }
+
+    .toggle {
+      @apply flex h-10 w-10 items-center justify-center rounded-sm text-app-white hover:bg-app-background-light md:hidden;
+    }
+
+    .toggle svg {
+      @apply h-5 w-5;
+    }
+
+    .toggle:focus-visible {
+      @apply bg-app-background-light;
+      outline: none;
+    }
+
+    .field {
+      @apply relative;
+    }
+
+    @media (max-width: 767.98px) {
+      .field {
+        @apply invisible absolute left-4 right-16 top-1/2 z-10 -translate-y-1/2;
+        clip-path: inset(0 0 0 100%);
+        transition: clip-path 160ms cubic-bezier(0.7, 0, 0.84, 0), visibility 0s 160ms;
+      }
+
+      .search[data-expanded="true"] .field {
+        @apply visible;
+        clip-path: inset(0);
+        transition: clip-path 220ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s;
+      }
+
+      .search[data-expanded="true"] .toggle {
+        @apply invisible;
+      }
+
+      :global(header:has(astro-search[data-expanded="true"]) [data-site-title]) {
+        opacity: 0;
+      }
+    }
+
+    .icon {
+      @apply pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-app-gray opacity-60 transition;
+    }
+
+    .search:focus-within .icon {
+      @apply opacity-100;
+    }
+
+    .input {
+      @apply w-full rounded-sm border border-app-background-medium bg-app-background-light py-2 pl-9 pr-3 text-sm text-app-white transition-colors;
+      appearance: none;
+      outline: none;
+      box-shadow: none;
+      font-family: Lora;
+    }
+
+    .input::placeholder {
+      @apply text-app-gray opacity-60;
+    }
+
+    .input::-webkit-search-decoration,
+    .input::-webkit-search-cancel-button {
+      appearance: none;
+    }
+
+    .input:hover,
+    .input:focus {
+      @apply border-app-gray/30;
+    }
+
+    .panel {
+      @apply absolute left-0 right-0 top-full z-20 overflow-hidden border-t border-app-background-medium bg-app-black shadow-3xl md:left-auto md:mt-2 md:w-80 md:rounded-sm md:border;
+    }
+
+    .item {
+      font-size: inherit;
+    }
+
+    .item + .item {
+      @apply border-t border-app-background-medium;
+    }
+
+    .option {
+      @apply block border-l-2 border-transparent px-4 py-3 text-app-white no-underline;
+    }
+
+    .option[aria-selected="true"] {
+      @apply border-app-blue bg-app-background-light;
+    }
+
+    .title {
+      @apply block text-base;
+      font-family: "Playfair Display";
+    }
+
+    .option[aria-selected="true"] .title {
+      @apply text-app-blue;
+    }
+
+    .excerpt {
+      @apply mt-1 text-sm text-app-gray;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      font-family: Lora;
+    }
+
+    .excerpt:empty {
+      display: none;
+    }
+
+    .excerpt :global(mark) {
+      @apply bg-transparent font-semibold text-app-white;
+    }
+
+    .status {
+      @apply m-0 px-4 py-3 text-sm text-app-gray;
       font-family: Lora;
     }
   </style>
 </astro-search>
 
 <script>
+  type PagefindResultData = {
+    url: string;
+    meta: { title?: string };
+    excerpt: string;
+  };
+
+  type PagefindResult = {
+    id: string;
+    data: () => Promise<PagefindResultData>;
+  };
+
+  type PagefindSearchResponse = {
+    results: PagefindResult[];
+  };
+
+  type Pagefind = {
+    init: () => Promise<void>;
+    search: (query: string) => Promise<PagefindSearchResponse | null>;
+  };
+
+  const DEBOUNCE_MS = 150;
+  const MAX_RESULTS = 5;
+
+  let pagefindPromise: Promise<Pagefind> | undefined;
+
+  function loadPagefind(): Promise<Pagefind> {
+    pagefindPromise ??= (async () => {
+      const pagefind = (await import("/pagefind/pagefind.js")) as Pagefind;
+      await pagefind.init();
+      return pagefind;
+    })();
+    pagefindPromise.catch(() => {
+      pagefindPromise = undefined;
+    });
+    return pagefindPromise;
+  }
+
+  function parseExcerpt(excerpt: string): Node[] {
+    const body = new DOMParser().parseFromString(excerpt, "text/html").body;
+    return Array.from(body.childNodes, (node) => {
+      if (node instanceof HTMLElement && node.tagName === "MARK") {
+        const mark = document.createElement("mark");
+        mark.textContent = node.textContent;
+        return mark;
+      }
+      return document.createTextNode(node.textContent ?? "");
+    });
+  }
+
   class Search extends HTMLElement {
-    constructor() {
-      super();
+    private input!: HTMLInputElement;
+    private toggle!: HTMLButtonElement;
+    private mobile = window.matchMedia("(max-width: 767.98px)");
+    private panel!: HTMLElement;
+    private list!: HTMLUListElement;
+    private status!: HTMLElement;
+    private optionTemplate!: HTMLTemplateElement;
+    private options: HTMLAnchorElement[] = [];
+    private activeIndex = -1;
+    private latestQuery = "";
+    private debounceTimer: number | undefined;
 
-      const input = this.querySelector("input") as HTMLInputElement;
-      const searchResultsNode = this.querySelector(
-        "#search-results"
-      ) as HTMLElement;
+    connectedCallback() {
+      this.input = this.querySelector("input") as HTMLInputElement;
+      this.toggle = this.querySelector("[data-search-toggle]") as HTMLButtonElement;
+      this.panel = this.querySelector("[data-search-panel]") as HTMLElement;
+      this.list = this.querySelector('[role="listbox"]') as HTMLUListElement;
+      this.status = this.querySelector("[data-search-status]") as HTMLElement;
+      this.optionTemplate = this.querySelector("[data-search-option]") as HTMLTemplateElement;
 
-      let pagefind: any;
-      let latestQuery = "";
+      this.input.addEventListener("focus", this.onFocus);
+      this.input.addEventListener("input", this.onInput);
+      this.input.addEventListener("keydown", this.onKeyDown);
+      this.addEventListener("focusout", this.onFocusOut);
+      this.panel.addEventListener("mousedown", this.onPanelMouseDown);
+      this.toggle.addEventListener("click", this.onToggle);
+      this.mobile.addEventListener("change", this.onBreakpoint);
+    }
 
-      function removeResults() {
-        while (searchResultsNode?.firstChild) {
-          searchResultsNode.removeChild(searchResultsNode.firstChild);
+    disconnectedCallback() {
+      this.mobile.removeEventListener("change", this.onBreakpoint);
+    }
+
+    private onToggle = () => {
+      this.setExpanded(true);
+      this.input.focus();
+    };
+
+    private onBreakpoint = () => {
+      this.setExpanded(false);
+    };
+
+    private setExpanded(isExpanded: boolean) {
+      this.dataset.expanded = String(isExpanded);
+      this.toggle.setAttribute("aria-expanded", String(isExpanded));
+    }
+
+    private onFocus = () => {
+      void loadPagefind().catch(() => undefined);
+      if (this.input.value.trim()) this.scheduleSearch();
+    };
+
+    private onInput = () => {
+      this.scheduleSearch();
+    };
+
+    private onFocusOut = (event: FocusEvent) => {
+      if (event.relatedTarget instanceof Node && this.contains(event.relatedTarget)) return;
+      this.close();
+      this.setExpanded(false);
+    };
+
+    private onPanelMouseDown = (event: MouseEvent) => {
+      if (event.button === 0) event.preventDefault();
+    };
+
+    private onKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "ArrowDown":
+          if (this.options.length === 0) return;
+          event.preventDefault();
+          this.setActive((this.activeIndex + 1) % this.options.length);
+          return;
+        case "ArrowUp":
+          if (this.options.length === 0) return;
+          event.preventDefault();
+          this.setActive(this.activeIndex <= 0 ? this.options.length - 1 : this.activeIndex - 1);
+          return;
+        case "Enter": {
+          const active = this.options[this.activeIndex];
+          if (!active) return;
+          event.preventDefault();
+          active.click();
+          return;
         }
+        case "Escape":
+          if (!this.panel.hidden) {
+            event.preventDefault();
+            this.close();
+            return;
+          }
+          if (this.mobile.matches && this.dataset.expanded === "true") {
+            event.preventDefault();
+            this.setExpanded(false);
+            this.toggle.focus();
+          }
+          return;
+      }
+    };
+
+    private scheduleSearch() {
+      window.clearTimeout(this.debounceTimer);
+      const query = this.input.value.trim();
+      this.latestQuery = query;
+
+      if (!query) {
+        this.close();
+        return;
       }
 
-      async function loadPagefind() {
-        if (!pagefind) {
-          pagefind = await import("/pagefind/pagefind.js");
-          await pagefind.init();
-        }
-        return pagefind;
-      }
+      this.debounceTimer = window.setTimeout(() => {
+        void this.runSearch(query);
+      }, DEBOUNCE_MS);
+    }
 
-      input?.addEventListener("input", async (event: Event) => {
-        const query = (event.target as HTMLInputElement).value;
-        latestQuery = query;
-
-        removeResults();
-        searchResultsNode.classList.add("hidden");
-        if (query.length === 0) return;
-
-        const engine = await loadPagefind();
-        const search = await engine.search(query);
-        const results = await Promise.all(
-          search.results.slice(0, 5).map((result: any) => result.data())
+    private async runSearch(query: string) {
+      let results: PagefindResultData[];
+      try {
+        const pagefind = await loadPagefind();
+        const response = await pagefind.search(query);
+        results = await Promise.all(
+          (response?.results ?? []).slice(0, MAX_RESULTS).map((result) => result.data())
         );
+      } catch {
+        if (this.latestQuery !== query) return;
+        this.render([], "Search is unavailable right now.");
+        return;
+      }
 
-        if (latestQuery !== query) return;
+      if (this.latestQuery !== query) return;
+      this.render(results, results.length === 0 ? `No posts match "${query}".` : "");
+    }
 
-        removeResults();
-        if (results.length === 0) return;
-        searchResultsNode.classList.remove("hidden");
+    private render(results: PagefindResultData[], message: string) {
+      const items = results.map((result, index) => this.createOption(result, index));
+      this.options = items.map((item) => item.querySelector("a") as HTMLAnchorElement);
+      this.list.replaceChildren(...items);
 
-        for (const result of results) {
-          const node = document.createElement("div");
-          node.addEventListener("mousedown", () => {
-            window.location.href = result.url;
-          });
-          node.classList.add(
-            "hover:bg-app-blue",
-            "hover:text-app-black",
-            "py-2",
-            "px-4"
-          );
-          node.textContent = result.meta.title;
-          searchResultsNode?.appendChild(node);
-        }
-      });
+      this.status.textContent = message;
+      this.status.hidden = message === "";
+      this.list.hidden = this.options.length === 0;
+      this.setActive(-1);
+      this.panel.hidden = false;
+      this.input.setAttribute("aria-expanded", String(this.options.length > 0));
+    }
 
-      input.addEventListener("blur", () => {
-        latestQuery = "";
-        searchResultsNode.classList.add("hidden");
-        removeResults();
-      });
+    private createOption(result: PagefindResultData, index: number): HTMLLIElement {
+      const fragment = this.optionTemplate.content.cloneNode(true) as DocumentFragment;
+      const item = fragment.querySelector("li") as HTMLLIElement;
+      const option = item.querySelector("a") as HTMLAnchorElement;
+
+      option.id = `search-option-${index}`;
+      option.href = result.url;
+      option.addEventListener("mousemove", () => this.setActive(index));
+      (item.querySelector("[data-title]") as HTMLElement).textContent = result.meta.title ?? result.url;
+      (item.querySelector("[data-excerpt]") as HTMLElement).append(...parseExcerpt(result.excerpt));
+
+      return item;
+    }
+
+    private setActive(index: number) {
+      this.options[this.activeIndex]?.setAttribute("aria-selected", "false");
+      this.activeIndex = index;
+
+      const active = this.options[index];
+      if (!active) {
+        this.input.removeAttribute("aria-activedescendant");
+        return;
+      }
+
+      active.setAttribute("aria-selected", "true");
+      active.scrollIntoView({ block: "nearest" });
+      this.input.setAttribute("aria-activedescendant", active.id);
+    }
+
+    private close() {
+      window.clearTimeout(this.debounceTimer);
+      this.latestQuery = "";
+      this.panel.hidden = true;
+      this.list.replaceChildren();
+      this.options = [];
+      this.setActive(-1);
+      this.input.setAttribute("aria-expanded", "false");
     }
   }
+
   customElements.define("astro-search", Search);
 </script>

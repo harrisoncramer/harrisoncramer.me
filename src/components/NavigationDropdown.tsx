@@ -1,51 +1,88 @@
-import React, { useRef, useState, useEffect, } from "react"
+import { useEffect, useRef, useState } from "react"
+import type { NavLink } from "./Header"
 
-const NavigationDropdown = (): JSX.Element => {
-  const dropdownRef = useRef(null)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+type NavigationDropdownProps = {
+  links: readonly NavLink[]
+  path: string
+}
 
-  const pageClickEvent = (e: React.MouseEvent) => {
-    if (dropdownRef.current?.contains(e.target)) {
-      setIsDropdownOpen(!isDropdownOpen)
-    } else {
-      setIsDropdownOpen(false)
-    }
-  }
+const MENU_ID = "mobile-navigation"
+
+const NavigationDropdown = ({ links, path }: NavigationDropdownProps): JSX.Element => {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-      window.addEventListener("click", pageClickEvent)
-    return () => {
-      window.removeEventListener("click", pageClickEvent)
+    if (!isOpen) return
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && containerRef.current?.contains(event.target)) return
+      setIsOpen(false)
     }
-  }, [isDropdownOpen])
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return
+      setIsOpen(false)
+      buttonRef.current?.focus()
+    }
+
+    const desktop = window.matchMedia("(min-width: 768px)")
+    const onBreakpoint = (event: MediaQueryListEvent) => {
+      if (event.matches) setIsOpen(false)
+    }
+
+    document.addEventListener("pointerdown", onPointerDown)
+    document.addEventListener("keydown", onKeyDown)
+    desktop.addEventListener("change", onBreakpoint)
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown)
+      document.removeEventListener("keydown", onKeyDown)
+      desktop.removeEventListener("change", onBreakpoint)
+    }
+  }, [isOpen])
 
   return (
-    <nav>
-      <button aria-label="Navigation button">
-        <svg
-          ref={dropdownRef}
-          className="cursor-pointer"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill='white'
-        >
-          <path d="M4 22h-4v-4h4v4zm0-12h-4v4h4v-4zm0-8h-4v4h4v-4zm3 0v4h17v-4h-17zm0 12h17v-4h-17v4zm0 8h17v-4h-17v4z" />
-        </svg>
+    <div ref={containerRef}>
+      <button
+        ref={buttonRef}
+        type="button"
+        className="relative flex h-10 w-10 items-center justify-center rounded-sm text-app-white outline-none hover:bg-app-background-light focus-visible:bg-app-background-light"
+        aria-label="Menu"
+        aria-expanded={isOpen}
+        aria-controls={MENU_ID}
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        <span
+          aria-hidden="true"
+          className={`absolute h-0.5 w-5 bg-app-white transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? "rotate-45" : "-translate-y-1.5"}`}
+        />
+        <span
+          aria-hidden="true"
+          className={`absolute h-0.5 w-5 bg-app-white transition-opacity duration-150 ${isOpen ? "opacity-0" : "opacity-100"}`}
+        />
+        <span
+          aria-hidden="true"
+          className={`absolute h-0.5 w-5 bg-app-white transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? "-rotate-45" : "translate-y-1.5"}`}
+        />
       </button>
-      <ul className={`mt-4 w-48 absolute transition-opacity overflow-hidden ${!isDropdownOpen ? 'opacity-0' : 'opacity-100 shadow-app-background-light shadow-md'} bg-app-black text-app-white shadow rounded-md`}>
-        <li>
-          <a className={`block text-lg relative hover:bg-app-background-light text-app-white ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full` } href="/"><h3>Blog</h3></a>
-        </li>
-        <li>
-          <a className={`block text-lg relative hover:bg-app-background-light text-app-white border-t border-b border-app-background-dark ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full` } href="/about"><h3>About</h3></a>
-        </li>
-        <li>
-          <a className={`block text-lg relative hover:bg-app-background-light text-app-white ${isDropdownOpen && 'cursor-pointer'} px-4 py-2 w-full pb-4` } href="/contact"><h3>Contact</h3></a>
-        </li>
+      <ul
+        id={MENU_ID}
+        className={`absolute left-0 right-0 top-full border-y border-app-background-medium bg-app-black pb-3 pt-2 shadow-3xl ${isOpen ? "visible [clip-path:inset(0_0_-1rem_0)] [transition:clip-path_220ms_cubic-bezier(0.16,1,0.3,1),visibility_0s]" : "invisible [clip-path:inset(0_0_100%_0)] [transition:clip-path_160ms_cubic-bezier(0.7,0,0.84,0),visibility_0s_160ms]"}`}
+      >
+        {links.map((link) => (
+          <li key={link.href}>
+            <a
+              href={link.href}
+              aria-current={link.href === path ? "page" : undefined}
+              className="block px-4 py-2.5 font-['Playfair_Display'] text-base text-app-white hover:bg-app-background-light aria-[current=page]:text-app-blue"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
       </ul>
-    </nav>
+    </div>
   )
 }
 
