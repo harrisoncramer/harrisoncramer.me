@@ -68,14 +68,14 @@ const NavigationDropdown = ({ links, path }: NavigationDropdownProps): JSX.Eleme
       </button>
       <ul
         id={MENU_ID}
-        className={`absolute left-0 right-0 top-full border-t border-app-background-medium bg-app-black shadow-md ${isOpen ? "visible [clip-path:inset(0_0_-1rem_0)] [transition:clip-path_220ms_cubic-bezier(0.16,1,0.3,1),visibility_0s]" : "invisible [clip-path:inset(0_0_100%_0)] [transition:clip-path_160ms_cubic-bezier(0.7,0,0.84,0),visibility_0s_160ms]"}`}
+        className={`absolute left-0 right-0 top-full border-y border-app-background-medium bg-app-black pb-3 pt-2 shadow-3xl ${isOpen ? "visible [clip-path:inset(0_0_-1rem_0)] [transition:clip-path_220ms_cubic-bezier(0.16,1,0.3,1),visibility_0s]" : "invisible [clip-path:inset(0_0_100%_0)] [transition:clip-path_160ms_cubic-bezier(0.7,0,0.84,0),visibility_0s_160ms]"}`}
       >
         {links.map((link) => (
           <li key={link.href}>
             <a
               href={link.href}
               aria-current={link.href === path ? "page" : undefined}
-              className="block px-6 py-4 font-['Playfair_Display'] text-lg text-app-white hover:bg-app-background-light aria-[current=page]:text-app-blue"
+              className="block px-4 py-2.5 font-['Playfair_Display'] text-base text-app-white hover:bg-app-background-light aria-[current=page]:text-app-blue"
             >
               {link.label}
             </a>

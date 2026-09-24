@@ -1,23 +1,11 @@
 ---
 import "@fontsource/lora";
 import "@fontsource/playfair-display";
-import "@fontsource/raleway";
 
 import Header from "../components/Header";
 import Search from "../components/Search.astro";
 import "normalize.css";
 const { title, description } = Astro.props;
-
-let stars: number | null = null;
-try {
-  const response = await fetch(
-    "https://api.github.com/repos/harrisoncramer/harrisoncramer.me"
-  );
-  const json = await response.json();
-  if (typeof json.watchers_count === "number") {
-    stars = json.watchers_count;
-  }
-} catch {}
 ---
 
 <html lang="en">
@@ -28,7 +16,7 @@ try {
     <title>{title}</title>
   </head>
   <body>
-    <Header client:load stars={stars} path={Astro.url.pathname}>
+    <Header client:load path={Astro.url.pathname}>
       <Search />
     </Header>
     <div class="content-wrapper">
